@@ -1,0 +1,262 @@
+Array
+(
+    [GLOBALS] => Array
+ *RECURSION*
+    [_POST] => Array
+        (
+            [recipient] => vacation@zipiyo.com
+            [sender] => sanjay@gmail.com
+            [subject] => Fwd: test
+            [from] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Received] => by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:02:05 -0700 (PDT)
+            [X-Envelope-From] => <sanjay@gmail.com>
+            [Dkim-Signature] => v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=aE5VNzlL6pgn1k3hOb4m1tBFhGI+vonRg+AxLXwrwhE=; b=d4xfK4rribhBaXh9DP1ihYELY95lpEyjJ525zODAHnAWhzPsNprrlKaFC8VjCQm/Li OLONm8+TY4hGqnjib8EbZZQl2S+KrJiXpXzpuIt8PP6WCQHHh9isCyUPynQ9VCPf+1eh FcBgbxFYwd3g5/CPjm/QL8qa1+zjuraRmoxSojeV0lr5F45CS9il6Gz5L4SfHkHLrljl 4iC4yHD6TXr8/YzeWvPliJYt46RTCz5Ldyb5UvfoFAaCvjuXBtRtWtKAMJNb1Dr9kETd XhyyUHYfGYidunwq0GwlGO/dWkAqQqsk9gkWqmyrHASHsGkq1F+8UesZeri6xyDxX9FY T/MQ==
+            [In-Reply-To] => <CAOrZzwHwkieFx-dHcC6ez2xxV4zD6fsMic0YD_7NGwc0sFKZJg@mail.gmail.com>
+            [References] => <CAOrZzwHwkieFx-dHcC6ez2xxV4zD6fsMic0YD_7NGwc0sFKZJg@mail.gmail.com>
+            [From] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Date] => Tue, 8 May 2012 17:02:05 -0700
+            [Message-Id] => <CAOrZzwGy+1C+-oFKaGdoDyOZ6saOUsC5u6migKMv4EjwKgRH8A@mail.gmail.com>
+            [Subject] => Fwd: test
+            [To] => vacation <vacation@zipiyo.com>
+            [message-headers] => [["Received", "by luna.mailgun.net with SMTP mgrt 8158881; Wed, 09 May 2012 00:02:27 +0000"], ["X-Envelope-From", "<sanjay@gmail.com>"], ["Received", "from mail-bk0-f49.google.com (mail-bk0-f49.google.com [209.85.214.49]) by mxa.mailgun.org with ESMTP id 4fa9b413.4d7d4b0-luna; Wed, 09 May 2012 00:02:27 -0000 (UTC)"], ["Received", "by bkwj4 with SMTP id j4so6788258bkw.36 for <vacation@zipiyo.com>; Tue, 08 May 2012 17:02:25 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=aE5VNzlL6pgn1k3hOb4m1tBFhGI+vonRg+AxLXwrwhE=; b=d4xfK4rribhBaXh9DP1ihYELY95lpEyjJ525zODAHnAWhzPsNprrlKaFC8VjCQm/Li OLONm8+TY4hGqnjib8EbZZQl2S+KrJiXpXzpuIt8PP6WCQHHh9isCyUPynQ9VCPf+1eh FcBgbxFYwd3g5/CPjm/QL8qa1+zjuraRmoxSojeV0lr5F45CS9il6Gz5L4SfHkHLrljl 4iC4yHD6TXr8/YzeWvPliJYt46RTCz5Ldyb5UvfoFAaCvjuXBtRtWtKAMJNb1Dr9kETd XhyyUHYfGYidunwq0GwlGO/dWkAqQqsk9gkWqmyrHASHsGkq1F+8UesZeri6xyDxX9FY T/MQ=="], ["Received", "by 10.205.137.14 with SMTP id im14mr7770355bkc.137.1336521745433; Tue, 08 May 2012 17:02:25 -0700 (PDT)"], ["Received", "by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:02:05 -0700 (PDT)"], ["In-Reply-To", "<CAOrZzwHwkieFx-dHcC6ez2xxV4zD6fsMic0YD_7NGwc0sFKZJg@mail.gmail.com>"], ["References", "<CAOrZzwHwkieFx-dHcC6ez2xxV4zD6fsMic0YD_7NGwc0sFKZJg@mail.gmail.com>"], ["From", "\"Sanjay G. Mavinkurve\" <sanjay@gmail.com>"], ["Date", "Tue, 8 May 2012 17:02:05 -0700"], ["Message-Id", "<CAOrZzwGy+1C+-oFKaGdoDyOZ6saOUsC5u6migKMv4EjwKgRH8A@mail.gmail.com>"], ["Subject", "Fwd: test"], ["To", "vacation <vacation@zipiyo.com>"]]
+            [timestamp] => 1336521747
+            [token] => 6gwj71isze4pvrfgh-l53mhnfzrvehcjzxqlnp-3j2zuqd6cl3
+            [signature] => b0ea410af4ed03935020887e1a83b1e01b7064d4ff37f8f9a618e5fb034f335b
+            [body-plain] => 
+
+            [body-html] => <br>
+
+            [stripped-html] => <br>
+
+            [attachment-count] => 1
+        )
+
+    [_GET] => Array
+        (
+        )
+
+    [_COOKIE] => Array
+        (
+        )
+
+    [_FILES] => Array
+        (
+            [attachment-1] => Array
+                (
+                    [name] => Hawaii_Generic.jpg
+                    [type] => image/jpeg
+                    [tmp_name] => /tmp/phpH89VdK
+                    [error] => 0
+                    [size] => 80465
+                )
+
+        )
+
+    [f] => Resource id #3
+)
+Array
+(
+    [GLOBALS] => Array
+ *RECURSION*
+    [_POST] => Array
+        (
+            [recipient] => vacation@zipiyo.com
+            [sender] => sanjay@gmail.com
+            [subject] => Fwd: test
+            [from] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Received] => by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:11:12 -0700 (PDT)
+            [X-Envelope-From] => <sanjay@gmail.com>
+            [Dkim-Signature] => v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=zgJjW3Wke7rrsDvwvMyhzK+9wEhM1UkxDJGqjdIgMms=; b=eTMO4d7i61naz2+Qik5f8cdBvyU34LIje+taERn+Q0ry9NAZOiBHH98mduRS9WgBVy N/xmqUMEc+yzvJqVxdcXnsxWoNFbreZUI2KjFYkAWeuibA7EiV0JNIxljhkH8BdikOO2 G37B9lAqfo6gFymFTIf/UQJLDm8ZaPrCwtGadAz6nYTFfv9X1//N+g0S63kFSQ9PcoOz zRTHgfmxO6yYPo9EYAAZojMPaKlKVp7p1XNp5XVu6imZtX08wLAOepd5jd6CJQ1ph42r 6iN8rEDf+uDHLiFhsCL2giHIbCYLICAdciRid67Im3kTE/q0KO8hm47oSDFLT6VlGJPA ufeg==
+            [In-Reply-To] => <CAOrZzwGeM1Sby9xqNHuTx4XuksBXNjNVGFvcxrERJ+5AAmmxjw@mail.gmail.com>
+            [References] => <CAOrZzwGeM1Sby9xqNHuTx4XuksBXNjNVGFvcxrERJ+5AAmmxjw@mail.gmail.com>
+            [From] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Date] => Tue, 8 May 2012 17:11:12 -0700
+            [Message-Id] => <CAOrZzwHK_0shhPg3n7KZ6X=uXv9SMQfMSWk+8n-SD41ya=OVaQ@mail.gmail.com>
+            [Subject] => Fwd: test
+            [To] => vacation <vacation@zipiyo.com>
+            [message-headers] => [["Received", "by luna.mailgun.net with SMTP mgrt -911173914; Wed, 09 May 2012 00:11:34 +0000"], ["X-Envelope-From", "<sanjay@gmail.com>"], ["Received", "from mail-bk0-f49.google.com (mail-bk0-f49.google.com [209.85.214.49]) by mxa.mailgun.org with ESMTP id 4fa9b636.751c370-luna; Wed, 09 May 2012 00:11:34 -0000 (UTC)"], ["Received", "by bkwj4 with SMTP id j4so6793593bkw.36 for <vacation@zipiyo.com>; Tue, 08 May 2012 17:11:32 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=zgJjW3Wke7rrsDvwvMyhzK+9wEhM1UkxDJGqjdIgMms=; b=eTMO4d7i61naz2+Qik5f8cdBvyU34LIje+taERn+Q0ry9NAZOiBHH98mduRS9WgBVy N/xmqUMEc+yzvJqVxdcXnsxWoNFbreZUI2KjFYkAWeuibA7EiV0JNIxljhkH8BdikOO2 G37B9lAqfo6gFymFTIf/UQJLDm8ZaPrCwtGadAz6nYTFfv9X1//N+g0S63kFSQ9PcoOz zRTHgfmxO6yYPo9EYAAZojMPaKlKVp7p1XNp5XVu6imZtX08wLAOepd5jd6CJQ1ph42r 6iN8rEDf+uDHLiFhsCL2giHIbCYLICAdciRid67Im3kTE/q0KO8hm47oSDFLT6VlGJPA ufeg=="], ["Received", "by 10.205.137.17 with SMTP id im17mr3809011bkc.9.1336522292569; Tue, 08 May 2012 17:11:32 -0700 (PDT)"], ["Received", "by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:11:12 -0700 (PDT)"], ["In-Reply-To", "<CAOrZzwGeM1Sby9xqNHuTx4XuksBXNjNVGFvcxrERJ+5AAmmxjw@mail.gmail.com>"], ["References", "<CAOrZzwGeM1Sby9xqNHuTx4XuksBXNjNVGFvcxrERJ+5AAmmxjw@mail.gmail.com>"], ["From", "\"Sanjay G. Mavinkurve\" <sanjay@gmail.com>"], ["Date", "Tue, 8 May 2012 17:11:12 -0700"], ["Message-Id", "<CAOrZzwHK_0shhPg3n7KZ6X=uXv9SMQfMSWk+8n-SD41ya=OVaQ@mail.gmail.com>"], ["Subject", "Fwd: test"], ["To", "vacation <vacation@zipiyo.com>"]]
+            [timestamp] => 1336522294
+            [token] => 6csf8dbobucu0oevvi7t7ptdtwavfnaabi8qa7qg955fuhgoa2
+            [signature] => 9cf1bca2b733aac173268bab9107cd3f8e6115b2157898999fea67352a66efaa
+            [body-plain] => Sanjay (संजय)
+
+**********        *********       ******    *****   ****  s h r i  r a m *
+
+
+---------- Forwarded message ----------
+From: Sanjay G. Mavinkurve <sanjay@gmail.com>
+Date: Tue, May 8, 2012 at 11:40 AM
+Subject: test
+To: vacation <vacation@zipiyo.com>
+
+
+test
+
+            [stripped-signature] => 
+---------- Forwarded message ----------
+            [stripped-text] => Sanjay (संजय)
+
+**********        *********       ******    *****   ****  s h r i  r a m *
+
+            [body-html] => <br clear="all">Sanjay (संजय)<br><br>**********&nbsp; &nbsp; &nbsp; &nbsp; *********&nbsp; &nbsp; &nbsp;&nbsp; ******&nbsp; &nbsp; *****&nbsp;&nbsp; ****&nbsp; s h r i&nbsp; r a m *<br>
+<br><br><div class="gmail_quote">---------- Forwarded message ----------<br>From: <b class="gmail_sendername">Sanjay G. Mavinkurve</b> <span dir="ltr">&lt;<a href="mailto:sanjay@gmail.com">sanjay@gmail.com</a>&gt;</span><br>
+
+Date: Tue, May 8, 2012 at 11:40 AM<br>Subject: test<br>To: vacation &lt;<a href="mailto:vacation@zipiyo.com">vacation@zipiyo.com</a>&gt;<br><br><br>test
+</div><br>
+
+            [stripped-html] => <html><body><br clear="all">Sanjay (&#2360;&#2306;&#2332;&#2351;)<br><br>**********&#160; &#160; &#160; &#160; *********&#160; &#160; &#160;&#160; ******&#160; &#160; *****&#160;&#160; ****&#160; s h r i&#160; r a m *<br><br><br><br></body></html>
+            [attachment-count] => 1
+        )
+
+    [_GET] => Array
+        (
+        )
+
+    [_COOKIE] => Array
+        (
+        )
+
+    [_FILES] => Array
+        (
+            [attachment-1] => Array
+                (
+                    [name] => Hawaii_Generic.jpg
+                    [type] => image/jpeg
+                    [tmp_name] => /tmp/phpO45T00
+                    [error] => 0
+                    [size] => 80465
+                )
+
+        )
+
+    [f] => Resource id #3
+)
+Array
+(
+    [GLOBALS] => Array
+ *RECURSION*
+    [_POST] => Array
+        (
+            [recipient] => vacation@zipiyo.com
+            [sender] => sanjay@gmail.com
+            [subject] => Fwd: test
+            [from] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Received] => by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:12:16 -0700 (PDT)
+            [X-Envelope-From] => <sanjay@gmail.com>
+            [Dkim-Signature] => v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=+JmSyRL6ESywE50Yy2BtG3v1nVue7pHh1/ZG4zL7Aak=; b=FLsnGvmpP/FGCHkIF5o9Z/lNsWohGyaUj5dYdFIkAZUkwFBUis5teNCBSrMCOPYlZ3 MSGUHu5J/pLNRLq8MLoXrksCm+uTu2jZhhT0Q77Djx3CWPtci65oIZpiEtnecpU7S3bZ Fm4iemEOykMI/6Psq3tizI93zlxli90JBNWCaLHYcMy+28ZgkRDTlrHisWIaC1FPmEHA fbdPvIw99UDVPOGhW35nQ0wZcLtlMSt00VDnzKcGFw48jBhOW9ljS6cGJNd8UZCX0G3m 7t4rOGa0VAuYF0QgAjMz954oZoPbAjhYNBZ0MyyA88/XASamjMj7I3Okq0UcmN+QpibG p6KQ==
+            [In-Reply-To] => <CAOrZzwFyY8RxToYNPjjrtF9+JstYNEz1B4_VrCGebr81CtwK9Q@mail.gmail.com>
+            [References] => <CAOrZzwFyY8RxToYNPjjrtF9+JstYNEz1B4_VrCGebr81CtwK9Q@mail.gmail.com>
+            [From] => "Sanjay G. Mavinkurve" <sanjay@gmail.com>
+            [Date] => Tue, 8 May 2012 17:12:16 -0700
+            [Message-Id] => <CAOrZzwETK3k8r2pdLGVLsT1rf=i7Df84X3m51_dnXhY6feoF=w@mail.gmail.com>
+            [Subject] => Fwd: test
+            [To] => vacation <vacation@zipiyo.com>
+            [message-headers] => [["Received", "by luna.mailgun.net with SMTP mgrt 5768885; Wed, 09 May 2012 00:12:40 +0000"], ["X-Envelope-From", "<sanjay@gmail.com>"], ["Received", "from mail-bk0-f49.google.com (mail-bk0-f49.google.com [209.85.214.49]) by mxa.mailgun.org with ESMTP id 4fa9b678.5248630-luna3; Wed, 09 May 2012 00:12:40 -0000 (UTC)"], ["Received", "by bkwj4 with SMTP id j4so6794214bkw.36 for <vacation@zipiyo.com>; Tue, 08 May 2012 17:12:38 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:in-reply-to:references:from:date:message-id:subject:to :content-type; bh=+JmSyRL6ESywE50Yy2BtG3v1nVue7pHh1/ZG4zL7Aak=; b=FLsnGvmpP/FGCHkIF5o9Z/lNsWohGyaUj5dYdFIkAZUkwFBUis5teNCBSrMCOPYlZ3 MSGUHu5J/pLNRLq8MLoXrksCm+uTu2jZhhT0Q77Djx3CWPtci65oIZpiEtnecpU7S3bZ Fm4iemEOykMI/6Psq3tizI93zlxli90JBNWCaLHYcMy+28ZgkRDTlrHisWIaC1FPmEHA fbdPvIw99UDVPOGhW35nQ0wZcLtlMSt00VDnzKcGFw48jBhOW9ljS6cGJNd8UZCX0G3m 7t4rOGa0VAuYF0QgAjMz954oZoPbAjhYNBZ0MyyA88/XASamjMj7I3Okq0UcmN+QpibG p6KQ=="], ["Received", "by 10.205.137.17 with SMTP id im17mr3810007bkc.9.1336522358316; Tue, 08 May 2012 17:12:38 -0700 (PDT)"], ["Received", "by 10.204.70.2 with HTTP; Tue, 8 May 2012 17:12:16 -0700 (PDT)"], ["In-Reply-To", "<CAOrZzwFyY8RxToYNPjjrtF9+JstYNEz1B4_VrCGebr81CtwK9Q@mail.gmail.com>"], ["References", "<CAOrZzwFyY8RxToYNPjjrtF9+JstYNEz1B4_VrCGebr81CtwK9Q@mail.gmail.com>"], ["From", "\"Sanjay G. Mavinkurve\" <sanjay@gmail.com>"], ["Date", "Tue, 8 May 2012 17:12:16 -0700"], ["Message-Id", "<CAOrZzwETK3k8r2pdLGVLsT1rf=i7Df84X3m51_dnXhY6feoF=w@mail.gmail.com>"], ["Subject", "Fwd: test"], ["To", "vacation <vacation@zipiyo.com>"]]
+            [timestamp] => 1336522360
+            [token] => 0ilxm9fvv3pmkuukaa4kbpcwq4z8imafe-3e6c-7jiuc4xgx67
+            [signature] => e7046b05162fab240cf8f9ad3e1f041ed3fee16acabb7948d4e7eea421099a1f
+            [body-plain] => Sanjay (संजय)
+
+**********        *********       ******    *****   ****  s h r i  r a m *
+
+
+---------- Forwarded message ----------
+From: Sanjay G. Mavinkurve <sanjay@gmail.com>
+Date: Tue, May 8, 2012 at 11:42 AM
+Subject: test
+To: vacation <vacation@zipiyo.com>
+
+
+test
+
+            [stripped-signature] => 
+---------- Forwarded message ----------
+            [stripped-text] => Sanjay (संजय)
+
+**********        *********       ******    *****   ****  s h r i  r a m *
+
+            [body-html] => <br clear="all">Sanjay (संजय)<br><br>**********&nbsp; &nbsp; &nbsp; &nbsp; *********&nbsp; &nbsp; &nbsp;&nbsp; ******&nbsp; &nbsp; *****&nbsp;&nbsp; ****&nbsp; s h r i&nbsp; r a m *<br>
+<br><br><div class="gmail_quote">---------- Forwarded message ----------<br>From: <b class="gmail_sendername">Sanjay G. Mavinkurve</b> <span dir="ltr">&lt;<a href="mailto:sanjay@gmail.com">sanjay@gmail.com</a>&gt;</span><br>
+
+Date: Tue, May 8, 2012 at 11:42 AM<br>Subject: test<br>To: vacation &lt;<a href="mailto:vacation@zipiyo.com">vacation@zipiyo.com</a>&gt;<br><br><br>test
+</div><br>
+
+            [stripped-html] => <html><body><br clear="all">Sanjay (&#2360;&#2306;&#2332;&#2351;)<br><br>**********&#160; &#160; &#160; &#160; *********&#160; &#160; &#160;&#160; ******&#160; &#160; *****&#160;&#160; ****&#160; s h r i&#160; r a m *<br><br><br><br></body></html>
+            [attachment-count] => 1
+        )
+
+    [_GET] => Array
+        (
+        )
+
+    [_COOKIE] => Array
+        (
+        )
+
+    [_FILES] => Array
+        (
+            [attachment-1] => Array
+                (
+                    [name] => Hawaii_Generic.jpg
+                    [type] => image/jpeg
+                    [tmp_name] => /tmp/phpGsRqvb
+                    [error] => 0
+                    [size] => 80465
+                )
+
+        )
+
+    [f] => Resource id #3
+)
+Array
+(
+    [GLOBALS] => Array
+ *RECURSION*
+    [_POST] => Array
+        (
+            [recipient] => vacation@zipiyo.com
+            [sender] => vijayb@gmail.com
+            [from] => Vijay Boyapati <vijayb@gmail.com>
+            [Received] => by 10.231.229.9 with HTTP; Tue, 8 May 2012 17:14:15 -0700 (PDT)
+            [X-Envelope-From] => <vijayb@gmail.com>
+            [Dkim-Signature] => v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:date:message-id:subject:from:to:content-type; bh=mwb0XWrSlQKWVW86YY8qw/VezaF7OFheEaDGWpQIMNU=; b=gsIVEeMnTK2zK2BZkLopF70G+ehv7tswtWGy8SnyGe+mHu0PvUg+jCm3e1KZFD28DN uw+sMDY6m2j4iGne5B9ChsOwnN/uMnn29gMyQd07CALTAjmC3O8VDgxD7RCLEz33lNRr buzzyvL5vvrF7ksedoOsHr414Jezeczl0l2bm/6j1MSyPA18wyREtbRwXrrox7433OVb yPUedHKOdjuKaAN0I45JVHsVo6WgADdz1LQ00reyCygJAMh79wuEpaAxfVcnARJGmdwP pKYKmffZQVS8AanPQ0J81SNBHEiqmDsTmaZMasHtZppzk009zTKR94DrXIT/S49wtjzW 2mtQ==
+            [Date] => Tue, 8 May 2012 17:14:15 -0700
+            [Message-Id] => <CAKtWZ_NeuBVCBBtsQH118NbLQnbaW8_y68xc92ad1VLTbOPRKA@mail.gmail.com>
+            [From] => Vijay Boyapati <vijayb@gmail.com>
+            [To] => vacation@zipiyo.com
+            [message-headers] => [["Received", "by luna.mailgun.net with SMTP mgrt 3247929; Wed, 09 May 2012 00:14:19 +0000"], ["X-Envelope-From", "<vijayb@gmail.com>"], ["Received", "from mail-yx0-f177.google.com (mail-yx0-f177.google.com [209.85.213.177]) by mxa.mailgun.org with ESMTP id 4fa9b6da.77c76b0-luna; Wed, 09 May 2012 00:14:18 -0000 (UTC)"], ["Received", "by yenr9 with SMTP id r9so4040031yen.36 for <vacation@zipiyo.com>; Tue, 08 May 2012 17:14:16 -0700 (PDT)"], ["Dkim-Signature", "v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20120113; h=mime-version:date:message-id:subject:from:to:content-type; bh=mwb0XWrSlQKWVW86YY8qw/VezaF7OFheEaDGWpQIMNU=; b=gsIVEeMnTK2zK2BZkLopF70G+ehv7tswtWGy8SnyGe+mHu0PvUg+jCm3e1KZFD28DN uw+sMDY6m2j4iGne5B9ChsOwnN/uMnn29gMyQd07CALTAjmC3O8VDgxD7RCLEz33lNRr buzzyvL5vvrF7ksedoOsHr414Jezeczl0l2bm/6j1MSyPA18wyREtbRwXrrox7433OVb yPUedHKOdjuKaAN0I45JVHsVo6WgADdz1LQ00reyCygJAMh79wuEpaAxfVcnARJGmdwP pKYKmffZQVS8AanPQ0J81SNBHEiqmDsTmaZMasHtZppzk009zTKR94DrXIT/S49wtjzW 2mtQ=="], ["Received", "by 10.50.51.163 with SMTP id l3mr11771994igo.3.1336522455809; Tue, 08 May 2012 17:14:15 -0700 (PDT)"], ["Received", "by 10.231.229.9 with HTTP; Tue, 8 May 2012 17:14:15 -0700 (PDT)"], ["Date", "Tue, 8 May 2012 17:14:15 -0700"], ["Message-Id", "<CAKtWZ_NeuBVCBBtsQH118NbLQnbaW8_y68xc92ad1VLTbOPRKA@mail.gmail.com>"], ["Subject", ""], ["From", "Vijay Boyapati <vijayb@gmail.com>"], ["To", "vacation@zipiyo.com"]]
+            [timestamp] => 1336522460
+            [token] => 16iytcs76-xd2-tkkcj3kzlgykwaxklwyvaikr45ln3h2u01f1
+            [signature] => edc8666fa091f674e9d3370661387dc088b3e8113ebdcf76155f6b1d519c0728
+            [body-plain] => 
+
+            [body-html] => <br>
+
+            [stripped-html] => <br>
+
+            [attachment-count] => 1
+        )
+
+    [_GET] => Array
+        (
+        )
+
+    [_COOKIE] => Array
+        (
+        )
+
+    [_FILES] => Array
+        (
+            [attachment-1] => Array
+                (
+                    [name] => vij.jpg
+                    [type] => image/jpeg
+                    [tmp_name] => /tmp/php7SHr4f
+                    [error] => 0
+                    [size] => 42034
+                )
+
+        )
+
+    [f] => Resource id #3
+)
