@@ -1,8 +1,0 @@
-[08-May-2012 23:42:38 UTC] PHP Warning:  move_uploaded_file(/attachments/Hawaii_Generic.jpg): failed to open stream: No such file or directory in /var/www/uploadFile.php on line 22
-[08-May-2012 23:42:38 UTC] PHP Warning:  move_uploaded_file(): Unable to move '/tmp/php9afTnZ' to '/attachments/Hawaii_Generic.jpg' in /var/www/uploadFile.php on line 22
-[08-May-2012 23:45:11 UTC] PHP Warning:  move_uploaded_file(/attachments/Hawaii_Generic.jpg): failed to open stream: No such file or directory in /var/www/uploadFile.php on line 22
-[08-May-2012 23:45:11 UTC] PHP Warning:  move_uploaded_file(): Unable to move '/tmp/php0mWW60' to '/attachments/Hawaii_Generic.jpg' in /var/www/uploadFile.php on line 22
-[08-May-2012 23:47:39 UTC] PHP Warning:  move_uploaded_file(/attachments/Hawaii_Generic.jpg): failed to open stream: Permission denied in /var/www/uploadFile.php on line 22
-[08-May-2012 23:47:39 UTC] PHP Warning:  move_uploaded_file(): Unable to move '/tmp/php4xOZbm' to '/attachments/Hawaii_Generic.jpg' in /var/www/uploadFile.php on line 22
-[08-May-2012 23:52:07 UTC] PHP Warning:  move_uploaded_file(/attachments/Hawaii_Generic.jpg): failed to open stream: No such file or directory in /var/www/uploadFile.php on line 22
-[08-May-2012 23:52:07 UTC] PHP Warning:  move_uploaded_file(): Unable to move '/tmp/phpelSM7R' to '/attachments/Hawaii_Generic.jpg' in /var/www/uploadFile.php on line 22

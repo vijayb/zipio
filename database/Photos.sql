@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `Photos` (
   `caption` varchar(1000) DEFAULT NULL,
   `width` int(11) NOT NULL,
   `height` int(11) NOT NULL,
-  `visible` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `s3_url_hash` (`s3_url_hash`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
@@ -30,4 +29,3 @@ CREATE TRIGGER `photostrigger` BEFORE INSERT ON `Photos`
     NEW.s3_url_hash = UNHEX(SHA1(NEW.s3_url))
 //
 DELIMITER ;
-
