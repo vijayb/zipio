@@ -26,7 +26,7 @@ $query = "INSERT INTO Permissions (
             '$user_id',
             '$album_id'
           ) ON DUPLICATE KEY UPDATE id=id";
-print($query);
+debug($query);
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 
@@ -37,9 +37,11 @@ if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 
 $photos_array = get_photos_info($album_id);
 
+
 for ($i = 0; $i < count($photos_array); $i++) {
     if ($photos_array[$i]["user_id"] == $user_id) {
-        $query = "UPDATE AlbumPhotos SET visible=1 WHERE id=$user_id";
+        $query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_id=" . $photos_array[$i]["id"];
+	debug($query);
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
     }

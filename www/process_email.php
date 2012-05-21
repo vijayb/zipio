@@ -1,5 +1,16 @@
 <?php
 
+/*
+TRUNCATE TABLE AlbumPhotos;
+TRUNCATE TABLE Permissions;
+TRUNCATE TABLE Albums;
+TRUNCATE TABLE Friends;
+TRUNCATE TABLE Photos;
+TRUNCATE TABLE Users;
+*/
+
+ob_start();
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -12,13 +23,16 @@ print("<br><br>");
 $sender = $_POST["sender"];
 $recipient = $_POST["recipient"];
 
+//$confirmation_number = rand_string(5);
+//send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email called", "Hi!");
+
 if (!class_exists('S3')) require_once 'S3.php';
 if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
 if (!defined('awsSecretKey')) define('awsSecretKey', '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');
 
 $s3 = new S3(awsAccessKey, awsSecretKey);
 $s3_root = "https://s3.amazonaws.com/zipio_photos";
-$www_root = "http://localhost";
+$www_root = "http://ec2-107-22-123-149.compute-1.amazonaws.com";
 
 // First, check if this user exists
 
@@ -68,9 +82,6 @@ debug("target_album_handle: " . $target_album_handle . "\n");
 
 $path_to_photo = $_FILES["attachment-1"]["tmp_name"];
 
-
-
-
 // Check if target user is specified explicitly (e.g., ...@alex.zipio.com)
 if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
     $target_userstring = $matches[1];
@@ -81,25 +92,24 @@ if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
 }
 
 
-
-
-
-
 $target_album_id = album_exists($target_album_handle, $target_user_id);
 $target_user_info = get_user_info($target_user_id);
 $user_info = get_user_info($user_id);
 
 
 // At this point, we have:
-//  $user_id
-//      The ID of the user who submitted the photo
+//  $user_info
+//      The info of the user who submitted the photo
+//  $target_user_info
+//      The info of the user whose album the user is trying to write to. This
+//      is set even if the user is submitting to his own album.
 //  $target_album_id
 //      The ID of the album to add the photo to IF IT EXISTS. If it doesn't
 //      exist, this variable is -1 and a new album will be created later.
 
 // The different ways to add a photo:
 //  Add to own existing album
-//  Add to own new album
+//  Create a new album and add a photo to it
 //  Add to friend's album
 //  Add to not-yet-friend's album
 
@@ -112,13 +122,16 @@ if ($target_album_id > 0) {
     debug("Target album has ID $target_album_id");
 
     if ($target_user_id == $user_id) {
-        // User is adding to own album
+        // User is adding a photo to own existing album
         debug("User is adding to his own album.");
         add_photo($user_id, $target_album_id, 1, $path_to_photo);
 
         $user_email_body = <<<EMAIL
-        You added a photo to your {$target_album_info["handle"]} album.
-        <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            You added a photo to your <b>{$target_album_info["handle"]}</b> album.
+            <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            <br><br>
+            Let your buddies add photos to this album! Tell them to email their photos to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipiyo.com</b> (don't worry, we'll ask you to approve each person who tries to add a photo).
+
 EMAIL;
         debug($user_email_body);
 
@@ -139,21 +152,22 @@ EMAIL;
 
 
             $user_email_body = <<<EMAIL
-            You tried to add a photo to {$target_user_info["username"]}'s (that's {$target_user_info["email"]}) {$target_album_info["handle"]} album.
-            Your photo will appear in the album once {$target_user_info["username"]} approves you.
-            <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
+                You tried to add a photo to {$target_user_info["username"]}'s (that's {$target_user_info["email"]}) {$target_album_info["handle"]} album.
+                <br><br>
+                Your photo will appear in the album once {$target_user_info["username"]} approves you.
+                <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
 EMAIL;
             debug($user_email_body);
 
 
-            $target_email_body = <<<EMAIL
-            {$user_info["email"]} tried to post a photo to your {$target_album_info["handle"]} album.
-            Is that okay?
-            <a href='$www_root/grant_write_permission.php?album_id={$target_album_id}&album_token={$target_album_info["token"]}&user_id={$user_info["id"]}&user_token={$user_info["token"]}'>Yes</a>
-            <a href=''>No</a>
+            $target_user_email_body = <<<EMAIL
+                {$user_info["email"]} tried to post a photo to your {$target_album_info["handle"]} album.
+                Is that okay?
+                <a href='$www_root/grant_write_permission.php?album_id={$target_album_id}&album_token={$target_album_info["token"]}&user_id={$user_info["id"]}&user_token={$user_info["token"]}'>Yes</a>
+                <a href='#'>No</a>
 
 EMAIL;
-            debug($target_email_body);
+            debug($target_user_email_body);
 
         }
     }
@@ -165,66 +179,57 @@ EMAIL;
     debug("Target album ($target_album_handle) does not exist.", "red");
 
     if ($target_user_id == $user_id) {
-        // Create an album
+        // User is creating a new album and adding a photo to it
         debug("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
         add_photo($user_id, $target_album_id, 1, $path_to_photo);
 
         $user_email_body = <<<EMAIL
-        You created a new album called {$target_album_info["handle"]}.
-        <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            You created a new album called <b>{$target_album_info["handle"]}</b>.
+            <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            <br><br>
+            To add photos, email more photos to <b>{$target_album_info["handle"]}@zipiyo.com</b>.
+            <br><br>
+            Let your buddies add photos to this album! Tell them to email their photos to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipiyo.com</b> (don't worry, we'll ask you to approve each person who tries to add a photo).
 EMAIL;
         debug($user_email_body);
 
     } else {
         // A user cannot create an album for another user, so disallow
         debug("User is attempting to create album for another user.", "red");
+
+        $user_email_body = <<<EMAIL
+            You tried to add a photo to {$target_user_info["username"]}'s {$target_album_info["handle"]} album, but {$target_user_info["username"]} doesn't have an album by that name!
+EMAIL;
+
+
     }
 } else if ($target_album_id == -1) {
     debug("Target user ($target_user_id) does not exist.", "red");
 }
 
 
+if ($brand_new_user) {
+    $user_email_body = "Welcome to Zipiyo! We've assigned you a username of <b>" . $user_info["username"] . "</b>, but you can change it to something else.<br><br>" . $user_email_body;
+}
 
+send_email($user_info["email"], 'founders@zipiyo.com', "Zipiyo activity notification", $user_email_body);
 
-
-// send_email('sanjay@gmail.com', 'founders@zipio.com', 'My Subject', "hello");
-
-
-
-
-
-
-
-
-/*
-$uploads_dir = 'attachments';
-$name = $_FILES["attachment-1"]["name"];
-$tmp_name = $_FILES["attachment-1"]["tmp_name"];
-
-move_uploaded_file($tmp_name, "$uploads_dir/$name");
-
-
-TRUNCATE TABLE AlbumPhotos;# MySQL returned an empty result set (i.e. zero rows).
-TRUNCATE TABLE Permissions;
-TRUNCATE TABLE Albums;# MySQL returned an empty result set (i.e. zero rows).
-TRUNCATE TABLE Friends;# MySQL returned an empty result set (i.e. zero rows).
-TRUNCATE TABLE Photos;# MySQL returned an empty result set (i.e. zero rows).
-TRUNCATE TABLE Users;# MySQL returned an empty result set (i.e. zero rows).
-
-
-
-*/
-// service request number: 856884051
-// 800-624-9896
+if (isset($target_user_email_body)) {
+    send_email($target_user_info["email"], 'founders@zipiyo.com', "Zipiyo activity notification", $target_user_email_body);
+}
 
 
 
 
 
 
+$contents = ob_get_flush();
 
+
+
+//send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email end", $contents);
 
 
 
