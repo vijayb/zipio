@@ -8,7 +8,9 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 CREATE TABLE IF NOT EXISTS `AlbumPhotos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `photo_id` int(11) unsigned NOT NULL,
+  `photo_owner_id` int(11) unsigned NOT NULL,
   `album_id` int(11) unsigned NOT NULL,
+  `album_owner_id` int(11) unsigned NOT NULL,
   `visible` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY (`photo_id`),

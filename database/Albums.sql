@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS `Albums` (
   `num_views` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY (`user_id`),
+  KEY (`handle_hash`),
   UNIQUE KEY `handle_user_key` (`handle_hash`, `user_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
