@@ -9,13 +9,24 @@
 </tr>
 
 <tr>
+    <td>file</td>
+    <td><input name="attachment-2" type="file"/></td>
+</tr>
+
+<tr>
     <td>recipient</td>
     <td><input name="recipient" type="text" value="vacation@zipiyo.com"/></td>
 </tr>
 
 <tr>
     <td>sender</td>
-    <td><input name="sender" type="text" value="sanjay@gmail.com"/></td>
+    <td>
+        <select name="sender">
+            <option value="sanjay@gmail.com"/>sanjay@gmail.com</option>
+            <option value="sanjay@gmail.com"/>vijayb@gmail.com</option>
+            <option value="sanjay@gmail.com"/>sanjay@mavinkurve.com</option>
+        </select>
+    </td>
 </tr>
 
 <tr>
@@ -30,7 +41,7 @@
 
 <tr>
     <td>attachment-count</td>
-    <td><input name="attachment-count" type="text" value="1"/></td>
+    <td><input name="attachment-count" type="text" value="2"/></td>
 </tr>
 
 <tr>

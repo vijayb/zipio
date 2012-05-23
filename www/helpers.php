@@ -73,7 +73,7 @@ function generate_token_from_id($id, $type) {
     }
 
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $created = $row["created"];
@@ -81,8 +81,6 @@ function generate_token_from_id($id, $type) {
     } else {
         return 0;
     }
-
-    print("token for $id $type:" . $token . "\n<br>");
     return $token;
 }
 
@@ -98,13 +96,13 @@ function check_token($id, $token, $type) {
 }
 
 
-function are_friends($user_id_1, $user_id_2) {
+function is_friend($user_id, $potential_friend_id) {
 
-    global $con;
+    global $con;    
 
-    $query = "SELECT * FROM Friends WHERE user_id='$user_id_1' AND friend_id=$user_id_2";
+    $query = "SELECT * FROM Friends WHERE user_id='$user_id' AND friend_id=$potential_friend_id";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if (mysql_num_rows($result) == 1) {
         return 1;
@@ -119,7 +117,7 @@ function has_write_permission($user_id, $album_id) {
 
     $query = "SELECT * FROM Permissions WHERE user_id='$user_id' AND album_id=$album_id LIMIT 1";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if (mysql_num_rows($result) == 1) {
         return 1;
@@ -140,14 +138,14 @@ function create_album($user_id, $handle) {
                   '$handle'
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
     $album_id = mysql_insert_id();
     return $album_id;
 }
 
 
-function add_photo($owner_user_id, $target_album_id, $visible = 1, $path_to_photo) {
+function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $visible = 1, $path_to_photo) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -159,46 +157,45 @@ function add_photo($owner_user_id, $target_album_id, $visible = 1, $path_to_phot
     if (!$visible) $visible_string = "<b>invisible</b>";
     debug("Adding $visible_string photo (owner $owner_user_id) to album $target_album_id");
 
+    $s3_url = $owner_user_id . $target_album_id . sha1(rand_string(20));
     $bucket_name = "zipio_photos";
-    $s3_file_name = $owner_user_id . "-" . $target_album_id . "-" . uniqid(rand_string(5));
 
-    // Put our file (also with public read access)
-    if ($s3->putObjectFile($path_to_photo, $bucket_name, $s3_file_name, S3::ACL_PUBLIC_READ)) {
-            // debug("S3::putObjectFile(): File copied to {$bucket_name}/". $s3_file_name . PHP_EOL, "green");
+    if ($s3->putObjectFile($path_to_photo, $bucket_name, $s3_url, S3::ACL_PUBLIC_READ)) {
 
-            // Get object info
-            $info = $s3->getObjectInfo($bucket_name, $s3_file_name);
-            // echo "S3::getObjectInfo(): Info for {$bucket_name}/". $s3_file_name.': '. print_r($info, 1);
+        $query = "INSERT INTO Photos (
+                    user_id,
+                    s3_url
+                  ) VALUES (
+                    '$owner_user_id',
+                    '$s3_url'
+                  ) ON DUPLICATE KEY UPDATE id=id";
+        $result = mysql_query($query, $con);
+        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+        $photo_id = mysql_insert_id();
+        
+        $query = "INSERT INTO AlbumPhotos (
+                    photo_id,
+                    photo_owner_id,
+                    album_id,
+                    album_owner_id,
+                    visible
+                  ) VALUES (
+                    '$photo_id',
+                    '$owner_user_id',
+                    '$target_album_id',
+                    '$target_album_owner_id',
+                    '$visible'
+                  ) ON DUPLICATE KEY UPDATE id=id";
+        $result = mysql_query($query, $con);
+        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    
+        return $photo_id;
+
     } else {
-            echo "Failed to copy file.\n";
-    }
-
-
-    $query = "INSERT INTO Photos (
-                user_id,
-                s3_url
-              ) VALUES (
-                '$owner_user_id',
-                '$s3_file_name'
-              ) ON DUPLICATE KEY UPDATE id=id";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
-
-    $photo_id = mysql_insert_id();
-
-    $query = "INSERT INTO AlbumPhotos (
-                photo_id,
-                album_id,
-                visible
-              ) VALUES (
-                '$photo_id',
-                '$target_album_id',
-                '$visible'
-              ) ON DUPLICATE KEY UPDATE id=id";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
-
-    return $photo_id;
+        echo "Failed to copy file.\n";
+        return 0;
+    } 
+   
 }
 
 
@@ -209,9 +206,11 @@ function album_exists($handle, $user_id) {
     global $con;
 
     // Check if the album exists for the given user
-    $query = "SELECT id FROM Albums WHERE handle='$handle' AND user_id='$user_id' LIMIT 1";
+    $query = "SELECT id FROM Albums WHERE handle_hash=UNHEX(SHA1('" . $handle . "')) AND user_id='$user_id' LIMIT 1";
+    debug($handle);
+    debug($query);
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $album_id = $row["id"];
@@ -221,7 +220,7 @@ function album_exists($handle, $user_id) {
     // Check if the user exists at all!
     $query = "SELECT * FROM Users WHERE id='$user_id'";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if (mysql_num_rows($result) == 1) {
         // The user exists
@@ -239,9 +238,9 @@ function get_user_id_from_userstring($username) {
 
     $query = "SELECT id FROM Users WHERE username='$username' LIMIT 1";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-    $user_id = -1;
+    $user_id = 0;
 
     if ($row = mysql_fetch_assoc($result)) {
         $user_id = $row["id"];
@@ -257,7 +256,7 @@ function get_user_info($user_id) {
 
     $query = "SELECT * FROM Users WHERE id='$user_id' LIMIT 1";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $row["token"] = generate_token($row["id"], $row["created"]);
@@ -273,7 +272,7 @@ function get_album_info($album_id) {
 
     $query = "SELECT * FROM Albums WHERE id='$album_id' LIMIT 1";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $row["token"] = generate_token($row["id"], $row["created"]);
@@ -289,7 +288,7 @@ function get_photos_info($album_id) {
 
     $query = "SELECT photo_id FROM AlbumPhotos WHERE album_id='$album_id'";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     $photos = array();
 
@@ -310,12 +309,12 @@ function get_photo_info($photo_id, $album_id) {
 
     $query = "SELECT * FROM Photos WHERE id='$photo_id' LIMIT 1";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $inner_query = "SELECT * FROM AlbumPhotos WHERE photo_id='$photo_id' AND album_id='$album_id' LIMIT 1";
         $inner_result = mysql_query($inner_query, $con);
-        if (!$inner_result) die('Invalid query: ' . mysql_error());
+        if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
             if ($inner_row = mysql_fetch_assoc($inner_result)) {
                 $row["visible"] = $inner_row["visible"];
             }

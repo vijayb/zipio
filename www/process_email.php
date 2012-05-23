@@ -2,7 +2,6 @@
 
 /*
 TRUNCATE TABLE AlbumPhotos;
-TRUNCATE TABLE Permissions;
 TRUNCATE TABLE Albums;
 TRUNCATE TABLE Friends;
 TRUNCATE TABLE Photos;
@@ -23,8 +22,12 @@ print("<br><br>");
 $sender = $_POST["sender"];
 $recipient = $_POST["recipient"];
 
-//$confirmation_number = rand_string(5);
-//send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email called", "Hi!");
+if (!filter_var($sender, FILTER_VALIDATE_EMAIL) || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+    exit();
+}
+
+$confirmation_number = rand_string(5);
+send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email", "Hi!");
 
 if (!class_exists('S3')) require_once 'S3.php';
 if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
@@ -34,13 +37,20 @@ $s3 = new S3(awsAccessKey, awsSecretKey);
 $s3_root = "https://s3.amazonaws.com/zipio_photos";
 $www_root = "http://ec2-107-22-123-149.compute-1.amazonaws.com";
 
+
+
+
+
+
+
+
 // First, check if this user exists
 
 $brand_new_user = 0;
 
-$query = "SELECT id FROM Users WHERE email='$sender'";
+$query = "SELECT id FROM Users WHERE email='$sender' LIMIT 1";
 $result = mysql_query($query, $con);
-if (!$result) die('Invalid query: ' . mysql_error());
+if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
 if (mysql_num_rows($result) == 1) {
     // A user with this email already exists, so get the user's ID
@@ -66,7 +76,7 @@ if (mysql_num_rows($result) == 1) {
                 '$usercode'
               ) ON DUPLICATE KEY UPDATE last_seen=UTC_TIMESTAMP()";
     $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
     $user_id = mysql_insert_id();
 
@@ -74,15 +84,26 @@ if (mysql_num_rows($result) == 1) {
 
 }
 
+
+
+
+
+
+
+
 $parts = explode('@', $recipient);
 $target_album_handle = $parts[0];
 $recipient_domain = $parts[1];
 
 debug("target_album_handle: " . $target_album_handle . "\n");
 
-$path_to_photo = $_FILES["attachment-1"]["tmp_name"];
+// Get the attached photos
+$paths_to_photos = array();
+for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+    array_push($paths_to_photos, $_FILES["attachment-" . ($i + 1)]["tmp_name"]);
+}
 
-// Check if target user is specified explicitly (e.g., ...@alex.zipio.com)
+// Check if target user is specified explicitly (e.g., vacation@alex.zipiyo.com)
 if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
     $target_userstring = $matches[1];
     debug("target_userstring: " . $target_userstring . "\n");
@@ -97,6 +118,17 @@ $target_user_info = get_user_info($target_user_id);
 $user_info = get_user_info($user_id);
 
 
+
+
+
+
+
+
+
+
+
+
+
 // At this point, we have:
 //  $user_info
 //      The info of the user who submitted the photo
@@ -105,7 +137,9 @@ $user_info = get_user_info($user_id);
 //      is set even if the user is submitting to his own album.
 //  $target_album_id
 //      The ID of the album to add the photo to IF IT EXISTS. If it doesn't
-//      exist, this variable is -1 and a new album will be created later.
+//      exist but the user exists, this variable is 0. If the album doesn't
+//      exist AND the user doesn't exist, this variable is -1.
+
 
 // The different ways to add a photo:
 //  Add to own existing album
@@ -124,7 +158,9 @@ if ($target_album_id > 0) {
     if ($target_user_id == $user_id) {
         // User is adding a photo to own existing album
         debug("User is adding to his own album.");
-        add_photo($user_id, $target_album_id, 1, $path_to_photo);
+        for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+        }
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -136,25 +172,41 @@ EMAIL;
         debug($user_email_body);
 
     } else {
-        // User is adding to another user's album, so check if the submitter of the photo has permission
-        $has_write_permission = has_write_permission($target_user_id, $user_id);
-        if ($has_write_permission == 1) {
-            debug("User " . $user_info["username"] . " has permission to write to " . $target_user_info["username"] . "'s " . $target_album_info["handle"] . ".", "green");
+        // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
+        
+        $is_friend = is_friend($target_user_id, $user_id);
+        if ($is_friend == 1) {
+            debug("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"], "green");
             // Add the photo to the friend's album
-            add_photo($user_id, $target_album_id, 1, $path_to_photo);
-            $user_email_body = "You added a photo to " . $target_user_info["username"] . "'s " . $target_album_info["handle"] . " album. <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>";
+            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+            }
+            $user_email_body = <<<EMAIL
+                You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
+                <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
+EMAIL;
+
+            $target_user_email_body = <<<EMAIL
+                {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
+                 <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
+EMAIL;
+            debug($target_user_email_body);
+
+
+
             debug($user_email_body);
 
-        } else if ($has_write_permission == 0) {
-            debug("User " . $user_info["username"] . " does note have permission to write to " . $target_user_info["username"] . "'s " . $target_album_info["handle"] . ".", "red");
+        } else if ($is_friend == 0) {
+            debug("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"], "red");
             // Add photo as invisible and send an email to the owner
-            add_photo($user_id, $target_album_id, 0, $path_to_photo);
-
+            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i]);
+            }
 
             $user_email_body = <<<EMAIL
                 You tried to add a photo to {$target_user_info["username"]}'s (that's {$target_user_info["email"]}) {$target_album_info["handle"]} album.
                 <br><br>
-                Your photo will appear in the album once {$target_user_info["username"]} approves you.
+                Your photo will appear in the album once {$target_user_info["username"]} approves you as a friend.
                 <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
 EMAIL;
             debug($user_email_body);
@@ -162,8 +214,8 @@ EMAIL;
 
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} tried to post a photo to your {$target_album_info["handle"]} album.
-                Is that okay?
-                <a href='$www_root/grant_write_permission.php?album_id={$target_album_id}&album_token={$target_album_info["token"]}&user_id={$user_info["id"]}&user_token={$user_info["token"]}'>Yes</a>
+                Add as a friend?
+                <a href='$www_root/add_friend.php?target_user_id={$target_user_id}&target_user_token={$target_user_info["token"]}&user_id={$user_info["id"]}&user_token={$user_info["token"]}'>Yes</a>
                 <a href='#'>No</a>
 
 EMAIL;
@@ -183,7 +235,9 @@ EMAIL;
         debug("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
-        add_photo($user_id, $target_album_id, 1, $path_to_photo);
+        for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+        }
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
@@ -229,7 +283,7 @@ $contents = ob_get_flush();
 
 
 
-//send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email end", $contents);
+send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email", $contents);
 
 
 
