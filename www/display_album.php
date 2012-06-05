@@ -1,11 +1,23 @@
 <?php
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
 require("db.php");
 require("helpers.php");
 
-$album_to_display = $_GET["album_id"];
+if (!isset($_GET["token"])) {
+    exit();
+}
+
+$request = decrypt_json($_GET["token"]);
+print("<!--" . print_r($request, true) . "-->");
+
+if ($request["action"] != "display_album") {
+    exit();
+}
+
+$album_to_display = $request["album_id"];
 
 $photos_array = get_photos_info($album_to_display);
 for ($i = 0; $i < count($photos_array); $i++) {
@@ -18,5 +30,7 @@ for ($i = 0; $i < count($photos_array); $i++) {
     print("<img style='opacity:$opacity;'src='https://s3.amazonaws.com/zipio_photos/" . $photos_array[$i]["s3_url"] . "'><br><br>");
 
 }
+
+
 
 ?>

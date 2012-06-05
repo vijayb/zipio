@@ -1,6 +1,12 @@
 <?php
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
+
+$s3_root = "https://s3.amazonaws.com/zipio_photos";
+$www_root = "http://localhost";
+//$www_root = "http://" . $_SERVER["HTTP_HOST"];
+
 
 function rand_string($length) {
     $chars = "abcdefghijklmnopqrstuvwxyz";
@@ -46,10 +52,10 @@ function debug($string, $color = "black") {
 function send_email($to, $from, $subject, $html) {
 
     if ($from == "") {
-        $from = "Zipio <founders@zipiyo.com>";
+        $from = "Zipio <founders@zipio.com>";
     }
 
-    $request = new HttpRequest('https://api.mailgun.net/v2/zipiyo.com/messages', HttpRequest::METH_POST);
+    $request = new HttpRequest('https://api.mailgun.net/v2/zipio.com/messages', HttpRequest::METH_POST);
     $auth = base64_encode('api:key-68imhgvpoa-6uw3cl8728kcs9brvlmr9');
     $request->setHeaders(array('Authorization' => 'Basic '.$auth));
     $request->setPostFields(array('from' => $from, 'to' => $to, 'subject' => $subject, 'html' => $html));
@@ -58,20 +64,34 @@ function send_email($to, $from, $subject, $html) {
     return $request;
 }
 
+
+function encrypt_json($arr) {
+
+    $public_key = openssl_get_publickey(file_get_contents('/usr/local/zipio/public.key'));
+
+
+    $json = json_encode($arr);
+    $res = openssl_public_encrypt($json, $encrypted_text, $public_key);
+    return base64_encode($encrypted_text);
+}
+
+function decrypt_json($encrypted_json) {
+
+    $private_key = openssl_get_privatekey(file_get_contents('/usr/local/zipio/private.key'));
+
+    $res = openssl_private_decrypt(base64_decode($encrypted_json), $decrypted_text, $private_key);
+    return json_decode($decrypted_text, true);
+}
+
 function generate_token($id, $created) {
     return sha1($id . $created);
 }
 
-function generate_token_from_id($id, $type) {
+function generate_token_from_id($id, $table) {
 
     global $con;
 
-    if ($type == "USER") {
-        $query = "SELECT created FROM Users WHERE id='$id' LIMIT 1";
-    } else if ($type == "ALBUM") {
-        $query = "SELECT created FROM Albums WHERE id='$id' LIMIT 1";
-    }
-
+    $query = "SELECT created FROM $table WHERE id='$id' LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -84,9 +104,9 @@ function generate_token_from_id($id, $type) {
     return $token;
 }
 
-function check_token($id, $token, $type) {
+function check_token($id, $token, $table) {
 
-    $correct_token = generate_token_from_id($id, $type);
+    $correct_token = generate_token_from_id($id, $table);
 
     if ($token == $correct_token) {
         return 1;
@@ -98,7 +118,7 @@ function check_token($id, $token, $type) {
 
 function is_friend($user_id, $potential_friend_id) {
 
-    global $con;    
+    global $con;
 
     $query = "SELECT * FROM Friends WHERE user_id='$user_id' AND friend_id=$potential_friend_id";
     $result = mysql_query($query, $con);
@@ -160,6 +180,8 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $vi
     $s3_url = $owner_user_id . $target_album_id . sha1(rand_string(20));
     $bucket_name = "zipio_photos";
 
+
+
     if ($s3->putObjectFile($path_to_photo, $bucket_name, $s3_url, S3::ACL_PUBLIC_READ)) {
 
         $query = "INSERT INTO Photos (
@@ -172,7 +194,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $vi
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
         $photo_id = mysql_insert_id();
-        
+
         $query = "INSERT INTO AlbumPhotos (
                     photo_id,
                     photo_owner_id,
@@ -188,14 +210,14 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $vi
                   ) ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-    
+
         return $photo_id;
 
     } else {
         echo "Failed to copy file.\n";
         return 0;
-    } 
-   
+    }
+
 }
 
 
@@ -232,11 +254,11 @@ function album_exists($handle, $user_id) {
 }
 
 
-function get_user_id_from_userstring($username) {
+function get_user_id_from_userstring($userstring) {
 
     global $con;
 
-    $query = "SELECT id FROM Users WHERE username='$username' LIMIT 1";
+    $query = "SELECT id FROM Users WHERE username='$userstring' OR usercode='$userstring' LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -340,7 +362,26 @@ function make_visible($user_id, $album_id) {
 
 }
 
+function update_data($table, $id, $key_values) {
 
+    global $con;
+
+    $update_string = "";
+
+    foreach ($key_values as $key=>$value) {
+        $update_string .= " " . $key . "='" . mysql_real_escape_string($value) . "',";
+    }
+
+    $update_string = rtrim($update_string, ",");
+    $query = "UPDATE $table SET $update_string WHERE id=$id LIMIT 1";
+    debug($query);
+    $result = mysql_query($query, $con);
+    if (!$result) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
 
 
 

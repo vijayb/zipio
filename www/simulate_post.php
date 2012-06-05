@@ -15,7 +15,7 @@
 
 <tr>
     <td>recipient</td>
-    <td><input name="recipient" type="text" value="vacation@zipiyo.com"/></td>
+    <td><input name="recipient" type="text" value="vacation@zipio.com"/></td>
 </tr>
 
 <tr>
@@ -23,8 +23,8 @@
     <td>
         <select name="sender">
             <option value="sanjay@gmail.com"/>sanjay@gmail.com</option>
-            <option value="sanjay@gmail.com"/>vijayb@gmail.com</option>
-            <option value="sanjay@gmail.com"/>sanjay@mavinkurve.com</option>
+            <option value="vijayb@gmail.com"/>vijayb@gmail.com</option>
+            <option value="sanjay@mavinkurve.com"/>sanjay@mavinkurve.com</option>
         </select>
     </td>
 </tr>

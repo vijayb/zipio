@@ -1,11 +1,13 @@
 <?php
 
 /*
+
 TRUNCATE TABLE AlbumPhotos;
 TRUNCATE TABLE Albums;
 TRUNCATE TABLE Friends;
 TRUNCATE TABLE Photos;
 TRUNCATE TABLE Users;
+
 */
 
 ob_start();
@@ -16,6 +18,7 @@ error_reporting(E_ALL | E_STRICT);
 require("db.php");
 require("helpers.php");
 
+print("POST REQUEST:");
 print_r($_POST);
 print("<br><br>");
 
@@ -27,15 +30,13 @@ if (!filter_var($sender, FILTER_VALIDATE_EMAIL) || !filter_var($recipient, FILTE
 }
 
 $confirmation_number = rand_string(5);
-send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email", "Hi!");
 
 if (!class_exists('S3')) require_once 'S3.php';
 if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
 if (!defined('awsSecretKey')) define('awsSecretKey', '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');
 
 $s3 = new S3(awsAccessKey, awsSecretKey);
-$s3_root = "https://s3.amazonaws.com/zipio_photos";
-$www_root = "http://ec2-107-22-123-149.compute-1.amazonaws.com";
+
 
 
 
@@ -103,8 +104,8 @@ for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
     array_push($paths_to_photos, $_FILES["attachment-" . ($i + 1)]["tmp_name"]);
 }
 
-// Check if target user is specified explicitly (e.g., vacation@alex.zipiyo.com)
-if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
+// Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
+if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
     $target_userstring = $matches[1];
     debug("target_userstring: " . $target_userstring . "\n");
     $target_user_id = get_user_id_from_userstring($target_userstring);
@@ -118,14 +119,11 @@ $target_user_info = get_user_info($target_user_id);
 $user_info = get_user_info($user_id);
 
 
-
-
-
-
-
-
-
-
+debug("target_album_id: " . $target_album_id);
+debug("target_user_info: ");
+print_r($target_user_info);
+debug("user_info: ");
+print_r($user_info);
 
 
 
@@ -147,6 +145,7 @@ $user_info = get_user_info($user_id);
 //  Add to friend's album
 //  Add to not-yet-friend's album
 
+
 if ($target_album_id > 0) {
     // The target album exists (and so does the target user)...
     $target_album_info = get_album_info($target_album_id);
@@ -162,18 +161,24 @@ if ($target_album_id > 0) {
             add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
         }
 
+        $display_album_ta = array();
+        $display_album_ta["album_id"] = $target_album_id;
+        $display_album_ta["action"] = "display_album";
+        $display_album_ta["timestamp"] = time();
+        $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
+
+
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
-            <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            <a href='{$display_album_link}'>See album</a>
             <br><br>
-            Let your buddies add photos to this album! Tell them to email their photos to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipiyo.com</b> (don't worry, we'll ask you to approve each person who tries to add a photo).
+            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 
 EMAIL;
-        debug($user_email_body);
 
     } else {
         // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
-        
+
         $is_friend = is_friend($target_user_id, $user_id);
         if ($is_friend == 1) {
             debug("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"], "green");
@@ -181,20 +186,27 @@ EMAIL;
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
             }
+
+
+            $display_album_ta = array();
+            $display_album_ta["album_id"] = $target_album_id;
+            $display_album_ta["action"] = "display_album";
+            $display_album_ta["timestamp"] = time();
+            $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
+
+
             $user_email_body = <<<EMAIL
                 You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
+                <a href='{$display_album_link}'>See album</a>
 EMAIL;
 
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                 <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
+                 <a href='{$display_album_link}'>See album</a>
 EMAIL;
-            debug($target_user_email_body);
 
 
 
-            debug($user_email_body);
 
         } else if ($is_friend == 0) {
             debug("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"], "red");
@@ -203,23 +215,34 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i]);
             }
 
-            $user_email_body = <<<EMAIL
-                You tried to add a photo to {$target_user_info["username"]}'s (that's {$target_user_info["email"]}) {$target_album_info["handle"]} album.
-                <br><br>
-                Your photo will appear in the album once {$target_user_info["username"]} approves you as a friend.
-                <a href='$www_root/display_album.php?album_id=$target_album_id'>See album</a>
-EMAIL;
-            debug($user_email_body);
+            $display_album_ta = array();
+            $display_album_ta["album_id"] = $target_album_id;
+            $display_album_ta["action"] = "display_album";
+            $display_album_ta["timestamp"] = time();
+            $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
 
+            $user_email_body = <<<EMAIL
+                You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
+                <br><br>
+                Your photo will appear in the album once <b>{$target_user_info["username"]}</b> approves you as a friend.
+                <a href='{$display_album_link}'>See album</a>
+EMAIL;
+
+            $add_friend_ta = array();
+            $add_friend_ta["user_id"] = $user_info["id"];
+            $add_friend_ta["target_user_id"] = $target_user_info["id"];
+            $add_friend_ta["album_id"] = $target_album_id;
+            $add_friend_ta["action"] = "add_friend";
+            $add_friend_ta["timestamp"] = time();
+            $add_friend_link = $www_root . "/add_friend.php?token=" . urlencode(encrypt_json($add_friend_ta));
 
             $target_user_email_body = <<<EMAIL
-                {$user_info["email"]} tried to post a photo to your {$target_album_info["handle"]} album.
+                {$user_info["email"]} tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
                 Add as a friend?
-                <a href='$www_root/add_friend.php?target_user_id={$target_user_id}&target_user_token={$target_user_info["token"]}&user_id={$user_info["id"]}&user_token={$user_info["token"]}'>Yes</a>
+                <a href='{$add_friend_link}'>Yes</a>
                 <a href='#'>No</a>
 
 EMAIL;
-            debug($target_user_email_body);
 
         }
     }
@@ -239,15 +262,18 @@ EMAIL;
             add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
         }
 
+        $display_album_ta = array();
+        $display_album_ta["album_id"] = $target_album_id;
+        $display_album_ta["action"] = "display_album";
+        $display_album_ta["timestamp"] = time();
+        $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
+
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
-            <a href='{$www_root}/display_album.php?album_id={$target_album_id}'>See album</a>
+            <a href='{$display_album_link}'>See album</a>
             <br><br>
-            To add photos, email more photos to <b>{$target_album_info["handle"]}@zipiyo.com</b>.
-            <br><br>
-            Let your buddies add photos to this album! Tell them to email their photos to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipiyo.com</b> (don't worry, we'll ask you to approve each person who tries to add a photo).
+            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 EMAIL;
-        debug($user_email_body);
 
     } else {
         // A user cannot create an album for another user, so disallow
@@ -265,26 +291,31 @@ EMAIL;
 
 
 if ($brand_new_user) {
-    $user_email_body = "Welcome to Zipiyo! We've assigned you a username of <b>" . $user_info["username"] . "</b>, but you can change it to something else.<br><br>" . $user_email_body;
+
+    $change_username_ta = array();
+    $change_username_ta["user_id"] = $user_info["id"];
+    $change_username_ta["timestamp"] = time();
+    $change_username_ta["action"] = "change_username";
+    $change_link = $www_root . "/change_username.php?token=" . urlencode(encrypt_json($change_username_ta));
+
+
+    $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>. <a href='$change_link'>Change your username</a> to something nicer.<br><br>" . $user_email_body;
 }
 
-send_email($user_info["email"], 'founders@zipiyo.com', "Zipiyo activity notification", $user_email_body);
-
-if (isset($target_user_email_body)) {
-    send_email($target_user_info["email"], 'founders@zipiyo.com', "Zipiyo activity notification", $target_user_email_body);
+if (!preg_match("/zipio.com$/", $sender)) {
+    send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
+    if (isset($target_user_email_body)) {
+        send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
+    }
 }
 
-
-
-
-
+debug($user_email_body);
+debug($target_user_email_body);
 
 $contents = ob_get_flush();
 
-
-
-send_email($sender, 'founders@zipiyo.com', $confirmation_number . " - process_email", $contents);
-
-
+if (!preg_match("/zipio.com$/", $sender)) {
+    send_email("sanjay@gmail.com", 'founders@zipio.com', $confirmation_number . " - process_email", $contents);
+}
 
 ?>

@@ -44,3 +44,13 @@ CREATE TRIGGER `userstrigger` BEFORE INSERT ON `Users`
     END;
 //
 DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `userstrigger2` BEFORE UPDATE ON `Users`
+    FOR EACH ROW BEGIN
+        SET NEW.email_hash = UNHEX(SHA1(NEW.email));
+        SET NEW.usercode_hash = UNHEX(SHA1(NEW.usercode));
+        SET NEW.username_hash = UNHEX(SHA1(NEW.username));
+    END;
+//
+DELIMITER ;
