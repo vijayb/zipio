@@ -165,7 +165,8 @@ function create_album($user_id, $handle) {
 }
 
 
-function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $visible = 1, $path_to_photo) {
+function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
+                   $visible = 1, $path_to_photo) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -177,9 +178,13 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id, $vi
     if (!$visible) $visible_string = "<b>invisible</b>";
     debug("Adding $visible_string photo (owner $owner_user_id) to album $target_album_id");
 
-    $s3_url = $owner_user_id . $target_album_id . sha1(rand_string(20));
+    $s3_url = $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $bucket_name = "zipio_photos";
 
+    // Scale the image, indeud
+    $image = new imagick($path_to_photo); 
+    $image->scaleImage(400,300,true);
+    $image->writeImage($path_to_photo);
 
 
     if ($s3->putObjectFile($path_to_photo, $bucket_name, $s3_url, S3::ACL_PUBLIC_READ)) {
