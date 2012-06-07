@@ -17,6 +17,23 @@ if ($request["action"] != "display_album") {
     exit();
 }
 
+?>
+
+
+
+
+
+
+<?php require("static_top.php"); ?>
+
+
+
+<div class="row-fluid">
+    <div class="span12">
+        <div id="masonry-container">
+
+<?php
+
 $album_to_display = $request["album_id"];
 
 $photos_array = get_photos_info($album_to_display);
@@ -27,10 +44,19 @@ for ($i = 0; $i < count($photos_array); $i++) {
         $opacity = "1.0";
     }
 
-    print("<img style='opacity:$opacity;'src='https://s3.amazonaws.com/zipio_photos/" . $photos_array[$i]["s3_url"] . "'><br><br>");
+    print("<div class='item'><img style='opacity:$opacity;'src='https://s3.amazonaws.com/zipio_photos/" . $photos_array[$i]["s3_url"] . "_480'></div>");
 
 }
 
 
 
 ?>
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<?php require("static_bottom.php"); ?>

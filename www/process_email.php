@@ -306,11 +306,12 @@ if (!preg_match("/zipio.com$/", $sender)) {
     send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
         send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
+        debug($target_user_email_body);
     }
 }
 
 debug($user_email_body);
-debug($target_user_email_body);
+
 
 $contents = ob_get_flush();
 

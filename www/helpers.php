@@ -181,13 +181,33 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     $s3_url = $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $bucket_name = "zipio_photos";
 
-    // Scale the image, indeud
-    $image = new imagick($path_to_photo); 
-    $image->scaleImage(400,300,true);
-    $image->writeImage($path_to_photo);
+    $sizes = array(800, 480, 240);
+
+    $failed = 0;
+
+    for ($ii = 0; $ii < count($sizes); $ii++) {
+        // Scale the image, indeud
+        $image = new imagick($path_to_photo);
+        $image->scaleImage($sizes[$ii], $sizes[$ii], true);
 
 
-    if ($s3->putObjectFile($path_to_photo, $bucket_name, $s3_url, S3::ACL_PUBLIC_READ)) {
+        $tmp_path_to_photo = $path_to_photo . "_tmp_" . $sizes[$ii];
+        $image->writeImage($tmp_path_to_photo);
+        debug("Writing file: $tmp_path_to_photo");
+
+        $s3_name = $s3_url . "_" . $sizes[$ii];
+
+        if (!$s3->putObjectFile($tmp_path_to_photo, $bucket_name, $s3_name, S3::ACL_PUBLIC_READ)) {
+            debug("Error in writing to S3");
+            debug($tmp_path_to_photo);
+            $failed = 1;
+        }
+
+        unlink($tmp_path_to_photo);
+
+    }
+
+    if (!$failed) {
 
         $query = "INSERT INTO Photos (
                     user_id,
