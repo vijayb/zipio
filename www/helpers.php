@@ -190,14 +190,15 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $failed = 0;
 
+    $image = new imagick($path_to_photo);
     for ($ii = 0; $ii < count($sizes); $ii++) {
         // Scale the image, indeud
-        $image = new imagick($path_to_photo);
-        $image->scaleImage($sizes[$ii], $sizes[$ii], true);
+        $tmpimage = clone $image;
+        $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
 
         $tmp_path_to_photo = $path_to_photo . "_tmp_" . $sizes[$ii];
-        $image->writeImage($tmp_path_to_photo);
+        $tmpimage->writeImage($tmp_path_to_photo);
         debug("Writing file: $tmp_path_to_photo");
 
         $s3_name = $s3_url . "_" . $sizes[$ii];
@@ -210,8 +211,25 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         }
 
         unlink($tmp_path_to_photo);
-
     }
+
+    $cropped_image = clone $image;
+    if ($image->getImageWidth() > $image->getImageHeight()) {
+        $cropped_image->scaleImage(0, 300);
+    } else {
+        $cropped_image->scaleImage(300, 0);
+    }
+    $cropped_path = $path_to_photo."_cropped";
+    opticrop($cropped_image, 300, 300, $cropped_path);
+    $s3_name = $s3_url."_cropped";
+    if (!$s3->putObjectFile($cropped_path, $bucket_name,
+                            $s3_name, S3::ACL_PUBLIC_READ)) {
+        debug("Error in writing to S3");
+        debug($cropped_path);
+        $failed = 1;
+    }
+    unlink($cropped_path);
+
 
     if (!$failed) {
 
