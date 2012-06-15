@@ -161,12 +161,10 @@ if ($target_album_id > 0) {
             add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
         }
 
-        $display_album_ta = array();
-        $display_album_ta["album_id"] = $target_album_id;
-        $display_album_ta["action"] = "display_album";
-        $display_album_ta["timestamp"] = time();
-        $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
-
+        $display_album_ra = array();
+        $display_album_ra["user_id"] = $user_info["id"];
+        $display_album_ra["timestamp"] = time();
+        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -187,12 +185,11 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
             }
 
+            $display_album_ra = array();
+            $display_album_ra["user_id"] = $user_info["id"];
+            $display_album_ra["timestamp"] = time();
+            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
-            $display_album_ta = array();
-            $display_album_ta["album_id"] = $target_album_id;
-            $display_album_ta["action"] = "display_album";
-            $display_album_ta["timestamp"] = time();
-            $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
 
 
             $user_email_body = <<<EMAIL
@@ -215,11 +212,10 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i]);
             }
 
-            $display_album_ta = array();
-            $display_album_ta["album_id"] = $target_album_id;
-            $display_album_ta["action"] = "display_album";
-            $display_album_ta["timestamp"] = time();
-            $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
+            $display_album_ra = array();
+            $display_album_ra["user_id"] = $user_info["id"];
+            $display_album_ra["timestamp"] = time();
+            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
             $user_email_body = <<<EMAIL
                 You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
@@ -228,13 +224,13 @@ EMAIL;
                 <a href='{$display_album_link}'>See album</a>
 EMAIL;
 
-            $add_friend_ta = array();
-            $add_friend_ta["user_id"] = $user_info["id"];
-            $add_friend_ta["target_user_id"] = $target_user_info["id"];
-            $add_friend_ta["album_id"] = $target_album_id;
-            $add_friend_ta["action"] = "add_friend";
-            $add_friend_ta["timestamp"] = time();
-            $add_friend_link = $www_root . "/add_friend.php?token=" . urlencode(encrypt_json($add_friend_ta));
+            $add_friend_ra = array();
+            $add_friend_ra["user_id"] = $user_info["id"];
+            $add_friend_ra["target_user_id"] = $target_user_info["id"];
+            $add_friend_ra["album_id"] = $target_album_id;
+            $add_friend_ra["action"] = "add_friend";
+            $add_friend_ra["timestamp"] = time();
+            $add_friend_link = $www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
 
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -259,14 +255,18 @@ EMAIL;
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+            $current_photo_id = add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+            if ($i == 0) {
+                // Set the first photo as the cover photo
+                debug("current_photo_id: $current_photo_id");
+                update_data("Albums", $target_album_id, array("cover_photo_id" => $current_photo_id));
+            }
         }
 
-        $display_album_ta = array();
-        $display_album_ta["album_id"] = $target_album_id;
-        $display_album_ta["action"] = "display_album";
-        $display_album_ta["timestamp"] = time();
-        $display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
+        $display_album_ra = array();
+        $display_album_ra["user_id"] = $user_info["id"];
+        $display_album_ra["timestamp"] = time();
+        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
@@ -292,11 +292,11 @@ EMAIL;
 
 if ($brand_new_user) {
 
-    $change_username_ta = array();
-    $change_username_ta["user_id"] = $user_info["id"];
-    $change_username_ta["timestamp"] = time();
-    $change_username_ta["action"] = "change_username";
-    $change_link = $www_root . "/change_username.php?token=" . urlencode(encrypt_json($change_username_ta));
+    $change_username_ra = array();
+    $change_username_ra["user_id"] = $user_info["id"];
+    $change_username_ra["timestamp"] = time();
+    $change_username_ra["action"] = "change_username";
+    $change_link = $www_root . "/change_username.php?request=" . urlencode(encrypt_json($change_username_ra));
 
 
     $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>. <a href='$change_link'>Change your username</a> to something nicer.<br><br>" . $user_email_body;

@@ -1,5 +1,105 @@
 // Functions that we've written ourselves
 
+function saveUsernamePassword() {
+
+    var username = user["username"];
+
+    if ($("#change-username").is(":visible")) {
+        username = $("#username").val();
+    }
+
+    var passwordHash = sha1($("#password").val());
+
+    var urlString = "/save_username_password.php?token=" + user["token"] + "&username=" + username + "&password_hash=" + passwordHash;
+
+    console.log(urlString);
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                window.location.replace("/" + username);
+            }
+        },
+        async: true
+    });
+
+}
+
+function flipChangeUsername() {
+    if ($("#change-username").is(":visible")) {
+        $('#change-username').hide();
+        $('#read-only-username').show();
+
+    } else {
+        $('#read-only-username').hide();
+        $('#change-username').show();
+        $("#change-password-submit").addClass("disabled");
+        $("#username-check").html("Type in the username you'd like");
+        $('#username').val("");
+        $('#username').focus();
+    }
+}
+
+
+function checkUsername() {
+
+    if (!$("#change-username").is(":visible")) {
+        if ($("#password").val() != "") {
+            $("#change-password-submit").removeClass("disabled");
+        } else {
+            $("#change-password-submit").addClass("disabled");
+        }
+    }
+
+    var usernameEntered = $("#username").val();
+
+    if (usernameEntered == "") {
+        $("#username-check").html("Type in the username you'd like");
+        return;
+    }
+
+    if (/[^A-Za-z0-9]/.test(usernameEntered) ) {
+        $("#username-check").html("Only letters and numbers, please");
+        return;
+    }
+
+    var urlString = "/check_username.php?username=" + usernameEntered;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            data = parseInt(data);
+            if (data == 0) {
+                $("#username-check").html("<b>" + usernameEntered + "</b> is available!");
+                if ($("#password").val() != "") {
+                    $("#change-password-submit").removeClass("disabled");
+                } else {
+                    $("#change-password-submit").addClass("disabled");
+                }
+            } else if (data == user["id"]) {
+                $("#username-check").html("Ummm...that's already your username");
+                $("#change-password-submit").addClass("disabled");
+            } else {
+                $("#username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
+                $("#change-password-submit").addClass("disabled");
+            }
+        },
+        async: true
+    });
+}
+
+function registerUser() {
+}
+
+function isLoggedIn() {
+    if (username == "") {
+        return false;
+    }
+    return true;
+}
+
 function getURLParameter(name) {
     return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
 }
@@ -11,7 +111,94 @@ function debug(string) {
 
 }
 
+function resizeWindow() {
+    if (span3Width != $(".span3").width()) {
+        setMasonry();
+        $(".item").css("margin-bottom", $(".span3").css("margin-left"));
+        span3Width = $(".span3").width();
+    }
+}
+
+function setMasonry() {
+    var container = $("#masonry-container");
+    var mobileWidth = 480;
+    var maxWidth = 768;
+
+    $(container).imagesLoaded(function() {
+        $(container).masonry({
+            itemSelector : '.item',
+            isAnimated: true,
+            columnWidth: function() {
+                // Get the width of each span3 + the margin on the left
+                // because the Masonry column width includes the space
+                // "between" columns.
+                return $(".span3").width() + parseInt($(".span3").css("margin-left").match(/\d+/));
+            }
+        });
+    });
+}
+
+function preload(arrayOfImages) {
+    $(arrayOfImages).each(function(){
+        $('<img/>')[0].src = this;
+    });
+}
+
+function deletePhotoFromAlbum(photoID, albumID) {
+    var urlString = "/delete_photo_from_album.php?photo_id=" + photoID + "&album_id=" + albumID;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            $("#photo-" + photoID).remove();
+            $("#masonry-container").masonry("reload");
+        },
+        async: true
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Functions that have been copied from various sources on the Internet
+
+var delay = (function(){
+  var timer = 0;
+  return function(callback, ms){
+    clearTimeout (timer);
+    timer = setTimeout(callback, ms);
+  };
+})();
 
 function sha1 (str) {
 

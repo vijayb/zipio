@@ -4,9 +4,35 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
 $s3_root = "https://s3.amazonaws.com/zipio_photos";
-$www_root = "http://localhost";
-//$www_root = "http://" . $_SERVER["HTTP_HOST"];
+$www_root = "http://zipio.com";
+
 define('CACHE_PATH', 'opticrop-cache/');
+
+function login_user($user_id) {
+    session_regenerate_id();
+    $_SESSION["user_id"] = $user_id;
+    $_SESSION["user_info"] = get_user_info($user_id);
+    $_SESSION["user_info"]["token"] = calculate_token_from_id($user_id);
+}
+
+function is_logged_in() {
+    if (isset($_SESSION['user_id'])) {
+        return $_SESSION['user_id'];
+    } else {
+        return 0;
+    }
+}
+
+function check_request_for_login($_GET) {
+    if (isset($_GET["request"])) {
+        $request = decrypt_json($_GET["request"]);
+        if (isset($request["user_id"])) {
+            login_user($request["user_id"]);
+            $url = strtok($_SERVER['REQUEST_URI'], '?');
+            header("Location: $url");
+        }
+    }
+}
 
 function rand_string($length) {
     $chars = "abcdefghijklmnopqrstuvwxyz";
@@ -85,30 +111,30 @@ function decrypt_json($encrypted_json) {
     return json_decode($decrypted_text, true);
 }
 
-function generate_token($id, $created) {
+function calculate_token($id, $created) {
     return sha1($id . $created);
 }
 
-function generate_token_from_id($id, $table) {
+function calculate_token_from_id($id) {
 
     global $con;
 
-    $query = "SELECT created FROM $table WHERE id='$id' LIMIT 1";
+    $query = "SELECT created FROM Users WHERE id='$id' LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
         $created = $row["created"];
-        $token = generate_token($id, $created);
+        $token = calculate_token($id, $created);
     } else {
         return 0;
     }
     return $token;
 }
 
-function check_token($id, $token, $table) {
+function check_token($id, $token) {
 
-    $correct_token = generate_token_from_id($id, $table);
+    $correct_token = calculate_token_from_id($id);
 
     if ($token == $correct_token) {
         return 1;
@@ -230,9 +256,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     }
     unlink($cropped_path);
 
-
     if (!$failed) {
-
         $query = "INSERT INTO Photos (
                     user_id,
                     s3_url
@@ -274,14 +298,19 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
 
 
-function album_exists($handle, $user_id) {
+function album_exists($handle, $user_id_or_string) {
 
     global $con;
 
+    // Check if argument is an ID
+    $user_id = get_user_id_from_userstring($user_id_or_string);
+
+    if ($user_id == 0) {
+        $user_id = $user_id_or_string;
+    }
+
     // Check if the album exists for the given user
     $query = "SELECT id FROM Albums WHERE handle_hash=UNHEX(SHA1('" . $handle . "')) AND user_id='$user_id' LIMIT 1";
-    debug($handle);
-    debug($query);
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -299,7 +328,6 @@ function album_exists($handle, $user_id) {
         // The user exists
         return 0;
     } else {
-        // The user doesn't exist
         return -1;
     }
 }
@@ -323,6 +351,69 @@ function get_user_id_from_userstring($userstring) {
 }
 
 
+function get_username_from_user_id($user_id) {
+
+    global $con;
+
+    $query = "SELECT username FROM Users WHERE id='$user_id' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $username = "";
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $username = $row["username"];
+    }
+
+    return $username;
+
+}
+
+function get_usercode_from_user_id($user_id) {
+
+    global $con;
+
+    $query = "SELECT usercode FROM Users WHERE id='$user_id' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $usercode = "";
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $usercode = $row["usercode"];
+    }
+
+    return $usercode;
+
+}
+
+function get_username_from_userstring($userstring) {
+
+    global $con;
+
+    $username = "";
+
+    $query = "SELECT username FROM Users WHERE usercode='$userstring' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $username = $row["username"];
+        return $username;
+    }
+
+    $query = "SELECT username FROM Users WHERE username='$userstring' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $username = $row["username"];
+        return $username;
+    }
+
+    return $username;
+}
+
 function get_user_info($user_id) {
 
     global $con;
@@ -332,7 +423,7 @@ function get_user_info($user_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
-        $row["token"] = generate_token($row["id"], $row["created"]);
+        $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
         return 0;
@@ -348,11 +439,29 @@ function get_album_info($album_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
-        $row["token"] = generate_token($row["id"], $row["created"]);
+        $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
         return 0;
     }
+}
+
+function get_albums_info($user_id) {
+
+    global $con;
+
+    $query = "SELECT * FROM Albums WHERE user_id='$user_id'";
+
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $albums_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $album = get_album_info($row["id"]);
+        array_push($albums_array, $album);
+    }
+    return $albums_array;
+
 }
 
 function get_photos_info($album_id) {
@@ -362,8 +471,6 @@ function get_photos_info($album_id) {
     $query = "SELECT photo_id FROM AlbumPhotos WHERE album_id='$album_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $photos = array();
 
     $photos_array = array();
     while ($row = mysql_fetch_assoc($result)) {
@@ -413,6 +520,8 @@ function make_visible($user_id, $album_id) {
 
 }
 
+
+
 function update_data($table, $id, $key_values) {
 
     global $con;
@@ -422,11 +531,12 @@ function update_data($table, $id, $key_values) {
     foreach ($key_values as $key=>$value) {
         $update_string .= " " . $key . "='" . mysql_real_escape_string($value) . "',";
     }
-
     $update_string = rtrim($update_string, ",");
+
+
     $query = "UPDATE $table SET $update_string WHERE id=$id LIMIT 1";
-    debug($query);
     $result = mysql_query($query, $con);
+
     if (!$result) {
         return 0;
     } else {
@@ -440,7 +550,9 @@ function update_data($table, $id, $key_values) {
 // cropped image, and $out is where the cropped image will be written.
 // Note that the dimensions of $image must be greater than or equal to
 // $w x $h in both dimensions.
+
 function opticrop($img, $w, $h, $out) {
+
     // source dimensions
     $w0 = $img->getImageWidth();
     $h0 = $img->getImageHeight();
@@ -485,7 +597,7 @@ function opticrop($img, $w, $h, $out) {
         // crop width to target AR
         $wcrop0 = round($ar*$h0);
         $hcrop0 = $h0;
-    } 
+    }
     else {
         // crop height to target AR
         $wcrop0 = $w0;
@@ -527,7 +639,7 @@ function opticrop($img, $w, $h, $out) {
         $area = $wcrop * $hcrop;
         $betanorm = $beta / ($n*pow($area, $gamma-1));
         //dprint("beta: $beta; betan: $betanorm");
-  
+
         //dprint("image$k.jpg:<br/>\n<img src=\"$currfile\"/>");
         // best image found, save it
         if ($betanorm > $maxbetanorm) {

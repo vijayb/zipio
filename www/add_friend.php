@@ -1,5 +1,8 @@
 <?php
 
+// USER is the one who added the photos to TARGET USER's album
+// TARGET USER clicks on the link in his email to add USER as a friend
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -8,17 +11,12 @@ require("helpers.php");
 
 debug("1");
 
-if (!isset($_GET["token"])) {
+if (!isset($_GET["request"])) {
     exit();
 }
 
-$request = decrypt_json($_GET["token"]);
+$request = decrypt_json($_GET["request"]);
 print("<!--" . print_r($request, true) . "-->");
-
-if ($request["action"] != "add_friend") {
-    print_r($request);
-    exit();
-}
 
 $user_id = $request["user_id"];
 $target_user_id = $request["target_user_id"];
@@ -57,12 +55,11 @@ print($output);
 
 
 
-$display_album_ta = array();
-$display_album_ta["album_id"] = $request["album_id"];
-$display_album_ta["action"] = "display_album";
-$display_album_ta["timestamp"] = time();
-$display_album_link = $www_root . "/display_album.php?token=" . urlencode(encrypt_json($display_album_ta));
-
+$display_album_ra = array();
+$display_album_ra["user_id"] = $user_info["id"];
+$display_album_ra["token"] = $user_info["token"];
+$display_album_ra["timestamp"] = time();
+$display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
 
 $target_user_email_body = <<<EMAIL

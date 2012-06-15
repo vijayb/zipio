@@ -1,43 +1,43 @@
-<head>
+<?php
+session_start();
+ini_set("display_errors", 1);
+error_reporting(E_ALL | E_STRICT);
 
-<link href="/lib/styles.css" rel="stylesheet" />
-
-</head>
-
-<body>
-<div class="container">
-
-<div class="row">
-    <div class="span12">
-        <div id="masonry-container">
-            <div class="item"><img src="flower.jpg"></div>
-            <div class="item"><img src="flower.jpg"></div>
-            <div class="item"><img src="flower.jpg"></div>
-            <div class="item"><img src="flower.jpg"></div>
-            <div class="item"><img src="flower.jpg"></div>
-        </div>
-    </div>
-</div>
-
-</div>
+require("db.php");
+require("helpers.php");
 
 
-<script src="/lib/jquery-1.7.2.min.js"></script>
-<script src="/lib/jquery.masonry.min.js"></script>
-<script src="/lib/modernizr.js"></script>
+
+?>
+
+
+
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+<?php require("static_top.php"); ?>
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+
+
+
+
+Welcome to Zipio.
+
+
+
+
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+<?php require("static_scripts.php"); ?>
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+
+
+
 
 <script>
 
-$(function(){
-    $masonryContainer = $('#masonry-container');
-    $masonryContainer.imagesLoaded(function() {
-        $('#masonry-container').masonry({
-            itemSelector : '.item',
-            isAnimated: true
-        });
-    });
-});
-
 </script>
 
-</body>
+
+
+
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+<?php require("static_bottom.php"); ?>
+<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
