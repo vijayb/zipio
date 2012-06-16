@@ -29,17 +29,10 @@ $page_title = <<<HTML
 HTML;
 
 $page_title_right = <<<HTML
-<div class="btn-group">
-    <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-    Album options <span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu">
-    <!-- dropdown menu links -->
-    </ul>
-</div>
+<button class="btn btn-large btn-primary">Follow this album</button>
 HTML;
 
-$page_title_right = "";
+
 
 ?>
 
@@ -48,6 +41,31 @@ $page_title_right = "";
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+
+
+
+
+<div class="row">
+    <div class="span12">
+        <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+                        Album Settings
+                    </a>
+                </div>
+
+                <div id="collapseThree" class="accordion-body collapse" style="height: 0px; ">
+                    <div class="accordion-inner">
+                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
@@ -80,7 +98,7 @@ for ($i = 0; $i < count($photos_array); $i++) {
                         <i class="icon-chevron-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$photos_array[$i]["id"]}, {$album_to_display});"><i class="icon-trash"></i> Delete this photo</a></li>
+                        <li><a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$photos_array[$i]["id"]}, {$album_to_display}, {$album_info["cover_photo_id"]});"><i class="icon-trash"></i> Delete this photo</a></li>
                     </ul>
                 </div>
             </div>
@@ -151,7 +169,7 @@ $(function() {
 
     // If the user is logged in but has not yet registered (i.e., set a
     // password), then show the registration dialog
-    if (isLoggedIn() && user["password_hash"] == "") {
+    if (isLoggedIn() && gUser["password_hash"] == "") {
         $('#register-modal').modal('show');
     }
 

@@ -1,25 +1,44 @@
 // Functions that we've written ourselves
 
+function attemptLogin() {
+    var passwordHash = sha1($("#login-password").val());
+    var email = $("#login-email").val();
+
+    var urlString = "/attempt_login.php?email=" + email + "&password_hash=" + passwordHash;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) != 0) {
+                window.location.replace(window.location.href);
+            } else {
+                $("#login-error").show();
+            }
+        },
+        async: true
+    });
+
+
+}
+
 function saveUsernamePassword() {
 
-    var username = user["username"];
+    var username = gUser["username"];
+    var passwordHash = sha1($("#register-password").val());
 
-    if ($("#change-username").is(":visible")) {
-        username = $("#username").val();
+    if ($("#register-username").is(":visible")) {
+        username = $("#register-username").val();
     }
 
-    var passwordHash = sha1($("#password").val());
-
-    var urlString = "/save_username_password.php?token=" + user["token"] + "&username=" + username + "&password_hash=" + passwordHash;
-
-    console.log(urlString);
+    var urlString = "/save_username_password.php?token=" + gUser["token"] + "&username=" + username + "&password_hash=" + passwordHash;
 
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                window.location.replace("/" + username);
+                window.location.replace(window.location.href);
             }
         },
         async: true
@@ -28,40 +47,40 @@ function saveUsernamePassword() {
 }
 
 function flipChangeUsername() {
-    if ($("#change-username").is(":visible")) {
-        $('#change-username').hide();
-        $('#read-only-username').show();
+    if ($("#register-username-panel").is(":visible")) {
+        $('#register-username-panel').hide();
+        $('#register-read-only-username-panel').show();
 
     } else {
-        $('#read-only-username').hide();
-        $('#change-username').show();
-        $("#change-password-submit").addClass("disabled");
-        $("#username-check").html("Type in the username you'd like");
-        $('#username').val("");
-        $('#username').focus();
+        $('#register-username-panel').show();
+        $('#register-read-only-username-panel').hide();
+        $("#register-password-submit").addClass("disabled");
+        $("#register-username-check").html("Type in the username you'd like");
+        $('#register-username').val("");
+        $('#register-username').focus();
     }
 }
 
 
 function checkUsername() {
 
-    if (!$("#change-username").is(":visible")) {
-        if ($("#password").val() != "") {
-            $("#change-password-submit").removeClass("disabled");
+    if (!$("#register-username-panel").is(":visible")) {
+        if ($("#register-password").val() != "") {
+            $("#register-password-submit").removeClass("disabled");
         } else {
-            $("#change-password-submit").addClass("disabled");
+            $("#register-password-submit").addClass("disabled");
         }
     }
 
-    var usernameEntered = $("#username").val();
+    var usernameEntered = $("#register-username").val();
 
     if (usernameEntered == "") {
-        $("#username-check").html("Type in the username you'd like");
+        $("#register-username-check").html("Type in the username you'd like");
         return;
     }
 
     if (/[^A-Za-z0-9]/.test(usernameEntered) ) {
-        $("#username-check").html("Only letters and numbers, please");
+        $("#register-username-check").html("Only letters and numbers, please");
         return;
     }
 
@@ -72,18 +91,18 @@ function checkUsername() {
         success: function(data) {
             data = parseInt(data);
             if (data == 0) {
-                $("#username-check").html("<b>" + usernameEntered + "</b> is available!");
+                $("#register-username-check").html("<b>" + usernameEntered + "</b> is available!");
                 if ($("#password").val() != "") {
-                    $("#change-password-submit").removeClass("disabled");
+                    $("#register-password-submit").removeClass("disabled");
                 } else {
-                    $("#change-password-submit").addClass("disabled");
+                    $("#register-password-submit").addClass("disabled");
                 }
-            } else if (data == user["id"]) {
-                $("#username-check").html("Ummm...that's already your username");
-                $("#change-password-submit").addClass("disabled");
+            } else if (data == gUser["id"]) {
+                $("#register-username-check").html("Ummm...that's already your username");
+                $("#register-password-submit").addClass("disabled");
             } else {
-                $("#username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
-                $("#change-password-submit").addClass("disabled");
+                $("#register-username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
+                $("#register-password-submit").addClass("disabled");
             }
         },
         async: true
@@ -94,10 +113,10 @@ function registerUser() {
 }
 
 function isLoggedIn() {
-    if (username == "") {
-        return false;
+    if (typeof gUser != 'undefined') {
+        return true;
     }
-    return true;
+    return false;
 }
 
 function getURLParameter(name) {
@@ -144,8 +163,8 @@ function preload(arrayOfImages) {
     });
 }
 
-function deletePhotoFromAlbum(photoID, albumID) {
-    var urlString = "/delete_photo_from_album.php?photo_id=" + photoID + "&album_id=" + albumID;
+function deletePhotoFromAlbum(photoID, albumID, coverPhotoID) {
+    var urlString = "/delete_photo_from_album.php?photo_id=" + photoID + "&album_id=" + albumID + "&cover_photo_id=" + coverPhotoID;
     jQuery.ajax({
         type: "GET",
         url: urlString,

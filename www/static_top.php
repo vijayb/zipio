@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Bootstrap, from Twitter</title>
+<title>Zipio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
@@ -37,11 +37,15 @@
 // Define default values for templates
 
 if (is_logged_in()) {
+
+    $brand_name = "<span style=''>zipio</span>";
+
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">You're logged in as <b>{$_SESSION["user_info"]["username"]}</b> <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>You're logged in as <b>{$_SESSION["user_info"]["username"]}</b> ({$_SESSION["user_info"]["email"]})<b class="caret"></b></a>
                 <ul class="dropdown-menu">
+                    <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
                     <li><a href="#"><i class="icon-wrench"></i> Account settngs</a></li>
                     <li class="divider"></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
@@ -50,9 +54,13 @@ if (is_logged_in()) {
         </ul>
 HTML;
 } else {
+
+    $brand_name = "zipio";
+
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show')">Login</a></li>
+            <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show')">Sign up</a></li>
         </ul>
 HTML;
 
@@ -81,7 +89,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
                 <span class="icon-bar"></span>
             </a>
 
-            <a class="brand" href="#" style="font-weight:bold">zipio</a>
+            <a class="brand" href="#" style="font-weight:bold"><?php print($brand_name); ?></a>
 
             <?php print($logged_in_status); ?>
 
@@ -102,13 +110,13 @@ if (!isset($logged_in_status)) $logged_in_status = "";
                 <div class="control-group">
                     <label class="control-label" for="input01">Your username</label>
                     <div class="controls">
-                        <div id="change-username" style="display:none">
-                            <input type="text" class="input-xlarge" id="username" name="username" autocomplete="off">
-                            <p class="help-block" id="username-check"></p>
+                        <div id="register-username-panel" style="display:none">
+                            <input type="text" class="input-xlarge" id="register-username" autocomplete="off">
+                            <p class="help-block" id="register-username-check"></p>
                             <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">Cancel (I'll stick with <b><?php print($_SESSION["user_info"]["username"]); ?></b>)</a></p>
                         </div>
 
-                        <div id="read-only-username">
+                        <div id="register-read-only-username-panel">
                             <span class="input-xlarge uneditable-input"><?php print($_SESSION["user_info"]["username"]); ?></span>
                             <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">Change my username</a></p>
                         </div>
@@ -117,7 +125,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
                 <div class="control-group">
                     <label class="control-label" for="input01">Pick a password</label>
                     <div class="controls">
-                        <input type="password" class="input-xlarge" id="password" name="password">
+                        <input type="password" class="input-xlarge" id="register-password">
                     </div>
                 </div>
             </fieldset>
@@ -125,9 +133,12 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="btn" data-dismiss="modal">I'll do this later</a>
-        <a href="javascript:void(0);" onclick="saveUsernamePassword();" class="btn btn-primary disabled" id="change-password-submit">Go</a>
+        <a href="javascript:void(0);" onclick="saveUsernamePassword();" class="btn btn-primary disabled" id="register-submit">Go</a>
     </div>
 </div>
+
+
+
 
 
 <div class="modal hide" id="login-modal">
@@ -136,34 +147,91 @@ if (!isset($logged_in_status)) $logged_in_status = "";
         <h2>Login</h2>
     </div>
     <div class="modal-body">
+
+        <div class="alert fade in" id="login-error" style="display:none;">
+            <button type="button" class="close">×</button>
+            <strong>Woops.</strong> That email/password combo is invalid.
+        </div>
+
         <form class="form-horizontal">
             <fieldset>
                 <div class="control-group">
                     <label class="control-label" for="input01">Email</label>
                     <div class="controls">
-                        <input type="text" class="input-xlarge" id="username" name="email">
+                        <input type="text" class="input-xlarge" id="login-email">
                         <!-- <p class="help-block">Supporting help text</p> -->
                     </div>
                 </div>
                 <div class="control-group">
                     <label class="control-label" for="input01">Password</label>
                     <div class="controls">
-                        <input type="password" class="input-xlarge" id="password" name="password">
+                        <input type="password" class="input-xlarge" id="login-password">
                     </div>
                 </div>
             </fieldset>
         </form>
+
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="#" class="btn btn-primary">Login</a>
+        <a href="javascript:void(0);" onclick="attemptLogin();" class="btn btn-primary">Login</a>
     </div>
 </div>
+
+
+
+
+
+<div class="modal hide" id="signup-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>Signup for a Zipio account</h2>
+    </div>
+    <div class="modal-body">
+
+        <div class="alert fade in" id="login-error" style="display:none;">
+            <button type="button" class="close">×</button>
+            <strong>Woops.</strong> That email/password combo is invalid.
+        </div>
+
+        <form class="form-horizontal">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label" for="input01">Pick a username</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="signup-username" autocomplete="off">
+                        <p class="help-block" id="signup-username-check"></p>
+                        <!-- <p class="help-block">Supporting help text</p> -->
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="input01">Your email</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="signup-email">
+                        <!-- <p class="help-block">Supporting help text</p> -->
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="input01">Create a password</label>
+                    <div class="controls">
+                        <input type="password" class="input-xlarge" id="signup-password">
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <a href="javascript:void(0);" onclick="attemptLogin();" class="btn btn-primary">Signup</a>
+    </div>
+</div>
+
 
 
 <div class="container">
 
     <div class="row" style="margin-bottom:20px;">
         <div class="span10"><h1><?php print($page_title); ?></h1></div>
-        <div class="span2"><?php print($page_title_right); ?></div>
+        <div class="span2" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

@@ -66,7 +66,7 @@ if (mysql_num_rows($result) == 1) {
 
     $brand_new_user = 1;
 
-    $usercode = generate_usercode(5);
+    $usercode = generate_usercode($sender);
     $query = "INSERT INTO Users (
                 email,
                 usercode,
@@ -168,7 +168,7 @@ if ($target_album_id > 0) {
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
-            <a href='{$display_album_link}'>See album</a>
+            <a href='{$display_album_link}'>See the album!</a>
             <br><br>
             To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 
@@ -194,12 +194,12 @@ EMAIL;
 
             $user_email_body = <<<EMAIL
                 You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                <a href='{$display_album_link}'>See album</a>
+                <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                 <a href='{$display_album_link}'>See album</a>
+                 <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
 
@@ -221,7 +221,7 @@ EMAIL;
                 You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
                 <br><br>
                 Your photo will appear in the album once <b>{$target_user_info["username"]}</b> approves you as a friend.
-                <a href='{$display_album_link}'>See album</a>
+                <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
             $add_friend_ra = array();
@@ -270,7 +270,7 @@ EMAIL;
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
-            <a href='{$display_album_link}'>See album</a>
+            <a href='{$display_album_link}'>See the album!</a>
             <br><br>
             To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 EMAIL;
@@ -292,14 +292,7 @@ EMAIL;
 
 if ($brand_new_user) {
 
-    $change_username_ra = array();
-    $change_username_ra["user_id"] = $user_info["id"];
-    $change_username_ra["timestamp"] = time();
-    $change_username_ra["action"] = "change_username";
-    $change_link = $www_root . "/change_username.php?request=" . urlencode(encrypt_json($change_username_ra));
-
-
-    $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>. <a href='$change_link'>Change your username</a> to something nicer.<br><br>" . $user_email_body;
+    $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
 }
 
 if (!preg_match("/zipio.com$/", $sender)) {

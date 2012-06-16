@@ -4,9 +4,10 @@ ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
 $s3_root = "https://s3.amazonaws.com/zipio_photos";
-$www_root = "http://zipio.com";
+$www_root = "http://localhost";
 
 define('CACHE_PATH', 'opticrop-cache/');
+
 
 function login_user($user_id) {
     session_regenerate_id();
@@ -39,6 +40,12 @@ function rand_string($length) {
     return substr(str_shuffle($chars),0,$length);
 }
 
+function generate_usercode($email) {
+    $parts = explode('@', $email);
+    return ($parts[0]);
+}
+
+/*
 function generate_usercode($length = 8, $include_numbers = false) {
     $vowels = array("a", "e", "i", "o", "u");
     $cons = array("b", "c", "d", "g", "h", "j", "k", "l", "m", "n", "p", "r",
@@ -67,7 +74,7 @@ function generate_usercode($length = 8, $include_numbers = false) {
     }
     return $pre.substr($password, 0, $string_length ) . $post;
 }
-
+*/
 
 
 function debug($string, $color = "black") {

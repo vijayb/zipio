@@ -27,14 +27,25 @@
 
 <script>
 
-var user;
+// The code below (i.e., all the code in this <script> block) is executed for
+// every page on zipio.com that uses the standard template.
+
+// gUser is a global that holds the user information IF AND ONLY IF a user is
+// logged in. If a user is not logged in, gUser is undefined. Therefore, to
+// check whether a user is logged in via JS, gUser is tested.
+
+var gUser;
 
 $(function() {
+
+    // This PHP code populates gUser in the case that there is a logged in
+    // user. Recall that PHP knows about the login status through session
+    // variables.
 
     <?php
 
     if (is_logged_in()) {
-        print("user = " . json_encode($_SESSION["user_info"]));
+        print("gUser = " . json_encode($_SESSION["user_info"]));
     }
 
     ?>
@@ -46,9 +57,18 @@ $(function() {
         return this;
     });
 
+    $('.alert .close').live("click", function(e) {
+        $(this).parent().hide();
+    });
+
     $("#username").keyup(function() {
-        $("#username-check").html("<small>Checking...</small>");
-        delay(checkUsername, 300);
+        $("#register-username-check").html("<small>Checking...</small>");
+        delay(checkUsername, 500);
+    });
+
+    $("#signup-username").keyup(function() {
+        $("#signup-username-check").html("<small>Checking...</small>");
+        delay(checkUsername, 500);
     });
 
     $("#password").keyup(checkUsername);

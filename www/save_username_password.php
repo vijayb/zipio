@@ -14,8 +14,8 @@ if (!check_token($_SESSION["user_id"], $_GET["token"])) {
     exit();
 }
 
-$result = update_data("Users", $_SESSION["user_id"], array("username" => $_GET["username"],
-                                                           "password_hash" => $_GET["password_hash"]));
+$result = update_data("Users", $_SESSION["user_id"], array("username" => mysql_real_escape_string($_GET["username"]),
+                                                           "password_hash" => mysql_real_escape_string($_GET["password_hash"])));
 
 login_user($_SESSION["user_id"]);
 print($result);
