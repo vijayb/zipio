@@ -61,17 +61,17 @@ $(function() {
         $(this).parent().hide();
     });
 
-    $("#username").keyup(function() {
+    $("#register-username").keyup(function() {
         $("#register-username-check").html("<small>Checking...</small>");
-        delay(checkUsername, 500);
+        delay(function() { checkUsername("register") }, 500);
     });
 
     $("#signup-username").keyup(function() {
         $("#signup-username-check").html("<small>Checking...</small>");
-        delay(checkUsername, 500);
+        delay(function() { checkUsername("signup") }, 500);
     });
 
-    $("#password").keyup(checkUsername);
+    $("#register-password").keyup(function() { checkUsername("register") });
 });
 
 </script>
