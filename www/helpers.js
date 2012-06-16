@@ -48,6 +48,34 @@ function saveUsernamePassword() {
 
 }
 
+function signupUser() {
+    
+    var username = $("#signup-username").val();
+    var passwordHash = sha1($("#signup-password").val());    
+    var emailAdd = $("#signup-email").val();
+    
+    var urlString = "/sign_up_user.php?&username=" + username + 
+                    "&password_hash=" + passwordHash + 
+                    "&email_add=" + emailAdd;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#try-again").hide();
+                $("#signup-modal").modal('hide');
+                $("#signup-success-modal").modal('show');
+                
+            } else {
+                $("#signup-modal").modal('show');
+                $("#try-again").show();
+            }
+        },
+        async: true
+    });
+    
+}
+
 function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
         $('#register-username-panel').hide();

@@ -139,8 +139,6 @@ if (!isset($logged_in_status)) $logged_in_status = "";
 
 
 
-
-
 <div class="modal hide" id="login-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
@@ -181,14 +179,15 @@ if (!isset($logged_in_status)) $logged_in_status = "";
 
 
 
-
 <div class="modal hide" id="signup-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Signup for a Zipio account</h2>
     </div>
     <div class="modal-body">
-
+        <div class = "hide" id = "try-again">
+            <div class = "alert alert-error"> Something went wrong. Please try again.</div>
+        </div>
         <form class="form-horizontal">
             <fieldset>
                 <div class="control-group">
@@ -219,6 +218,21 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="signupUser();" class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
+    </div>
+</div>
+
+
+
+<div class="modal hide" id="signup-success-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>Awesome!</h2>
+    </div>
+    <div class="modal-body">
+        You're now successfully<strong> registered</strong> at Zipio!
+    </div>
+    <div class="modal-footer">
+       <center> <a href="#" class="btn" data-dismiss="modal">OK</a> </center>
     </div>
 </div>
 
