@@ -14,7 +14,6 @@ if (!isset($_GET["photo_id"]) || !isset($_GET["album_id"])) {
     $cover_photo_id = $_GET["cover_photo_id"];
 }
 
-/***************** handles cover photo issue -- shobit *******************/
 
 if ($cover_photo_id == $photo_id) {
     $query = "SELECT photo_id FROM AlbumPhotos WHERE photo_id!='$photo_id' AND album_id='$album_id' LIMIT 1";
@@ -28,13 +27,11 @@ if ($cover_photo_id == $photo_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 }
 
-/***********************************************************************/
 
 $query = "DELETE FROM AlbumPhotos WHERE photo_id='$photo_id' AND album_id='$album_id'";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-/********************** corner case of cover photo issue **************/
 $query = "SELECT * FROM AlbumPhotos WHERE album_id='$album_id'";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -44,6 +41,5 @@ if ($count == 0) {
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 }
-/***********************************************************************/
 
 ?>
