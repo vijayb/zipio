@@ -133,7 +133,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="btn" data-dismiss="modal">I'll do this later</a>
-        <a href="javascript:void(0);" onclick="saveUsernamePassword();" class="btn btn-primary disabled" id="register-submit">Go</a>
+        <button onclick="saveUsernamePassword();" class="btn btn-primary" id="register-submit" data-loading-text="Please wait...">Go</button>
     </div>
 </div>
 
@@ -189,11 +189,6 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-body">
 
-        <div class="alert fade in" id="login-error" style="display:none;">
-            <button type="button" class="close">×</button>
-            <strong>Woops.</strong> That email/password combo is invalid.
-        </div>
-
         <form class="form-horizontal">
             <fieldset>
                 <div class="control-group">
@@ -223,7 +218,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="javascript:void(0);" onclick="attemptLogin();" class="btn btn-primary">Signup</a>
+        <button onclick="signupUser();" class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
     </div>
 </div>
 

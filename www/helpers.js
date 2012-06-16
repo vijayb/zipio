@@ -24,6 +24,8 @@ function attemptLogin() {
 
 function saveUsernamePassword() {
 
+    $("#register-submit").button("loading");
+
     var username = gUser["username"];
     var passwordHash = sha1($("#register-password").val());
 
@@ -62,25 +64,17 @@ function flipChangeUsername() {
 }
 
 
-function checkUsername() {
+function checkUsername(prefix) {
 
-    if (!$("#register-username-panel").is(":visible")) {
-        if ($("#register-password").val() != "") {
-            $("#register-password-submit").removeClass("disabled");
-        } else {
-            $("#register-password-submit").addClass("disabled");
-        }
-    }
-
-    var usernameEntered = $("#register-username").val();
+    var usernameEntered = $("#" + prefix + "-username").val();
 
     if (usernameEntered == "") {
-        $("#register-username-check").html("Type in the username you'd like");
+        $("#" + prefix + "-username-check").html("Type in the username you'd like");
         return;
     }
 
     if (/[^A-Za-z0-9]/.test(usernameEntered) ) {
-        $("#register-username-check").html("Only letters and numbers, please");
+        $("#" + prefix + "-username-check").html("Only letters and numbers, please");
         return;
     }
 
@@ -91,18 +85,11 @@ function checkUsername() {
         success: function(data) {
             data = parseInt(data);
             if (data == 0) {
-                $("#register-username-check").html("<b>" + usernameEntered + "</b> is available!");
-                if ($("#password").val() != "") {
-                    $("#register-password-submit").removeClass("disabled");
-                } else {
-                    $("#register-password-submit").addClass("disabled");
-                }
-            } else if (data == gUser["id"]) {
-                $("#register-username-check").html("Ummm...that's already your username");
-                $("#register-password-submit").addClass("disabled");
+                $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is available!");
+            } else if (isLoggedIn() && data == gUser["id"]) {
+                $("#" + prefix + "-username-check").html("Ummm...that's already your username");
             } else {
-                $("#register-username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
-                $("#register-password-submit").addClass("disabled");
+                $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
             }
         },
         async: true
