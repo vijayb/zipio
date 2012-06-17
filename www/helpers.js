@@ -1,6 +1,10 @@
 // Functions that we've written ourselves
 
 function attemptLogin() {
+
+    // Put the "Go" button in a loading state
+    $("#login-submit").button("loading");
+
     var passwordHash = sha1($("#login-password").val());
     var email = $("#login-email").val();
 
@@ -24,6 +28,7 @@ function attemptLogin() {
 
 function saveUsernamePassword() {
 
+    // Put the "Go" button in a loading state
     $("#register-submit").button("loading");
 
     var username = gUser["username"];
@@ -33,7 +38,9 @@ function saveUsernamePassword() {
         username = $("#register-username").val();
     }
 
-    var urlString = "/save_username_password.php?token=" + gUser["token"] + "&username=" + username + "&password_hash=" + passwordHash;
+    var urlString = "/save_username_password.php?token=" + gUser["token"] +
+                                               "&username=" + username +
+                                               "&password_hash=" + passwordHash;
 
     jQuery.ajax({
         type: "GET",
@@ -49,31 +56,36 @@ function saveUsernamePassword() {
 }
 
 function signupUser() {
-    
+
+    // Put the "Go" button in a loading state
+    $("#signup-submit").button("loading");
+
     var username = $("#signup-username").val();
-    var passwordHash = sha1($("#signup-password").val());    
-    var emailAdd = $("#signup-email").val();
-    
-    var urlString = "/sign_up_user.php?&username=" + username + 
-                    "&password_hash=" + passwordHash + 
-                    "&email_add=" + emailAdd;
+    var passwordHash = sha1($("#signup-password").val());
+    var email = $("#signup-email").val();
+
+    var urlString = "/sign_up_user.php?username=" + username +
+                                     "&password_hash=" + passwordHash +
+                                     "&email=" + email;
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
-            if (parseInt(data) == 1) {
-                $("#try-again").hide();
-                $("#signup-modal").modal('hide');
-                $("#signup-success-modal").modal('show');
-                
-            } else {
-                $("#signup-modal").modal('show');
-                $("#try-again").show();
-            }
+            window.location.replace(window.location.href);
         },
         async: true
     });
-    
+}
+
+function setSignupSubmitButton() {
+    debug(".");
+    if ($("#signup-email-check").data("correct") == 1 &&
+        $("#signup-username-check").data("correct") == 1 &&
+        $("#signup-password").val() != "") {
+        $("#signup-submit").removeClass("disabled");
+    } else {
+        $("#signup-submit").addClass("disabled");
+    }
 }
 
 function flipChangeUsername() {
@@ -92,8 +104,50 @@ function flipChangeUsername() {
 }
 
 
-function checkUsername(prefix) {
 
+
+
+
+function checkEmailIsUnique(prefix) {
+
+    $("#" + prefix + "-email-check").data("correct", 0);
+    var emailEntered = $("#" + prefix + "-email").val();
+
+    if (emailEntered == "") {
+        $("#" + prefix + "-email-check").html("Type in your email");
+        return;
+    }
+
+    if (!validateEmail(emailEntered)) {
+        $("#" + prefix + "-email-check").html("That doesn't appear to be a valid address");
+        return;
+    }
+
+    var urlString = "/check_email_is_unique.php?email=" + emailEntered;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            data = parseInt(data);
+            if (data == 0) {
+                $("#" + prefix + "-email-check").html("Looks good!");
+                $("#" + prefix + "-email-check").data("correct", 1);
+            } else {
+                $("#" + prefix + "-email-check").html("<b>" + emailEntered + "</b> has already signed up");
+            }
+        },
+        async: true
+    });
+}
+
+
+
+
+
+function checkUsernameIsUnique(prefix) {
+
+    $("#" + prefix + "-username-check").data("correct", 0);
     var usernameEntered = $("#" + prefix + "-username").val();
 
     if (usernameEntered == "") {
@@ -106,7 +160,7 @@ function checkUsername(prefix) {
         return;
     }
 
-    var urlString = "/check_username.php?username=" + usernameEntered;
+    var urlString = "/check_username_is_unique.php?username=" + usernameEntered;
     jQuery.ajax({
         type: "GET",
         url: urlString,
@@ -114,6 +168,7 @@ function checkUsername(prefix) {
             data = parseInt(data);
             if (data == 0) {
                 $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is available!");
+                $("#" + prefix + "-username-check").data("correct", 1);
             } else if (isLoggedIn() && data == gUser["id"]) {
                 $("#" + prefix + "-username-check").html("Ummm...that's already your username");
             } else {
@@ -122,9 +177,6 @@ function checkUsername(prefix) {
         },
         async: true
     });
-}
-
-function registerUser() {
 }
 
 function isLoggedIn() {
@@ -196,7 +248,10 @@ function deletePhotoFromAlbum(photoID, albumID, coverPhotoID) {
 
 
 
-
+function validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
 
 
 
@@ -225,14 +280,6 @@ function deletePhotoFromAlbum(photoID, albumID, coverPhotoID) {
 
 
 // Functions that have been copied from various sources on the Internet
-
-var delay = (function(){
-  var timer = 0;
-  return function(callback, ms){
-    clearTimeout (timer);
-    timer = setTimeout(callback, ms);
-  };
-})();
 
 function sha1 (str) {
 

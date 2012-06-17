@@ -3,6 +3,7 @@
 <script src="/lib/jquery-1.7.2.min.js"></script>
 <script src="/lib/jquery.masonry.min.js"></script>
 <script src="/lib/modernizr.js"></script>
+<script src="/lib/jquery.typewatch.js"></script>
 <script src="/helpers.js"></script>
 
 
@@ -58,20 +59,39 @@ $(function() {
     });
 
     $('.alert .close').live("click", function(e) {
+        $(this).parent().removeClass("alert-success");
+        $(this).parent().removeClass("alert-error");
+        $(this).parent().removeClass("alert-info");
         $(this).parent().hide();
     });
 
-    $("#register-username").keyup(function() {
-        $("#register-username-check").html("<small>Checking...</small>");
-        delay(function() { checkUsername("register") }, 500);
+    $("#register-username").typeWatch({
+        callback: function() { checkUsernameIsUnique("register") },
+        wait: 300,
+        highlight: true,
+        captureLength: 0
     });
 
-    $("#signup-username").keyup(function() {
-        $("#signup-username-check").html("<small>Checking...</small>");
-        delay(function() { checkUsername("signup") }, 500);
+    $("#signup-username").typeWatch({
+        callback: function() { checkUsernameIsUnique("signup") },
+        wait: 300,
+        highlight: true,
+        captureLength: 0
     });
 
-    $("#register-password").keyup(function() { checkUsername("register") });
+
+    $("#signup-email").typeWatch({
+        callback: function() { checkEmailIsUnique("signup") },
+        wait: 300,
+        highlight: true,
+        captureLength: 0
+    });
+
+
+    $("#signup-modal input").keyup(function() {
+        setSignupSubmitButton();
+    });
+
 });
 
 </script>

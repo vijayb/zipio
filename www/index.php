@@ -6,6 +6,10 @@ error_reporting(E_ALL | E_STRICT);
 require("db.php");
 require("helpers.php");
 
+check_request_for_login($_GET);
+print("<!--" . print_r($_SESSION, true) . "-->");
+
+
 
 
 ?>
@@ -19,11 +23,6 @@ require("helpers.php");
 
 
 
-Welcome to Zipio.
-
-
-
-
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_scripts.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
@@ -32,6 +31,9 @@ Welcome to Zipio.
 
 
 <script>
+
+
+
 
 </script>
 

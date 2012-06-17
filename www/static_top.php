@@ -38,7 +38,7 @@
 
 if (is_logged_in()) {
 
-    $brand_name = "<span style=''>zipio</span>";
+    $brand_name = "<span style='color:red;'>zipio</span>";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -98,6 +98,18 @@ if (!isset($logged_in_status)) $logged_in_status = "";
 </div>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="modal hide" id="register-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
@@ -139,6 +151,14 @@ if (!isset($logged_in_status)) $logged_in_status = "";
 
 
 
+
+
+
+
+
+
+
+
 <div class="modal hide" id="login-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
@@ -172,9 +192,17 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <a href="javascript:void(0);" onclick="attemptLogin();" class="btn btn-primary">Login</a>
+        <button onclick="attemptLogin();" class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">Login</button>
     </div>
 </div>
+
+
+
+
+
+
+
+
 
 
 
@@ -202,6 +230,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
                     <label class="control-label" for="input01">Your email</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="signup-email">
+                        <p class="help-block" id="signup-email-check"></p>
                         <!-- <p class="help-block">Supporting help text</p> -->
                     </div>
                 </div>
@@ -217,28 +246,30 @@ if (!isset($logged_in_status)) $logged_in_status = "";
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="signupUser();" class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
+        <button onclick="signupUser();" class="btn btn-primary disabled" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
     </div>
 </div>
 
 
 
-<div class="modal hide" id="signup-success-modal">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h2>Awesome!</h2>
-    </div>
-    <div class="modal-body">
-        You're now successfully<strong> registered</strong> at Zipio!
-    </div>
-    <div class="modal-footer">
-       <center> <a href="#" class="btn" data-dismiss="modal">OK</a> </center>
-    </div>
-</div>
+
+
+
+
+
 
 
 
 <div class="container">
+
+    <div class="row">
+        <div class="span12">
+            <div class="alert" style="display:none;" id="header-alert">
+                <button class="close">×</button>
+                <span id="header-alert-text"></span>
+            </div>
+        </div>
+    </div>
 
     <div class="row" style="margin-bottom:20px;">
         <div class="span10"><h1><?php print($page_title); ?></h1></div>

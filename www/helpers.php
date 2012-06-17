@@ -183,18 +183,19 @@ function has_write_permission($user_id, $album_id) {
 }
 
 
-function create_user($username, $password_hash, $email_add) {
+function create_user($username, $password_hash, $email) {
+
     global $con;
-    
-    $usercode = generate_usercode($email_add);
-    
+
+    $usercode = generate_usercode($email);
+
     $query = "INSERT INTO Users (
                 email,
                 usercode,
                 username,
                 password_hash
               ) VALUES (
-                '$email_add',
+                '$email',
                 '$usercode',
                 '$usercode',
                 '$password_hash'
@@ -202,7 +203,9 @@ function create_user($username, $password_hash, $email_add) {
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
-    return 1;
+    $user_id = mysql_insert_id();
+
+    return $user_id;
 }
 
 
