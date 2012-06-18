@@ -45,6 +45,31 @@ function generate_usercode($email) {
     return ($parts[0]);
 }
 
+
+
+function create_follower($album_owner_id, $follower_id, $album_id) {
+
+    global $con;
+    
+    $query ="INSERT INTO Followers (
+                follower_id,
+                album_owner_id,
+                album_id
+              ) VALUES (
+                '$follower_id',
+                '$album_owner_id',
+                '$album_id'
+              )";
+              
+    $result = mysql_query($query, $con);
+    
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+
+    $id = mysql_insert_id();
+
+    return $id;
+}
+
 /*
 function generate_usercode($length = 8, $include_numbers = false) {
     $vowels = array("a", "e", "i", "o", "u");
@@ -183,11 +208,9 @@ function has_write_permission($user_id, $album_id) {
 }
 
 
-function create_user($username, $password_hash, $email) {
+function create_user($username, $usercode, $password_hash, $email) {
 
     global $con;
-
-    $usercode = generate_usercode($email);
 
     $query = "INSERT INTO Users (
                 email,
@@ -197,7 +220,7 @@ function create_user($username, $password_hash, $email) {
               ) VALUES (
                 '$email',
                 '$usercode',
-                '$usercode',
+                '$username',
                 '$password_hash'
               )";
     $result = mysql_query($query, $con);
@@ -327,6 +350,21 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         return 0;
     }
 
+}
+
+
+/** return 1 if user is following album
+ *  else returns 0
+ **/
+function is_following($logged_in_username, $album_id) {
+    
+    global $con;
+    
+    $query = "SELECT id FROM Followers WHERE follower_id='$logged_in_username' AND album_id='$album_id'";
+    $result = mysql_query($query);
+    if(mysql_num_rows($result) == 1) { // user is following the album
+        return 1;
+    } else return 0;
 }
 
 

@@ -28,9 +28,38 @@ $page_title = <<<HTML
     <a href="/{$username}">{$username}</a> &rsaquo; {$album_info["handle"]}
 HTML;
 
-$page_title_right = <<<HTML
-<button class="btn btn-large btn-primary">Follow this album</button>
+
+
+// checks for follow-this-album
+// 1. is logged_in_user already following the album?
+// 2. not following the album?
+// 3. is logged_in_user viewing his own album?
+// 4. user not logged in
+
+if (!is_logged_in()) { // user not logged in
+    $page_title_right = <<<HTML
+<button class="btn btn-large btn-primary" onclick="$('#follow-modal').modal('show')" id = "follow-this-album">Follow this album</button>
 HTML;
+        
+    } else { // user logged in
+        $user_id = is_logged_in();
+        $logged_in_username = get_username_from_user_id($user_id);
+        
+        if ($logged_in_username == $username) { // logged in user same as album owner?
+            $page_title_right = <<<HTML
+HTML;
+        } else { // logged in user viewing someone else's album
+            if (isset($album_info) && is_following($user_id, $album_info["id"]) == 1) { // logged in user already following this album?
+               $page_title_right = <<<HTML
+                    <button onclick="unfollowAlbum();" class="btn enabled" id="unfollow-submit" data-loading-text="Please wait...">Unfollow</button>
+HTML;
+            } else { // logged in user not following this album
+                 $page_title_right = <<<HTML
+                    <button class="btn btn-large btn-primary" onclick="followAlbum()" id = "follow-this-album">Follow this album</button>
+HTML;
+            }
+        }
+    }
 
 
 
@@ -169,7 +198,7 @@ $(function() {
 
     // If the user is logged in but has not yet registered (i.e., set a
     // password), then show the registration dialog
-    if (isLoggedIn() && gUser["password_hash"] == "") {
+    if (isLoggedIn() && gUser["password_hash"] == "" && gUser["username"] != "") {
         $('#register-modal').modal('show');
     }
 

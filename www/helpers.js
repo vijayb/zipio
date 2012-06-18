@@ -20,11 +20,81 @@ function attemptLogin() {
                 $("#login-error").show();
             }
         },
-        async: true
+        async: false
     });
 
 
 }
+
+
+
+
+/** this function is attached to the Follow Album button on page-top-right **/
+function followAlbum() {
+    
+    if (isLoggedIn()) {
+        
+        
+        
+    } else {
+        
+        $('#follow-modal').modal('show');
+    }
+    
+}
+
+/** this function is attached to the Unfollow Album button on page-top-right **/
+function unfollowAlbum(albumid, userid) {
+    
+    // Put the "Follow" button in a loading state
+    $("#unfollow-submit").button("loading");
+
+    var urlString = "/unfollow_album.php?userid=" + userid + "&album_id=" + albumid;
+    
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+                 window.location.replace(window.location.href);       
+                 
+        },
+        async: false
+    });
+    
+}
+
+
+/** this function is attached to the Follow button as part of the follow-modal that asks for email **/
+function submitEmailToFollow(albumid) {
+    
+    
+    /** TO-DO
+     *  three cases
+     * 1. user w/ password
+     * 2. user w/o password --->|____ send email for confirmation
+     * 3. new user          --->|
+     **/
+    
+    /** originally...
+    // Put the "Follow" button in a loading state
+    $("#follow-submit").button("loading");
+
+    var email = $("#follow-email").val();
+
+    var urlString = "/create_user_and_follow_album.php?email=" + email + "&album_id=" + albumid;
+    
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+                 window.location.replace(window.location.href);       
+                 
+        },
+        async: false
+    });**/
+        
+}
+
 
 function saveUsernamePassword() {
 
@@ -50,7 +120,7 @@ function saveUsernamePassword() {
                 window.location.replace(window.location.href);
             }
         },
-        async: true
+        async: false
     });
 
 }
@@ -73,8 +143,18 @@ function signupUser() {
         success: function(data) {
             window.location.replace(window.location.href);
         },
-        async: true
+        async: false
     });
+}
+
+
+
+function setFollowSubmitButton() {
+     if ($("#follow-email-check").data("correct") == 1) {
+        $("#follow-submit").removeClass("disabled");
+     } else {
+        $("#follow-submit").addClass("disabled");
+     }
 }
 
 function setSignupSubmitButton() {
@@ -111,6 +191,7 @@ function flipChangeUsername() {
 function checkEmailIsUnique(prefix) {
 
     $("#" + prefix + "-email-check").data("correct", 0);
+    
     var emailEntered = $("#" + prefix + "-email").val();
 
     if (emailEntered == "") {
@@ -120,6 +201,12 @@ function checkEmailIsUnique(prefix) {
 
     if (!validateEmail(emailEntered)) {
         $("#" + prefix + "-email-check").html("That doesn't appear to be a valid address");
+        return;
+    }
+    
+    if (prefix == "follow") {
+        $("#follow-email-check").html("We'll send you notifications to this email");
+        $("#follow-email-check").data("correct", 1);
         return;
     }
 
@@ -137,7 +224,7 @@ function checkEmailIsUnique(prefix) {
                 $("#" + prefix + "-email-check").html("<b>" + emailEntered + "</b> has already signed up");
             }
         },
-        async: true
+        async: false
     });
 }
 
@@ -175,7 +262,7 @@ function checkUsernameIsUnique(prefix) {
                 $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
             }
         },
-        async: true
+        async: false
     });
 }
 

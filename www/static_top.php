@@ -43,7 +43,7 @@ if (is_logged_in()) {
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>You're logged in as <b>{$_SESSION["user_info"]["username"]}</b> ({$_SESSION["user_info"]["email"]})<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>You're logged in as <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
                     <li><a href="#"><i class="icon-wrench"></i> Account settngs</a></li>
@@ -249,6 +249,59 @@ if (!isset($logged_in_status)) $logged_in_status = "";
         <button onclick="signupUser();" class="btn btn-primary disabled" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal hide" id="follow-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>Follow this album</h2>
+    </div>
+    <div class="modal-body">
+        
+        <form class="form-horizontal">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label" for="input01">Your email</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="follow-email">
+                        <p class="help-block" id="follow-email-check"></p>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);" class="btn btn-primary disabled" id="follow-submit" data-loading-text="Please wait...">Follow</button>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

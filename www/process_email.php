@@ -1,13 +1,14 @@
 <?php
 
 /*
-
-TRUNCATE TABLE AlbumPhotos;
-TRUNCATE TABLE Albums;
-TRUNCATE TABLE Friends;
-TRUNCATE TABLE Photos;
-TRUNCATE TABLE Users;
-
+    
+    TRUNCATE TABLE AlbumPhotos;
+    TRUNCATE TABLE Albums;
+    TRUNCATE TABLE Friends;
+    TRUNCATE TABLE Photos;
+    TRUNCATE TABLE Users;
+    TRUNCATE TABLE Followers;
+s
 */
 
 ob_start();

@@ -73,7 +73,7 @@ $(function() {
     });
 
     $("#signup-username").typeWatch({
-        callback: function() { checkUsernameIsUnique("signup") },
+        callback: function() { checkUsernameIsUnique("signup"); setSignupSubmitButton(); },
         wait: 300,
         highlight: true,
         captureLength: 0
@@ -81,10 +81,22 @@ $(function() {
 
 
     $("#signup-email").typeWatch({
-        callback: function() { checkEmailIsUnique("signup") },
+        callback: function() { checkEmailIsUnique("signup"); setSignupSubmitButton(); },
         wait: 300,
         highlight: true,
         captureLength: 0
+    });
+    
+    
+    $("#follow-email").typeWatch({
+        callback: function() { checkEmailIsUnique("follow");  setFollowSubmitButton(); },
+        wait: 300,
+        highlight: true,
+        captureLength: 0
+    });
+    
+    $("#follow-modal input").keyup(function() {
+        setFollowSubmitButton();
     });
 
 
