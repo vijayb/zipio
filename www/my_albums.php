@@ -48,7 +48,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $html = <<<HTML
     <div class="item span3">
         <a href="/{$username}/{$albums_array[$i]["handle"]}">
-            <img src='https://s3.amazonaws.com/zipio_photos/{$cover_photo_info["s3_url"]}_cropped'>
+            <img src='{$s3_root}/{$cover_photo_info["s3_url"]}_cropped'>
             <div class="album-details">
                 <span class="album-title">
                     {$albums_array[$i]["handle"]}

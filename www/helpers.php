@@ -36,21 +36,39 @@ function check_request_for_login($_GET) {
 }
 
 function rand_string($length) {
-    $chars = "abcdefghijklmnopqrstuvwxyz";
-    return substr(str_shuffle($chars),0,$length);
+    $chars = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+    return substr(str_shuffle($chars), 0, $length);
 }
 
-function generate_usercode($email) {
+function generate_username($email) {
+    global $con;
     $parts = explode('@', $email);
-    return ($parts[0]);
+    $username = preg_replace("/[^A-Za-z0-9]/", "", $parts[0]);
+
+    for ($i = 0; $i < 5; $i++) {
+        $suggested_username = $username . rand_number_string($i);
+        $query = "SELECT id FROM Users WHERE username_hash=UNHEX(SHA1('$suggested_username'))";
+        $result = mysql_query($query, $con);
+        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+        if (mysql_num_rows($result) == 0) {
+            return $suggested_username;
+        }
+    }
 }
 
+function rand_number_string($length) {
+    if ($length <= 0) {
+        return "";
+    }
+
+    return rand(pow(10, $length - 1), pow(10, $length) - 1);
+}
 
 
 function create_follower($album_owner_id, $follower_id, $album_id) {
 
     global $con;
-    
+
     $query ="INSERT INTO Followers (
                 follower_id,
                 album_owner_id,
@@ -60,9 +78,9 @@ function create_follower($album_owner_id, $follower_id, $album_id) {
                 '$album_owner_id',
                 '$album_id'
               )";
-              
+
     $result = mysql_query($query, $con);
-    
+
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
     $id = mysql_insert_id();
@@ -126,20 +144,13 @@ function send_email($to, $from, $subject, $html) {
 
 
 function encrypt_json($arr) {
-
-    $public_key = openssl_get_publickey(file_get_contents('/usr/local/zipio/public.key'));
-
-
     $json = json_encode($arr);
-    $res = openssl_public_encrypt($json, $encrypted_text, $public_key);
+    $encrypted_text = openssl_encrypt($json, "aes-128-cbc", "cheapass", true, "1234567812345678");
     return base64_encode($encrypted_text);
 }
 
 function decrypt_json($encrypted_json) {
-
-    $private_key = openssl_get_privatekey(file_get_contents('/usr/local/zipio/private.key'));
-
-    $res = openssl_private_decrypt(base64_decode($encrypted_json), $decrypted_text, $private_key);
+    $decrypted_text = openssl_decrypt(base64_decode($encrypted_json), "aes-128-cbc", "cheapass", true, "1234567812345678");
     return json_decode($decrypted_text, true);
 }
 
@@ -222,7 +233,7 @@ function create_user($username, $usercode, $password_hash, $email) {
                 '$usercode',
                 '$username',
                 '$password_hash'
-              )";
+              ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
@@ -253,7 +264,7 @@ function create_album($user_id, $handle) {
 
 
 function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
-                   $visible = 1, $path_to_photo) {
+                   $visible = 1, $path_to_photo, &$s3_url_parameter) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -267,6 +278,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $s3_url =
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
+    $s3_url_parameter = $s3_url;
     $bucket_name = "zipio_photos";
 
     $sizes = array(800, 480, 240);
@@ -342,7 +354,6 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
-
         return $photo_id;
 
     } else {
@@ -352,14 +363,35 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
 }
 
+function email_followers($album_info) {
+    global $con;
+    global $www_root;
+    $query = "SELECT follower_id, email FROM Followers LEFT JOIN Users ON follower_id=Users.id WHERE album_id=" . $album_info["id"];
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+
+    $album_owner_info = get_user_info($album_info["user_id"]);
+
+$follower_email_body = <<<EMAIL
+    Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
+    <br><br>
+EMAIL;
+
+
+    while ($row = mysql_fetch_assoc($result)) {
+        send_email($row["email"], "founders@zipio.com", "New photo added", "New photo added!");
+    }
+
+}
+
 
 /** return 1 if user is following album
  *  else returns 0
  **/
 function is_following($logged_in_username, $album_id) {
-    
+
     global $con;
-    
+
     $query = "SELECT id FROM Followers WHERE follower_id='$logged_in_username' AND album_id='$album_id'";
     $result = mysql_query($query);
     if(mysql_num_rows($result) == 1) { // user is following the album

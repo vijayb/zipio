@@ -86,15 +86,15 @@ $(function() {
         highlight: true,
         captureLength: 0
     });
-    
-    
+
+
     $("#follow-email").typeWatch({
         callback: function() { checkEmailIsUnique("follow");  setFollowSubmitButton(); },
         wait: 300,
         highlight: true,
         captureLength: 0
     });
-    
+
     $("#follow-modal input").keyup(function() {
         setFollowSubmitButton();
     });

@@ -1,14 +1,14 @@
 <?php
 
 /*
-    
+
     TRUNCATE TABLE AlbumPhotos;
     TRUNCATE TABLE Albums;
     TRUNCATE TABLE Friends;
     TRUNCATE TABLE Photos;
     TRUNCATE TABLE Users;
     TRUNCATE TABLE Followers;
-s
+
 */
 
 ob_start();
@@ -40,12 +40,6 @@ $s3 = new S3(awsAccessKey, awsSecretKey);
 
 
 
-
-
-
-
-
-
 // First, check if this user exists
 
 $brand_new_user = 0;
@@ -67,7 +61,7 @@ if (mysql_num_rows($result) == 1) {
 
     $brand_new_user = 1;
 
-    $usercode = generate_usercode($sender);
+    $usercode = generate_username($sender);
     $query = "INSERT INTO Users (
                 email,
                 usercode,
@@ -104,6 +98,9 @@ $paths_to_photos = array();
 for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
     array_push($paths_to_photos, $_FILES["attachment-" . ($i + 1)]["tmp_name"]);
 }
+
+// Stores the S3 URLs of the photos afters they are added to S3
+$s3_urls = array();
 
 // Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
 if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
@@ -159,8 +156,12 @@ if ($target_album_id > 0) {
         // User is adding a photo to own existing album
         debug("User is adding to his own album.");
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+            $s3_url = "";
+            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+            array_push($s3_urls, $s3_url);
         }
+        print_r($s3_urls);
+        email_followers($target_album_info);
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
@@ -183,8 +184,11 @@ EMAIL;
             debug("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"], "green");
             // Add the photo to the friend's album
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+                $s3_url = "";
+                add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+                array_push($s3_urls, $s3_url);
             }
+            email_followers($target_album_info);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
@@ -210,8 +214,11 @@ EMAIL;
             debug("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"], "red");
             // Add photo as invisible and send an email to the owner
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i]);
+                $s3_url = "";
+                add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
+                array_push($s3_urls, $s3_url);
             }
+            email_followers($target_album_info);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
@@ -255,14 +262,18 @@ EMAIL;
         debug("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
+
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-            $current_photo_id = add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i]);
+            $s3_url = "";
+            $current_photo_id = add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+            array_push($s3_urls, $s3_url);
             if ($i == 0) {
                 // Set the first photo as the cover photo
                 debug("current_photo_id: $current_photo_id");
                 update_data("Albums", $target_album_id, array("cover_photo_id" => $current_photo_id));
             }
         }
+        email_followers($target_album_info);
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];

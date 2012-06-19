@@ -43,7 +43,9 @@ if (is_logged_in()) {
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>You're logged in as <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>
+                    You're logged in as <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b>
+                </a>
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
                     <li><a href="#"><i class="icon-wrench"></i> Account settngs</a></li>
@@ -53,6 +55,8 @@ if (is_logged_in()) {
             </li>
         </ul>
 HTML;
+
+
 } else {
 
     $brand_name = "zipio";
@@ -66,9 +70,12 @@ HTML;
 
 }
 
+// It is the responsibility of the page that uses the template (and therefore
+// includes static_top.php) to initialize these variables. If that page has
+// not initialized the variables by now, we set defaults below.
+
 if (!isset($page_title)) $page_title = "Zipio";
 if (!isset($page_title_right)) $page_title_right = "";
-if (!isset($logged_in_status)) $logged_in_status = "";
 
 ?>
 
@@ -89,7 +96,9 @@ if (!isset($logged_in_status)) $logged_in_status = "";
                 <span class="icon-bar"></span>
             </a>
 
-            <a class="brand" href="#" style="font-weight:bold"><?php print($brand_name); ?></a>
+            <a class="brand" href="#" style="font-weight:bold">
+                <?php print($brand_name); ?>
+            </a>
 
             <?php print($logged_in_status); ?>
 
@@ -213,7 +222,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
         <h2>Signup for a Zipio account</h2>
     </div>
     <div class="modal-body">
-        <div class = "hide" id = "try-again">
+        <div class = "hide" id="try-again">
             <div class = "alert alert-error"> Something went wrong. Please try again.</div>
         </div>
         <form class="form-horizontal">
@@ -267,7 +276,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
         <h2>Follow this album</h2>
     </div>
     <div class="modal-body">
-        
+
         <form class="form-horizontal">
             <fieldset>
                 <div class="control-group">
@@ -319,6 +328,7 @@ if (!isset($logged_in_status)) $logged_in_status = "";
         <div class="span12">
             <div class="alert" style="display:none;" id="header-alert">
                 <button class="close">×</button>
+                <h3 class="alert-heading" id="header-alert-title" style="font-weight:bold;"></h3>
                 <span id="header-alert-text"></span>
             </div>
         </div>

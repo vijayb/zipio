@@ -25,7 +25,7 @@ if (!isset($_GET["username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    <a href="/{$username}">{$username}</a> &rsaquo; {$album_info["handle"]}
+    <a href="/{$username}">{$username}</a> &rsaquo; {$album_info["handle"]}<span style="color:#cccccc">@{$username}.zipio.com</span>
 HTML;
 
 
@@ -38,13 +38,13 @@ HTML;
 
 if (!is_logged_in()) { // user not logged in
     $page_title_right = <<<HTML
-<button class="btn btn-large btn-primary" onclick="$('#follow-modal').modal('show')" id = "follow-this-album">Follow this album</button>
+        <button class="btn btn-large btn-primary" onclick="showFollowModal();" id = "follow-this-album">Follow this album</button>
 HTML;
-        
+
     } else { // user logged in
         $user_id = is_logged_in();
         $logged_in_username = get_username_from_user_id($user_id);
-        
+
         if ($logged_in_username == $username) { // logged in user same as album owner?
             $page_title_right = <<<HTML
 HTML;
@@ -113,12 +113,12 @@ for ($i = 0; $i < count($photos_array); $i++) {
         $opacity = "1.0";
     }
 
-    $photos_array_js .= "'http://s3.amazonaws.com/zipio_photos/" . $photos_array[$i]["s3_url"] . "_800',";
+    $photos_array_js .= "'" . $s3_root . "/" . $photos_array[$i]["s3_url"] . "_800',";
 
     $html = <<<HTML
         <div class="item span3" id="photo-{$photos_array[$i]["id"]}">
-            <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="http://s3.amazonaws.com/zipio_photos/{$photos_array[$i]["s3_url"]}_800">
-                <img style='opacity:{$opacity};' src='http://s3.amazonaws.com/zipio_photos/{$photos_array[$i]["s3_url"]}_cropped'>
+            <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800">
+                <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped'>
             </a>
 
             <div class="tile-options" style="display:none;">
