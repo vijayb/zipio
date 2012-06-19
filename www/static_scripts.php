@@ -51,6 +51,10 @@ $(function() {
 
     ?>
 
+    // If there is an alert URL parameter, show the alert
+
+
+
     $('.modal').on('shown', function(e) {
         var modal = $(this);
         modal.css('margin-top', (modal.outerHeight() / 2) * -1)
@@ -79,14 +83,12 @@ $(function() {
         captureLength: 0
     });
 
-
     $("#signup-email").typeWatch({
         callback: function() { checkEmailIsUnique("signup"); setSignupSubmitButton(); },
         wait: 300,
         highlight: true,
         captureLength: 0
     });
-
 
     $("#follow-email").typeWatch({
         callback: function() { checkEmailIsUnique("follow");  setFollowSubmitButton(); },
@@ -98,7 +100,6 @@ $(function() {
     $("#follow-modal input").keyup(function() {
         setFollowSubmitButton();
     });
-
 
     $("#signup-modal input").keyup(function() {
         setSignupSubmitButton();

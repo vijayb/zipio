@@ -34,6 +34,7 @@ $album_owner_email_subject = $request["follower_username"] . " is now following 
 send_email($request["album_owner_email"], "founders@zipio.com", $album_owner_email_subject, $album_owner_email_body);
 
 login_user($request["follower_id"]);
+
 header("Location: " . $www_root . "/" . $request["album_owner_username"] . "/" . $request["album_handle"]);
 
 ?>

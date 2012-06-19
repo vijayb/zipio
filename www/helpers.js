@@ -266,7 +266,9 @@ function isLoggedIn() {
 }
 
 function getURLParameter(name) {
-    return decodeURI((RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]);
+    return decodeURIComponent(
+        (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
+    );
 }
 
 function debug(string) {

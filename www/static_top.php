@@ -106,18 +106,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
+<!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="register-modal">
     <div class="modal-header">
@@ -158,15 +147,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
+<!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="login-modal">
     <div class="modal-header">
@@ -205,16 +186,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
+<!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="signup-modal">
     <div class="modal-header">
@@ -259,16 +231,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
+<!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="follow-modal">
     <div class="modal-header">
@@ -295,32 +258,9 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 
 <div class="container">
 
