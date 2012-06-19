@@ -227,6 +227,9 @@ function create_album($user_id, $handle) {
 }
 
 
+
+//$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
+
 function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
                    $visible = 1, $path_to_photo, &$s3_url_parameter) {
 
@@ -255,7 +258,6 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-
         $tmp_path_to_photo = $path_to_photo . "_tmp_" . $sizes[$ii];
         $tmpimage->writeImage($tmp_path_to_photo);
         debug("Writing file: $tmp_path_to_photo");
@@ -269,6 +271,21 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
             $failed = 1;
         }
 
+        $tiltimage = clone $tmpimage;
+        $tilt_path_to_photo = $path_to_photo . "_tmp_".$sizes[$ii]."_tilt";
+        $tiltimage->writeImage($tilt_path_to_photo);
+        
+        exec("/usr/bin/convert \( $tilt_path_to_photo -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tilt_path_to_photo");
+        $s3_name = $s3_url . "_" . $sizes[$ii] ."_tilt";
+
+        if (!$s3->putObjectFile($tilt_path_to_photo, $bucket_name,
+                                $s3_name, S3::ACL_PUBLIC_READ)) {
+            debug("Error in writing to S3");
+            debug($tilt_path_to_photo);
+            $failed = 1;
+        }
+
+        unlink($tilt_path_to_photo);
         unlink($tmp_path_to_photo);
     }
 
@@ -287,7 +304,21 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         debug($cropped_path);
         $failed = 1;
     }
+
+    $cropped_tilt_path = $cropped_path."_tilt";
+    copy($cropped_path, $cropped_tilt_path);
+    exec("/usr/bin/convert \( $cropped_tilt_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $cropped_tilt_path");
+    $s3_name = $s3_url."_cropped_tilt";
+    if (!$s3->putObjectFile($cropped_tilt_path, $bucket_name,
+                            $s3_name, S3::ACL_PUBLIC_READ)) {
+        debug("Error in writing to S3");
+        debug($cropped_tilt_path);
+        $failed = 1;
+    }
+
+
     unlink($cropped_path);
+    unlink($cropped_tilt_path);
 
     if (!$failed) {
         $query = "INSERT INTO Photos (
