@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `Friends` (
   `user_id` int(11) unsigned NOT NULL,
   `friend_id` int(11) unsigned NOT NULL,
   `album_id` int(11) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY (`user_id`),
   KEY (`friend_id`),

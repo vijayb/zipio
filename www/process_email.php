@@ -217,7 +217,7 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            email_followers($target_album_info, $s3_urls);
+            // email_followers($target_album_info, $s3_urls);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];

@@ -10,7 +10,7 @@ if (!isset($_GET["token"]) || !isset($_GET["username"]) || !isset($_GET["passwor
     exit();
 }
 
-if (!check_token($_SESSION["user_id"], $_GET["token"])) {
+if (!check_token($_SESSION["user_id"], $_GET["token"], "Users")) {
     exit();
 }
 

@@ -53,6 +53,13 @@ $(function() {
 
     ?>
 
+    $('.modal').on('shown', function(e) {
+        var modal = $(this);
+        modal.css('margin-top', (modal.outerHeight() / 2) * -1)
+             .css('margin-left', (modal.outerWidth() / 2) * -1);
+        return this;
+    });
+
     // If there is an alert URL parameter, show the alert
     var alert = getURLHashParameter("alert");
     if (alert != "null") {
@@ -70,13 +77,6 @@ $(function() {
     if (isLoggedIn() && gUser["password_hash"] == "" && getURLHashParameter("register") == "true") {
         $('#register-modal').modal('show');
     }
-
-    $('.modal').on('shown', function(e) {
-        var modal = $(this);
-        modal.css('margin-top', (modal.outerHeight() / 2) * -1)
-             .css('margin-left', (modal.outerWidth() / 2) * -1);
-        return this;
-    });
 
     $('.alert .close').live("click", function(e) {
         $(this).parent().slideUp(function() {

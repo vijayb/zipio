@@ -6,12 +6,23 @@ error_reporting(E_ALL | E_STRICT);
 require("db.php");
 require("helpers.php");
 
-if (!isset($_GET["photo_id"]) || !isset($_GET["album_id"])) {
+if (!isset($_GET["photo_id"]) ||
+    !isset($_GET["album_id"]) ||
+    !isset($_GET["albumphoto_id"]) ||
+    !isset($_GET["cover_photo_id"]) ||
+    !isset($_GET["token"])) {
     exit();
 } else {
     $photo_id = $_GET["photo_id"];
     $album_id = $_GET["album_id"];
+    $albumphoto_id = $_GET["albumphoto_id"];
     $cover_photo_id = $_GET["cover_photo_id"];
+    $token = $_GET["token"];
+}
+
+if (!check_token($albumphoto_id, $token, "AlbumPhotos")) {
+    print("0");
+    exit();
 }
 
 if ($cover_photo_id == $photo_id) {
@@ -40,5 +51,7 @@ if ($count == 0) {
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 }
+
+print("1");
 
 ?>

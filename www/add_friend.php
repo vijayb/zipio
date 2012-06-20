@@ -37,6 +37,7 @@ $result = mysql_query($query, $con);
 debug($query);
 if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 
+
 // Now, all of user_id's photos that live in target_user_id's albums need to be made visible
 
 $query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_owner_id=$user_id AND album_owner_id=$target_user_id";

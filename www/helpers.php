@@ -13,7 +13,7 @@ function login_user($user_id) {
     session_regenerate_id();
     $_SESSION["user_id"] = $user_id;
     $_SESSION["user_info"] = get_user_info($user_id);
-    $_SESSION["user_info"]["token"] = calculate_token_from_id($user_id);
+    $_SESSION["user_info"]["token"] = calculate_token_from_id($user_id, "Users");
 }
 
 function is_logged_in() {
@@ -88,24 +88,20 @@ function debug($string, $color = "black") {
     print("<span style='color:$color;'>$string</span>" . "\n<br>");
 }
 
-
 function send_email($to, $from, $subject, $html) {
 
     if ($from == "") {
         $from = "Zipio <founders@zipio.com>";
     }
 
-    $request = new HttpRequest('https://api.mailgun.net/v2/zipio.com/messages',
-                               HttpRequest::METH_POST);
+    $request = new HttpRequest('https://api.mailgun.net/v2/zipio.com/messages', HttpRequest::METH_POST);
     $auth = base64_encode('api:key-68imhgvpoa-6uw3cl8728kcs9brvlmr9');
     $request->setHeaders(array('Authorization' => 'Basic '.$auth));
-    $request->setPostFields(array('from' => $from, 'to' => $to,
-                                  'subject' => $subject, 'html' => $html));
+    $request->setPostFields(array('from'=>$from, 'to'=>$to, 'subject'=>$subject, 'html'=>$html));
     $request->send();
 
     return $request;
 }
-
 
 function encrypt_json($arr) {
     $json = json_encode($arr);
@@ -122,11 +118,10 @@ function calculate_token($id, $created) {
     return sha1($id . $created);
 }
 
-function calculate_token_from_id($id) {
-
+function calculate_token_from_id($id, $table) {
     global $con;
 
-    $query = "SELECT created FROM Users WHERE id='$id' LIMIT 1";
+    $query = "SELECT created FROM " . $table . " WHERE id='$id' LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -139,17 +134,13 @@ function calculate_token_from_id($id) {
     return $token;
 }
 
-function check_token($id, $token) {
-
-    $correct_token = calculate_token_from_id($id);
-
+function check_token($id, $token, $table) {
+    $correct_token = calculate_token_from_id($id, $table);
     if ($token == $correct_token) {
         return 1;
     }
-
     return 0;
 }
-
 
 function is_friend($user_id, $potential_friend_id) {
 
@@ -166,22 +157,6 @@ function is_friend($user_id, $potential_friend_id) {
 
     return 0;
 }
-
-function has_write_permission($user_id, $album_id) {
-
-    global $con;
-
-    $query = "SELECT * FROM Permissions WHERE user_id='$user_id' AND album_id=$album_id LIMIT 1";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    if (mysql_num_rows($result) == 1) {
-        return 1;
-    }
-
-    return 0;
-}
-
 
 function create_user($username, $usercode, $password_hash, $email) {
 
@@ -600,10 +575,11 @@ function get_photo_info($photo_id, $album_id) {
         $inner_query = "SELECT * FROM AlbumPhotos WHERE photo_id='$photo_id' AND album_id='$album_id' LIMIT 1";
         $inner_result = mysql_query($inner_query, $con);
         if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-            if ($inner_row = mysql_fetch_assoc($inner_result)) {
-                $row["visible"] = $inner_row["visible"];
-            }
-
+        if ($inner_row = mysql_fetch_assoc($inner_result)) {
+            $row["visible"] = $inner_row["visible"];
+            $row["albumphoto_id"] = $inner_row["id"];
+        }
+        $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
         return 0;

@@ -13,7 +13,7 @@ if (!isset($_GET["user_id"]) || !isset($_GET["album_id"])) {
     $album_id = $_GET["album_id"];
 }
 
-if (!check_token($_SESSION["user_id"], $_GET["token"])) {
+if (!check_token($_SESSION["user_id"], $_GET["token"], "Users")) {
     print("0");
     exit();
 }

@@ -24,7 +24,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    <a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a> &rsaquo; {$album_info["handle"]}<span style="color:#cccccc">@{$album_owner_info["username"]}.zipio.com</span>
+    {$album_info["handle"]}<span style="color:#cccccc">@{$album_owner_info["username"]}.zipio.com</span>
 HTML;
 
 
@@ -108,8 +108,7 @@ HTML;
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
-
-<?php if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) { ?>
+<?php if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"] && false) { ?>
 
 <div class="row">
     <div class="span12">
@@ -144,7 +143,8 @@ $photos_array_js = "";
 
 for ($i = 0; $i < count($photos_array); $i++) {
     if ($photos_array[$i]["visible"] == 0) {
-        $opacity = "0.4";
+        continue;
+        // $opacity = "0.4";
     } else {
         $opacity = "1.0";
     }
@@ -152,23 +152,39 @@ for ($i = 0; $i < count($photos_array); $i++) {
     $photos_array_js .= "'" . $s3_root . "/" . $photos_array[$i]["s3_url"] . "_800',";
 
     $html = <<<HTML
-        <div class="item span3" id="photo-{$photos_array[$i]["id"]}">
-            <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800">
-                <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped'>
-            </a>
 
-            <div class="tile-options" style="display:none;">
-                <div class="btn-group">
-                    <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                        <i class="icon-chevron-down icon-white"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$photos_array[$i]["id"]}, {$album_to_display}, {$album_info["cover_photo_id"]});"><i class="icon-trash"></i> Delete this photo</a></li>
-                    </ul>
-                </div>
-            </div>
+<div class="item span3" id="photo-{$photos_array[$i]["id"]}">
+    <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800">
+        <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped'>
 
+    </a>
+
+    <!--
+    photo_id: {$photos_array[$i]["id"]}<br>
+    album_id: {$album_to_display}<br>
+    cover_photo_id: {$album_info["cover_photo_id"]}<br>
+    albumphoto_id: {$photos_array[$i]["albumphoto_id"]}<br>
+    -->
+
+    <div class="tile-options" style="display:none;">
+        <div class="btn-group">
+            <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-chevron-down icon-white"></i>
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$photos_array[$i]["id"]},
+                                                                                {$album_to_display},
+                                                                                {$photos_array[$i]["albumphoto_id"]},
+                                                                                {$album_info["cover_photo_id"]},
+                                                                                '{$photos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
+                    </a>
+                </li>
+            </ul>
         </div>
+    </div>
+</div>
+
 HTML;
     print($html);
 }
@@ -191,8 +207,16 @@ $photos_array_js = rtrim($photos_array_js, ",");
 
 
 var span3Width = 0;
+var gAlbum;
 
 $(function() {
+
+
+    <?php
+
+    print("gAlbum = " . json_encode($album_info));
+
+    ?>
 
     resizeWindow();
     span3Width = $(".span3").width();
@@ -222,14 +246,16 @@ $(function() {
         }
     });
 
-    $(".item").each(function(index) {
-        $(this).mouseenter(function() {
-            $(this).find(".tile-options").stop(true, true).show();
+    if (isLoggedIn() && gUser["id"] == gAlbum["user_id"]) {
+        $(".item").each(function(index) {
+            $(this).mouseenter(function() {
+                $(this).find(".tile-options").stop(true, true).show();
+            });
+            $(this).mouseleave(function() {
+                $(this).find(".tile-options").stop(true, true).fadeOut();
+            });
         });
-        $(this).mouseleave(function() {
-            $(this).find(".tile-options").stop(true, true).fadeOut();
-        });
-    });
+    }
 
 <?php
 
