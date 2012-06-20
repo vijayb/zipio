@@ -2,4 +2,4 @@ Options +FollowSymLinks
 RewriteEngine On
 
 RewriteRule ^([A-Za-z0-9-]+)/?$                                 my_albums.php?username=$1 [QSA]
-RewriteRule ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$                 display_album.php?username=$1&album_handle=$2 [QSA]
+RewriteRule ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$                 display_album.php?album_owner_username=$1&album_handle=$2 [QSA]

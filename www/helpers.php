@@ -274,7 +274,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tiltimage = clone $tmpimage;
         $tilt_path_to_photo = $path_to_photo . "_tmp_".$sizes[$ii]."_tilt";
         $tiltimage->writeImage($tilt_path_to_photo);
-        
+
         exec("/usr/bin/convert \( $tilt_path_to_photo -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tilt_path_to_photo");
         $s3_name = $s3_url . "_" . $sizes[$ii] ."_tilt";
 
@@ -358,23 +358,29 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
 }
 
-function email_followers($album_info) {
+function email_followers($album_info, $s3_urls) {
+
     global $con;
     global $www_root;
+    global $s3_root;
+
     $query = "SELECT follower_id, email FROM Followers LEFT JOIN Users ON follower_id=Users.id WHERE album_id=" . $album_info["id"];
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
     $album_owner_info = get_user_info($album_info["user_id"]);
 
-$follower_email_body = <<<EMAIL
-    Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
-    <br><br>
+    $follower_email_body = <<<EMAIL
+        Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
+        <br><br>
 EMAIL;
 
+    for ($i = 0; $i < count($s3_urls); $i++) {
+        $follower_email_body .= "<img src='" . $s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
+    }
 
     while ($row = mysql_fetch_assoc($result)) {
-        send_email($row["email"], "founders@zipio.com", "New photo added", "New photo added!");
+        send_email($row["email"], "founders@zipio.com", "New photos!", $follower_email_body);
     }
 
 }

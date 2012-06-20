@@ -35,6 +35,6 @@ send_email($request["album_owner_email"], "founders@zipio.com", $album_owner_ema
 
 login_user($request["follower_id"]);
 
-header("Location: " . $www_root . "/" . $request["album_owner_username"] . "/" . $request["album_handle"]);
+header("Location: " . $www_root . "/" . $request["album_owner_username"] . "/" . $request["album_handle"] . "#alert=1");
 
 ?>

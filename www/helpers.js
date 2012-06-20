@@ -22,8 +22,6 @@ function attemptLogin() {
         },
         async: false
     });
-
-
 }
 
 function showFollowModal() {
@@ -31,27 +29,33 @@ function showFollowModal() {
     $("#follow-email-check").empty();
     $("#follow-submit").button("reset");
     if (isLoggedIn()) {
+        // If the user is logged in, simply create the follower relationship
+        $("#follow-submit").button("loading");
 
     } else {
+        // If the user is not logged in, we need to ask for his email address
+        // to make sure the rightful owner of the email address actually wants
+        // to follow the album
         $("#follow-modal").modal('show');
         $("#follow-email").focus();
     }
 }
 
-/** this function is attached to the Unfollow Album button on page-top-right **/
-function unfollowAlbum(albumid, userid) {
-
-    // Put the "Follow" button in a loading state
+function unfollowAlbum(user_id, album_id, token) {
     $("#unfollow-submit").button("loading");
 
-    var urlString = "/unfollow_album.php?userid=" + userid + "&album_id=" + albumid;
+    var urlString = "/unfollow_album.php?user_id=" + user_id + "&album_id=" + album_id + "&token=" + token;
 
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
-                 window.location.replace(window.location.href);
-
+            if (parseInt(data) == 1) {
+                window.location.replace(window.location.href.split('#')[0] + "#alert=2");
+                window.location.reload(true);
+            } else {
+                // bad token
+            }
         },
         async: false
     });
@@ -73,7 +77,7 @@ function submitEmailToFollow(album_id) {
             $("#header-alert-title").html("You're not quite done!");
             $("#header-alert-text").html("Click the link in the email we just sent you to confirm that you want to follow this album.");
             $("#header-alert").addClass("alert-info");
-            $("#header-alert").show();
+            $("#header-alert").fadeIn();
         },
         async: false
     });
@@ -265,12 +269,6 @@ function isLoggedIn() {
     return false;
 }
 
-function getURLParameter(name) {
-    return decodeURIComponent(
-        (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
-    );
-}
-
 function debug(string) {
     if (this.console && typeof console.log != "undefined") {
         console.log(string);
@@ -338,7 +336,21 @@ function validateEmail(email) {
 
 
 
+function getAlert(alert) {
+    var returnArr = new Array();
 
+    if (alert == 1) {
+        returnArr["title"] = "You're now following this album!";
+        returnArr["text"] = "This is a title";
+        returnArr["class"] = "alert-info";
+    } else if (alert == 2) {
+        returnArr["title"] = "You're no longer following this album.";
+        returnArr["text"] = "";
+        returnArr["class"] = "alert-info";
+    }
+
+    return returnArr;
+}
 
 
 
@@ -361,6 +373,18 @@ function validateEmail(email) {
 
 
 // Functions that have been copied from various sources on the Internet
+
+function getURLParameter(name) {
+    return decodeURIComponent(
+        (location.search.match(RegExp("[?|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
+    );
+}
+
+function getURLHashParameter(name) {
+    return decodeURIComponent(
+        (location.hash.match(RegExp("[#|&]"+name+'=(.+?)(&|$)'))||[,null])[1]
+    );
+}
 
 function sha1 (str) {
 

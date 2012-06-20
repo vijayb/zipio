@@ -160,13 +160,12 @@ if ($target_album_id > 0) {
             add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
             array_push($s3_urls, $s3_url);
         }
-        print_r($s3_urls);
-        email_followers($target_album_info);
+        email_followers($target_album_info, $s3_urls);
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
         $display_album_ra["timestamp"] = time();
-        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -188,12 +187,12 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            email_followers($target_album_info);
+            email_followers($target_album_info, $s3_urls);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
             $display_album_ra["timestamp"] = time();
-            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
 
 
@@ -218,12 +217,12 @@ EMAIL;
                 add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            email_followers($target_album_info);
+            email_followers($target_album_info, $s3_urls);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
             $display_album_ra["timestamp"] = time();
-            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
 
             $user_email_body = <<<EMAIL
                 You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
@@ -273,12 +272,12 @@ EMAIL;
                 update_data("Albums", $target_album_id, array("cover_photo_id" => $current_photo_id));
             }
         }
-        email_followers($target_album_info);
+        email_followers($target_album_info, $s3_urls);
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
         $display_album_ra["timestamp"] = time();
-        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.

@@ -37,6 +37,8 @@
 
 var gUser;
 
+var gAlerts = new Array();
+
 $(function() {
 
     // This PHP code populates gUser in the case that there is a logged in
@@ -52,8 +54,22 @@ $(function() {
     ?>
 
     // If there is an alert URL parameter, show the alert
+    var alert = getURLHashParameter("alert");
+    if (alert != "null") {
+        debug("Showing an alert!")
+        alert = parseInt(alert);
+        $("#header-alert-title").html(getAlert(alert)["title"]);
+        $("#header-alert-text").html(getAlert(alert)["text"]);
+        $("#header-alert").addClass(getAlert(alert)["class"]);
+        $("#header-alert").fadeIn();
+        window.location.hash = "";
+    }
 
-
+    // If the user is logged in but has not yet registered (i.e., set a
+    // password), AND there's a hash variable register set to true
+    if (isLoggedIn() && gUser["password_hash"] == "" && getURLHashParameter("register") == "true") {
+        $('#register-modal').modal('show');
+    }
 
     $('.modal').on('shown', function(e) {
         var modal = $(this);
@@ -63,10 +79,11 @@ $(function() {
     });
 
     $('.alert .close').live("click", function(e) {
-        $(this).parent().removeClass("alert-success");
-        $(this).parent().removeClass("alert-error");
-        $(this).parent().removeClass("alert-info");
-        $(this).parent().hide();
+        $(this).parent().slideUp(function() {
+            $(this).parent().removeClass("alert-success");
+            $(this).parent().removeClass("alert-error");
+            $(this).parent().removeClass("alert-info");
+        });
     });
 
     $("#register-username").typeWatch({

@@ -44,7 +44,7 @@ if (is_logged_in()) {
         <ul class="nav pull-right">
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>
-                    You're logged in as <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b>
+                    <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b>
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
@@ -96,7 +96,7 @@ if (!isset($page_title_right)) $page_title_right = "";
                 <span class="icon-bar"></span>
             </a>
 
-            <a class="brand" href="#" style="font-weight:bold">
+            <a class="brand" href="#">
                 <?php print($brand_name); ?>
             </a>
 
@@ -237,6 +237,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Follow this album</h2>
+        <h3>We'll email you when photos are added</h3>
     </div>
     <div class="modal-body">
 
@@ -275,6 +276,6 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
     <div class="row" style="margin-bottom:20px;">
-        <div class="span10"><h1><?php print($page_title); ?></h1></div>
-        <div class="span2" style="text-align:right"><?php print($page_title_right); ?></div>
+        <div class="span8"><h1><?php print($page_title); ?></h1></div>
+        <div class="span4" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

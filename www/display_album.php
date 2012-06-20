@@ -9,15 +9,14 @@ require("helpers.php");
 check_request_for_login($_GET);
 print("<!--" . print_r($_SESSION, true) . "-->");
 
-if (!isset($_GET["username"]) || !isset($_GET["album_handle"])) {
+if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     exit();
 } else {
-    $album_to_display = album_exists($_GET["album_handle"], $_GET["username"]);
+    $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
-    $username = $_GET["username"];
-    $username = get_username_from_userstring($username);
+    $album_owner_info = get_user_info($album_info["user_id"]);
     print("<!-- album_id: $album_to_display -->\n");
-    print("<!-- username: $username -->\n");
+    print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
 }
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
@@ -25,38 +24,81 @@ if (!isset($_GET["username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    <a href="/{$username}">{$username}</a> &rsaquo; {$album_info["handle"]}<span style="color:#cccccc">@{$username}.zipio.com</span>
+    <a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a> &rsaquo; {$album_info["handle"]}<span style="color:#cccccc">@{$album_owner_info["username"]}.zipio.com</span>
 HTML;
+
+
+
 
 if (!is_logged_in()) {
-    // User is not logged in
+    // User is not logged in, so show the follow button since we don't know
+    // whether they are following the album or not. The follow button will open
+    // the follow modal so the user can enter his email address.
     $page_title_right = <<<HTML
-        <button class="btn btn-large btn-primary" onclick="showFollowModal();" id = "follow-this-album">Follow this album</button>
+        <button class="btn btn-large btn-success"
+                onclick="showFollowModal();"
+                id="follow-submit"
+                data-loading-text="Please wait...">
+            Follow this album<br><span style="font-size:12px;">No signup required!</a>
+        </button>
 HTML;
-    } else {
-        // User is logged in
-        $user_id = is_logged_in();
-        $logged_in_username = get_username_from_user_id($user_id);
 
-        if ($logged_in_username == $username) {
-            // Logged in user is the album owner
+} else {
+    // User is logged in
+    $user_id = is_logged_in();
+    $logged_in_username = get_username_from_user_id($user_id);
+
+
+    // Create a follow link to follow_album.php in case the user is logged in (which
+    // in tern means when he clicks the follow button, we need not ask him for his
+    // email address; we can immediately create the following relationship with
+    // follow_album.php).
+    $follow_album_ra = array();
+    $follow_album_ra["follower_id"] = $user_id;
+    $follow_album_ra["follower_username"] = $logged_in_username;
+    $follow_album_ra["album_id"] = $album_info["id"];
+    $follow_album_ra["album_handle"] = $album_info["handle"];
+    $follow_album_ra["album_owner_id"] = $album_owner_info["id"];
+    $follow_album_ra["album_owner_username"] = $album_owner_info["username"];
+    $follow_album_ra["album_owner_email"] = $album_owner_info["email"];
+    $follow_album_ra["timestamp"] = time();
+    $follow_album_link = $www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
+
+    if ($logged_in_username == $album_owner_info["username"]) {
+        // Logged in user is the album owner
+        $page_title_right = "";
+
+    } else {
+        // Logged in user is viewing someone else's album
+
+        if (isset($album_info) && is_following($user_id, $album_info["id"]) == 1) {
+            // Logged in user is already following this album, so show the
+            // unfollow button.
             $page_title_right = <<<HTML
+                <button class="btn btn-large"
+                        onclick="unfollowAlbum({$_SESSION["user_id"]},
+                                               {$album_info["id"]},
+                                               '{$_SESSION["user_info"]["token"]}');"
+                        id="unfollow-submit"
+                        data-loading-text="Please wait...">
+                    Unfollow this album
+                </button>
 HTML;
         } else {
-            // Logged in user is viewing someone else's album
-            if (isset($album_info) && is_following($user_id, $album_info["id"]) == 1) {
-                // Logged in user is already following this album
-               $page_title_right = <<<HTML
-                    <button onclick="unfollowAlbum();" class="btn enabled" id="unfollow-submit" data-loading-text="Please wait...">Unfollow</button>
+            // Logged in user is NOT following this album, so show the follow
+            // button, but the onclick will immediately cause the user to be
+            // following the album rather than asking for an email address.
+            $page_title_right = <<<HTML
+                <button class="btn btn-large btn-success"
+                        onclick="$(this).button('loading'); window.location.replace('{$follow_album_link}');"
+                        id="follow-submit"
+                        data-loading-text="Please wait...">
+                    Follow this album
+                </button>
 HTML;
-            } else {
-                // Logged in user is not following this album
-                 $page_title_right = <<<HTML
-                    <button class="btn btn-large btn-primary" onclick="followAlbum()" id = "follow-this-album">Follow this album</button>
-HTML;
-            }
         }
     }
+}
 
 ?>
 
@@ -67,7 +109,7 @@ HTML;
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
 
-
+<?php if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) { ?>
 
 <div class="row">
     <div class="span12">
@@ -91,14 +133,13 @@ HTML;
     </div>
 </div>
 
-
+<? } ?>
 
 <div class="row" id="masonry-container">
 
 <?php
 
 $photos_array = get_photos_info($album_to_display);
-
 $photos_array_js = "";
 
 for ($i = 0; $i < count($photos_array); $i++) {
@@ -129,7 +170,6 @@ for ($i = 0; $i < count($photos_array); $i++) {
 
         </div>
 HTML;
-
     print($html);
 }
 
@@ -190,13 +230,6 @@ $(function() {
             $(this).find(".tile-options").stop(true, true).fadeOut();
         });
     });
-
-    // If the user is logged in but has not yet registered (i.e., set a
-    // password), then show the registration dialog
-    if (isLoggedIn() && gUser["password_hash"] == "" && gUser["username"] != "") {
-        $('#register-modal').modal('show');
-    }
-
 
 <?php
 
