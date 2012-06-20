@@ -201,7 +201,43 @@ function create_album($user_id, $handle) {
     return $album_id;
 }
 
+function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
+    global $s3;
+    
+    $bucket_name = "zipio_photos";
 
+    $tmp_image_path = $image_path . "_tmp";
+    debug("Writing file: $tmp_image_path");
+
+    $image->writeImage($tmp_image_path);
+    if ($filter == 1) { // tilt shift
+        exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
+    } else if ($filter == 2) { // lomo
+
+    } else if ($filter == 3) { // nashville
+
+    } else if ($filter == 4) { // kelvin
+
+    } else if ($filter == 5) { // toaster
+
+    } else if ($filter == 6) { // gotham
+
+    } else { // No filter
+
+    }
+
+    echo $tmp_image_path." ***<BR>\n";
+    echo $s3_name." ***<BR>\n";
+    if (!$s3->putObjectFile($tmp_image_path, $bucket_name,
+                            $s3_name, S3::ACL_PUBLIC_READ)) {
+        debug("Error in writing to S3");
+        debug($tmp_image_path);
+        return 1;
+    }
+
+    unlink($tmp_image_path);
+    return 0;
+}
 
 //$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
 
@@ -223,7 +259,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     $s3_url_parameter = $s3_url;
     $bucket_name = "zipio_photos";
 
-    $sizes = array(800, 480, 240);
+    $sizes = array(800);
 
     $failed = 0;
 
@@ -233,35 +269,13 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-        $tmp_path_to_photo = $path_to_photo . "_tmp_" . $sizes[$ii];
-        $tmpimage->writeImage($tmp_path_to_photo);
-        debug("Writing file: $tmp_path_to_photo");
-
-        $s3_name = $s3_url . "_" . $sizes[$ii];
-
-        if (!$s3->putObjectFile($tmp_path_to_photo, $bucket_name,
-                                $s3_name, S3::ACL_PUBLIC_READ)) {
-            debug("Error in writing to S3");
-            debug($tmp_path_to_photo);
-            $failed = 1;
+        for ($filter = 0; $filter <= 1; $filter++) {
+            $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
+            $failed = $failed || filterImageAndWriteToS3($tmpimage,
+                                                         $path_to_photo,
+                                                         $s3_name,
+                                                         $filter);
         }
-
-        $tiltimage = clone $tmpimage;
-        $tilt_path_to_photo = $path_to_photo . "_tmp_".$sizes[$ii]."_tilt";
-        $tiltimage->writeImage($tilt_path_to_photo);
-
-        exec("/usr/bin/convert \( $tilt_path_to_photo -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tilt_path_to_photo");
-        $s3_name = $s3_url . "_" . $sizes[$ii] ."_tilt";
-
-        if (!$s3->putObjectFile($tilt_path_to_photo, $bucket_name,
-                                $s3_name, S3::ACL_PUBLIC_READ)) {
-            debug("Error in writing to S3");
-            debug($tilt_path_to_photo);
-            $failed = 1;
-        }
-
-        unlink($tilt_path_to_photo);
-        unlink($tmp_path_to_photo);
     }
 
     $cropped_image = clone $image;
@@ -272,28 +286,19 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     }
     $cropped_path = $path_to_photo."_cropped";
     opticrop($cropped_image, 300, 300, $cropped_path);
-    $s3_name = $s3_url."_cropped";
-    if (!$s3->putObjectFile($cropped_path, $bucket_name,
-                            $s3_name, S3::ACL_PUBLIC_READ)) {
-        debug("Error in writing to S3");
-        debug($cropped_path);
-        $failed = 1;
-    }
 
-    $cropped_tilt_path = $cropped_path."_tilt";
-    copy($cropped_path, $cropped_tilt_path);
-    exec("/usr/bin/convert \( $cropped_tilt_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $cropped_tilt_path");
-    $s3_name = $s3_url."_cropped_tilt";
-    if (!$s3->putObjectFile($cropped_tilt_path, $bucket_name,
-                            $s3_name, S3::ACL_PUBLIC_READ)) {
-        debug("Error in writing to S3");
-        debug($cropped_tilt_path);
-        $failed = 1;
-    }
+    $cropped_image = new imagick($cropped_path);
 
+    for ($filter = 0; $filter <= 1; $filter++) {
+        $s3_name = $s3_url."_cropped_" . $filter;
+        $failed = $failed || filterImageAndWriteToS3($cropped_image,
+                                                     $path_to_photo,
+                                                     $s3_name,
+                                                     $filter);
+    }
 
     unlink($cropped_path);
-    unlink($cropped_tilt_path);
+
 
     if (!$failed) {
         $query = "INSERT INTO Photos (
