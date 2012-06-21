@@ -210,18 +210,26 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     debug("Writing file: $tmp_image_path");
 
     $image->writeImage($tmp_image_path);
-
     if ($filter == 1) { // tilt shift
-        // exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
-    } else if ($filter == 2) { // lomo
-
-    } else if ($filter == 3) { // nashville
-
-    } else if ($filter == 4) { // kelvin
+        exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
+    } else if ($filter == 2) { // gotham
+        $cmd = "/usr/bin/convert $tmp_image_path -modulate 120,10,100 -fill '#222b6d' -colorize 20 -gamma 0.5 -contrast -contrast $tmp_image_path";
+        exec($cmd);
+        echo "[$cmd]<BR>\n";
+        $cmd = "/usr/bin/convert $tmp_image_path -bordercolor 'black' -border {20}x{20} $tmp_image_path";
+        echo "[$cmd]<BR>\n";
+        exec($cmd);
+    } else if ($filter == 3) { // kelvin
+        $cmd = "/usr/bin/convert \( $tmp_image_path -auto-gamma -modulate 120,50,100 \) \( -size ".$image->getImageWidth()."x".$image->getImageHeight()." -fill rgba\(255,153,0,0.5\) -draw 'rectangle 0,0 ".$image->getImageWidth().",".$image->getImageHeight()."' \) -compose multiply $tmp_image_path";
+        echo "[$cmd]<BR>\n";
+        exec($cmd);
+        // also need to add border for kelvin...
+    } else if ($filter == 4) { // nashville
 
     } else if ($filter == 5) { // toaster
 
-    } else if ($filter == 6) { // gotham
+    } else if ($filter == 6) { // lomo
+
 
     } else { // No filter
 
@@ -273,7 +281,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-        for ($filter = 0; $filter <= 1; $filter++) {
+        for ($filter = 0; $filter <= 3; $filter++) {
             $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
             $failed = $failed || filterImageAndWriteToS3($tmpimage,
                                                          $path_to_photo,
@@ -294,7 +302,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     $cropped_image = new imagick($cropped_path);
 
     // CHANGE THE CONDITION FOR THE LOOP WHEN IMPLEMENTING FILTERS
-    for ($filter = 0; $filter <= 0; $filter++) {
+    for ($filter = 0; $filter <= 3; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
                                                      $path_to_photo,
