@@ -1,5 +1,30 @@
 // Functions that we've written ourselves
 
+
+function changeFilter(photoID, albumphotoID, filter) {
+    var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
+
+    var fancyboxHref = $("#fancybox-" + photoID).attr("href");
+    fancyboxHref = fancyboxHref.replace(/_[0-9]+$/gi, "_" + filter);
+    debug(fancyboxHref);
+    $("#fancybox-" + photoID).attr("href", fancyboxHref);
+
+    var imageSrc = $("#image-" + photoID).attr("src");
+    imageSrc = imageSrc.replace(/_[0-9]+$/gi, "_" + filter);
+    debug(imageSrc);
+    $("#image-" + photoID).attr("src", imageSrc);
+
+/*
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+        },
+        async: false
+    });
+*/
+}
+
 function attemptLogin() {
 
     // Put the "Go" button in a loading state
@@ -25,9 +50,9 @@ function attemptLogin() {
 }
 
 function showFollowModal() {
-    $("#follow-email").val("");
+    $("#follow-modal input").val("");
     $("#follow-email-check").empty();
-    $("#follow-submit").button("reset");
+    $("#follow-submit").prop("disabled", true);
     if (isLoggedIn()) {
         // If the user is logged in, simply create the follower relationship
         $("#follow-submit").button("loading");
@@ -63,8 +88,28 @@ function unfollowAlbum(user_id, album_id, token) {
 }
 
 
-function submitEmailToFollow(album_id) {
+function submitForgotPassword($email) {
+    $("#password-submit").button("loading");
+    var email = $("#password-email").val();
+    var urlString = "/send_password_email.php?email=" + email;
 
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            $("#password-modal").modal('hide');
+            $("#header-alert-title").html("Check your email for a password reset link");
+            $("#header-alert-text").html("");
+            $("#header-alert").addClass("alert-success");
+            $("#header-alert").fadeIn();
+        },
+        async: false
+    });
+}
+
+
+
+function submitEmailToFollow(album_id) {
     $("#follow-submit").button("loading");
     var email = $("#follow-email").val();
     var urlString = "/send_follow_email.php?email=" + email + "&album_id=" + album_id;
@@ -77,9 +122,11 @@ function submitEmailToFollow(album_id) {
             $("#header-alert-title").html("You're not quite done!");
             $("#header-alert-text").html("Click the link in the email we just sent you to confirm that you want to follow this album.");
             $("#header-alert").addClass("alert-info");
-            $("#header-alert").fadeIn();
+            $("#header-alert").delay(500).fadeIn();
+
+            $("#follow-submit").button("reset");
         },
-        async: false
+        async: true
     });
 }
 
@@ -115,6 +162,7 @@ function saveUsernamePassword() {
 
 function showForgotPassword() {
     $(".modal").modal('hide');
+    $("#password-email-check").html("");
     $("#password-modal").modal('show');
     $("#password-email").val($("#login-email").val());
     $("#password-email").focus();
@@ -145,21 +193,22 @@ function signupUser() {
 
 
 function setFollowSubmitButton() {
-     if ($("#follow-email-check").data("correct") == 1) {
-        $("#follow-submit").removeClass("disabled");
-     } else {
-        $("#follow-submit").addClass("disabled");
-     }
+    $("#follow-submit").attr("disabled", "");
+    if ($("#follow-email-check").data("correct") == 1) {
+       $("#follow-submit").removeAttr("disabled");
+    } else {
+       $("#follow-submit").attr("disabled", "");
+    }
 }
 
 function setSignupSubmitButton() {
-    $("#signup-submit").addClass("disabled");
+    $("#signup-submit").attr("disabled", "");
     if ($("#signup-email-check").data("correct") == 1 &&
         $("#signup-username-check").data("correct") == 1 &&
         $("#signup-password").val() != "") {
-        $("#signup-submit").removeClass("disabled");
+        $("#signup-submit").removeAttr("disabled");
     } else {
-        $("#signup-submit").addClass("disabled");
+        $("#signup-submit").attr("disabled", "");
     }
 }
 
@@ -184,6 +233,7 @@ function flipChangeUsername() {
 
 
 function checkEmailIsUnique(prefix) {
+    debug("check email");
 
     $("#" + prefix + "-email-check").data("correct", 0);
 
@@ -195,12 +245,12 @@ function checkEmailIsUnique(prefix) {
     }
 
     if (!validateEmail(emailEntered)) {
-        $("#" + prefix + "-email-check").html("That doesn't appear to be a valid address");
+        $("#" + prefix + "-email-check").html("<i class='icon-remove'></i> That doesn't appear to be a valid address");
         return;
     }
 
     if (prefix == "follow") {
-        $("#follow-email-check").html("We'll send you notifications to this email");
+        $("#follow-email-check").html("<i class='icon-ok'></i> We'll send you notifications to this email");
         $("#follow-email-check").data("correct", 1);
         return;
     }
@@ -213,18 +263,23 @@ function checkEmailIsUnique(prefix) {
         success: function(data) {
             data = parseInt(data);
             if (data == 0) {
-                if (prefix != "password") {
-                    $("#" + prefix + "-email-check").html("Looks good!");
-                    $("#" + prefix + "-email-check").data("correct", 1);
+                // 0 means the email does NOT exist in the database
+                if (prefix == "password" || prefix == "login") {
+                    $("#" + prefix + "-email-check").html("<i class='icon-remove'></i> That email address isn't registered");
                 } else {
-                    $("#" + prefix + "-email-check").html("Hmmm, looks like that email address isn't registered");
+                    $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> Looks good!");
+                    $("#" + prefix + "-email-check").data("correct", 1);
                 }
-            } else {
-                if (prefix != "password") {
-                    $("#" + prefix + "-email-check").html("<b>" + emailEntered + "</b> has already signed up");
-                } else {
-                    $("#" + prefix + "-email-check").html("We'll send a password reset link to <b>" + emailEntered + "</b>");
+            } else if (data == 1) {
+                // 1 means the email DOES exist in the database
+                if (prefix == "password") {
+                    $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> We'll send a password reset link to <b>" + emailEntered + "</b>");
                     $("#" + prefix + "-email-check").data("correct", 1);
+                } else if (prefix == "login") {
+                    $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> Welcome back!");
+                    $("#" + prefix + "-email-check").data("correct", 1);
+                } else {
+                    $("#" + prefix + "-email-check").html("<i class='icon-remove'></i> <b>" + emailEntered + "</b> has already signed up");
                 }
             }
         },
@@ -247,7 +302,7 @@ function checkUsernameIsUnique(prefix) {
     }
 
     if (/[^A-Za-z0-9]/.test(usernameEntered) ) {
-        $("#" + prefix + "-username-check").html("Only letters and numbers, please");
+        $("#" + prefix + "-username-check").html("<i class='icon-remove'></i> Only letters and numbers, please");
         return;
     }
 
@@ -258,12 +313,12 @@ function checkUsernameIsUnique(prefix) {
         success: function(data) {
             data = parseInt(data);
             if (data == 0) {
-                $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is available!");
+                $("#" + prefix + "-username-check").html("<i class='icon-ok'></i> <b>" + usernameEntered + "</b> is available!");
                 $("#" + prefix + "-username-check").data("correct", 1);
             } else if (isLoggedIn() && data == gUser["id"]) {
-                $("#" + prefix + "-username-check").html("Ummm...that's already your username");
+                $("#" + prefix + "-username-check").html("<i class='icon-remove'></i> Ummm...that's already your username");
             } else {
-                $("#" + prefix + "-username-check").html("<b>" + usernameEntered + "</b> is already taken (try something else)");
+                $("#" + prefix + "-username-check").html("<i class='icon-remove'></i> <b>" + usernameEntered + "</b> is already taken (sorry, try something else)");
             }
         },
         async: false
@@ -605,5 +660,3 @@ function utf8_encode (argString) {
 
     return utftext;
 }
-
-//

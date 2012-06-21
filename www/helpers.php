@@ -301,7 +301,6 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $cropped_image = new imagick($cropped_path);
 
-    // CHANGE THE CONDITION FOR THE LOOP WHEN IMPLEMENTING FILTERS
     for ($filter = 0; $filter <= 3; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
@@ -528,6 +527,23 @@ function get_user_info($user_id) {
     }
 }
 
+function get_user_info_from_email($email) {
+
+    global $con;
+
+    $query = "SELECT * FROM Users WHERE email_hash=UNHEX(SHA1('$email'))";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $row["token"] = calculate_token($row["id"], $row["created"]);
+        return $row;
+    } else {
+        return 0;
+    }
+}
+
+
 function get_album_info($album_id) {
 
     global $con;
@@ -595,6 +611,7 @@ function get_photo_info($photo_id, $album_id) {
         if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
         if ($inner_row = mysql_fetch_assoc($inner_result)) {
             $row["visible"] = $inner_row["visible"];
+            $row["filter_code"] = $inner_row["filter_code"];
             $row["albumphoto_id"] = $inner_row["id"];
         }
         $row["token"] = calculate_token($row["id"], $row["created"]);

@@ -63,7 +63,7 @@ HTML;
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
-            <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show'); $('#login-email').focus();">Login</a></li>
+            <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show'); $('#login-email').val('').focus();">Login</a></li>
             <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show')">Sign up</a></li>
         </ul>
 HTML;
@@ -168,7 +168,7 @@ if (!isset($page_title_right)) $page_title_right = "";
                     <label class="control-label" for="input01">Email</label>
                     <div class="controls">
                         <input type="text" class="input-xlarge" id="login-email">
-                        <!-- <p class="help-block">Supporting help text</p> -->
+                        <p class="help-block" id="login-email-check"></p>
                     </div>
                 </div>
                 <div class="control-group">
@@ -214,7 +214,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="attemptLogin();" class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">Send me a password reset link</button>
+        <button onclick="submitForgotPassword();" class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">Send me a password reset link</button>
     </div>
 </div>
 
@@ -222,7 +222,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <div class="modal hide" id="signup-modal">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
+        <a class="close" data-dismiss="modal">×</a>
         <h2>Signup for a Zipio account</h2>
     </div>
     <div class="modal-body">
@@ -259,36 +259,37 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="signupUser();" class="btn btn-primary disabled" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
+        <button disabled onclick="signupUser();" class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
     </div>
 </div>
 
 <!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="follow-modal">
+
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
-        <h2>Follow this album&#8212;<b>no signup needed</b></h2>
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Follow this album&#8212;no signup needed!</h2>
         <h3>Enter your email and we'll let you know when photos are added</h3>
     </div>
-    <div class="modal-body">
 
-        <form class="form-horizontal">
-            <fieldset>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Your email</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" id="follow-email">
-                        <p class="help-block" id="follow-email-check"></p>
-                    </div>
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="input01">Your email</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="follow-email">
+                    <p class="help-block" id="follow-email-check"></p>
                 </div>
-            </fieldset>
-        </form>
+            </div>
+        </div>
     </div>
+
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);" class="btn btn-primary disabled" id="follow-submit" data-loading-text="Please wait...">Follow</button>
+        <button disabled onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);" class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">Follow</button>
     </div>
+
 </div>
 
 <!----------------------------------------------------------------------------->

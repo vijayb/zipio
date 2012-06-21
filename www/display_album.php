@@ -155,9 +155,8 @@ for ($i = 0; $i < count($photos_array); $i++) {
     $html = <<<HTML
 
 <div class="item span3" id="photo-{$photos_array[$i]["id"]}">
-    <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800_0">
-        <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped_0'>
-
+    <a id="fancybox-{$photos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800_{$photos_array[$i]["filter_code"]}">
+        <img id="image-{$photos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped_{$photos_array[$i]["filter_code"]}'>
     </a>
 
     <!--
@@ -181,7 +180,10 @@ for ($i = 0; $i < count($photos_array); $i++) {
                                                                                 '{$photos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
-            </ul>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 1);">Tilt shift</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 2);">Gotham</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 3);">Kelvin</a></li>
+          </ul>
         </div>
     </div>
 </div>
