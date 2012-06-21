@@ -24,11 +24,12 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    {$album_info["handle"]}<span style="color:#cccccc">@{$album_owner_info["username"]}.zipio.com</span>
+    {$album_info["handle"]}<span style="color:#000000">@{$album_owner_info["username"]}.zipio.com</span>
 HTML;
 
-
-
+$page_subtitle = <<<HTML
+    To add photos, email them to the address above
+HTML;
 
 if (!is_logged_in()) {
     // User is not logged in, so show the follow button since we don't know
@@ -149,13 +150,13 @@ for ($i = 0; $i < count($photos_array); $i++) {
         $opacity = "1.0";
     }
 
-    $photos_array_js .= "'" . $s3_root . "/" . $photos_array[$i]["s3_url"] . "_800',";
+    $photos_array_js .= "'" . $s3_root . "/" . $photos_array[$i]["s3_url"] . "_800_0',";
 
     $html = <<<HTML
 
 <div class="item span3" id="photo-{$photos_array[$i]["id"]}">
-    <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800">
-        <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped'>
+    <a class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800_0">
+        <img style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped_0'>
 
     </a>
 
@@ -192,6 +193,11 @@ HTML;
 $photos_array_js = rtrim($photos_array_js, ",");
 
 ?>
+
+
+
+
+
 
 </div>
 

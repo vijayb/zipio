@@ -3,7 +3,7 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
-$s3_root = "https://s3.amazonaws.com/zipio_photos";
+$s3_root = "https://s3.amazonaws.com/zipio_photos/photos";
 $www_root = "http://localhost";
 
 define('CACHE_PATH', 'opticrop-cache/');
@@ -203,15 +203,16 @@ function create_album($user_id, $handle) {
 
 function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     global $s3;
-    
+
     $bucket_name = "zipio_photos";
 
     $tmp_image_path = $image_path . "_tmp";
     debug("Writing file: $tmp_image_path");
 
     $image->writeImage($tmp_image_path);
+
     if ($filter == 1) { // tilt shift
-        exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
+        // exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
     } else if ($filter == 2) { // lomo
 
     } else if ($filter == 3) { // nashville
@@ -229,7 +230,7 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     echo $tmp_image_path." ***<BR>\n";
     echo $s3_name." ***<BR>\n";
     if (!$s3->putObjectFile($tmp_image_path, $bucket_name,
-                            $s3_name, S3::ACL_PUBLIC_READ)) {
+                            "photos/" . $s3_name, S3::ACL_PUBLIC_READ)) {
         debug("Error in writing to S3");
         debug($tmp_image_path);
         return 1;
@@ -257,13 +258,16 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     $s3_url =
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_url;
-    $bucket_name = "zipio_photos";
 
     $sizes = array(800);
 
     $failed = 0;
 
     $image = new imagick($path_to_photo);
+    $image->setImageCompression(Imagick::COMPRESSION_JPEG);
+    $image->setImageCompressionQuality(65);
+    $image->stripImage();
+
     for ($ii = 0; $ii < count($sizes); $ii++) {
         // Scale the image, indeud
         $tmpimage = clone $image;
@@ -289,7 +293,8 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $cropped_image = new imagick($cropped_path);
 
-    for ($filter = 0; $filter <= 1; $filter++) {
+    // CHANGE THE CONDITION FOR THE LOOP WHEN IMPLEMENTING FILTERS
+    for ($filter = 0; $filter <= 0; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
                                                      $path_to_photo,
@@ -356,7 +361,7 @@ function email_followers($album_info, $s3_urls) {
 EMAIL;
 
     for ($i = 0; $i < count($s3_urls); $i++) {
-        $follower_email_body .= "<img src='" . $s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
+        $follower_email_body .= "<img src='" . $s3_root . "/" . $s3_urls[$i] . "_cropped_0'><br><br>";
     }
 
     while ($row = mysql_fetch_assoc($result)) {

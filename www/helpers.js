@@ -113,6 +113,13 @@ function saveUsernamePassword() {
 
 }
 
+function showForgotPassword() {
+    $(".modal").modal('hide');
+    $("#password-modal").modal('show');
+    $("#password-email").val($("#login-email").val());
+    $("#password-email").focus();
+}
+
 function signupUser() {
 
     // Put the "Go" button in a loading state
@@ -206,10 +213,19 @@ function checkEmailIsUnique(prefix) {
         success: function(data) {
             data = parseInt(data);
             if (data == 0) {
-                $("#" + prefix + "-email-check").html("Looks good!");
-                $("#" + prefix + "-email-check").data("correct", 1);
+                if (prefix != "password") {
+                    $("#" + prefix + "-email-check").html("Looks good!");
+                    $("#" + prefix + "-email-check").data("correct", 1);
+                } else {
+                    $("#" + prefix + "-email-check").html("Hmmm, looks like that email address isn't registered");
+                }
             } else {
-                $("#" + prefix + "-email-check").html("<b>" + emailEntered + "</b> has already signed up");
+                if (prefix != "password") {
+                    $("#" + prefix + "-email-check").html("<b>" + emailEntered + "</b> has already signed up");
+                } else {
+                    $("#" + prefix + "-email-check").html("We'll send a password reset link to <b>" + emailEntered + "</b>");
+                    $("#" + prefix + "-email-check").data("correct", 1);
+                }
             }
         },
         async: false
@@ -293,6 +309,10 @@ function setMasonry() {
         $(container).masonry({
             itemSelector : '.item',
             isAnimated: true,
+            animationOptions: {
+                duration: 100,
+                queue: false
+            },
             columnWidth: function() {
                 // Get the width of each span3 + the margin on the left
                 // because the Masonry column width includes the space
@@ -320,10 +340,8 @@ function deletePhotoFromAlbum(photoID, albumID, albumPhotoID, coverPhotoID, toke
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                $("#photo-" + photoID).fadeOut(function() {
-                    $("#photo-" + photoID).remove();
-                    $("#masonry-container").masonry("reload");
-                });
+                $("#photo-" + photoID).remove();
+                $("#masonry-container").masonry("reload");
             } else if (parseInt(data) == 0) {
                 debug("Could not delete photo because the token's wrong");
                 return;
@@ -354,12 +372,12 @@ function getAlert(alert) {
 
     if (alert == 1) {
         returnArr["title"] = "You're now following this album!";
-        returnArr["text"] = "This is a title";
-        returnArr["class"] = "alert-info";
+        returnArr["text"] = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (Requires the album owner to approve you.)";
+        returnArr["class"] = "alert-success";
     } else if (alert == 2) {
         returnArr["title"] = "You're no longer following this album.";
         returnArr["text"] = "";
-        returnArr["class"] = "alert-info";
+        returnArr["class"] = "alert-success";
     }
 
     return returnArr;

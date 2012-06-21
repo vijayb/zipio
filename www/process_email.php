@@ -26,6 +26,9 @@ print("<br><br>");
 $sender = $_POST["sender"];
 $recipient = $_POST["recipient"];
 
+$start_time = time();
+debug("-----TIME 1: " . (time() - $start_time));
+
 if (!filter_var($sender, FILTER_VALIDATE_EMAIL) || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
     exit();
 }
@@ -47,6 +50,8 @@ $brand_new_user = 0;
 $query = "SELECT id FROM Users WHERE email='$sender' LIMIT 1";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+debug("-----TIME 2: " . (time() - $start_time));
 
 if (mysql_num_rows($result) == 1) {
     // A user with this email already exists, so get the user's ID
@@ -80,7 +85,7 @@ if (mysql_num_rows($result) == 1) {
 
 }
 
-
+debug("-----TIME 3: " . (time() - $start_time));
 
 
 
@@ -99,6 +104,8 @@ for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
     array_push($paths_to_photos, $_FILES["attachment-" . ($i + 1)]["tmp_name"]);
 }
 
+debug("-----TIME 4: " . (time() - $start_time));
+
 // Stores the S3 URLs of the photos afters they are added to S3
 $s3_urls = array();
 
@@ -111,6 +118,7 @@ if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
     $target_user_id = $user_id;
 }
 
+debug("-----TIME 5: " . (time() - $start_time));
 
 $target_album_id = album_exists($target_album_handle, $target_user_id);
 $target_user_info = get_user_info($target_user_id);
@@ -118,12 +126,8 @@ $user_info = get_user_info($user_id);
 
 
 debug("target_album_id: " . $target_album_id);
-debug("target_user_info: ");
-print_r($target_user_info);
-debug("user_info: ");
-print_r($user_info);
 
-
+debug("-----TIME 6: " . (time() - $start_time));
 
 // At this point, we have:
 //  $user_info
@@ -143,7 +147,6 @@ print_r($user_info);
 //  Add to friend's album
 //  Add to not-yet-friend's album
 
-
 if ($target_album_id > 0) {
     // The target album exists (and so does the target user)...
     $target_album_info = get_album_info($target_album_id);
@@ -155,12 +158,15 @@ if ($target_album_id > 0) {
     if ($target_user_id == $user_id) {
         // User is adding a photo to own existing album
         debug("User is adding to his own album.");
+        debug("-----TIME 6.1: " . (time() - $start_time));
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
             add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
             array_push($s3_urls, $s3_url);
         }
+        debug("-----TIME 6.2: " . (time() - $start_time));
         email_followers($target_album_info, $s3_urls);
+        debug("-----TIME 6.3: " . (time() - $start_time));
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
@@ -174,6 +180,8 @@ if ($target_album_id > 0) {
             To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 
 EMAIL;
+
+        debug("-----TIME 7: " . (time() - $start_time));
 
     } else {
         // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
@@ -206,7 +214,7 @@ EMAIL;
                  <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
-
+            debug("-----TIME 8: " . (time() - $start_time));
 
 
         } else if ($is_friend == 0) {
@@ -273,6 +281,8 @@ EMAIL;
             }
         }
         email_followers($target_album_info, $s3_urls);
+        debug("-----TIME 9: " . (time() - $start_time));
+
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
@@ -293,7 +303,7 @@ EMAIL;
         $user_email_body = <<<EMAIL
             You tried to add a photo to {$target_user_info["username"]}'s {$target_album_info["handle"]} album, but {$target_user_info["username"]} doesn't have an album by that name!
 EMAIL;
-
+        debug("-----TIME 10: " . (time() - $start_time));
 
     }
 } else if ($target_album_id == -1) {
@@ -315,7 +325,7 @@ if (!preg_match("/zipio.com$/", $sender)) {
 }
 
 debug($user_email_body);
-
+debug("-----TIME 11: " . (time() - $start_time));
 
 $contents = ob_get_flush();
 

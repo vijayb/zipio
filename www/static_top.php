@@ -63,7 +63,7 @@ HTML;
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
-            <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show')">Login</a></li>
+            <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show'); $('#login-email').focus();">Login</a></li>
             <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show')">Sign up</a></li>
         </ul>
 HTML;
@@ -75,6 +75,7 @@ HTML;
 // not initialized the variables by now, we set defaults below.
 
 if (!isset($page_title)) $page_title = "Zipio";
+if (!isset($page_subtitle)) $page_subtitle = "Post photos over email";
 if (!isset($page_title_right)) $page_title_right = "";
 
 ?>
@@ -174,6 +175,7 @@ if (!isset($page_title_right)) $page_title_right = "";
                     <label class="control-label" for="input01">Password</label>
                     <div class="controls">
                         <input type="password" class="input-xlarge" id="login-password">
+                        <p class="help-block"><a href="javascript:void(0);" onclick="showForgotPassword();">Forgot your password?</a></p>
                     </div>
                 </div>
             </fieldset>
@@ -183,6 +185,36 @@ if (!isset($page_title_right)) $page_title_right = "";
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="attemptLogin();" class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">Login</button>
+    </div>
+</div>
+
+<!----------------------------------------------------------------------------->
+
+<div class="modal hide" id="password-modal">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>Forgot your password?</h2>
+        <h3>You know the drill</h3>
+    </div>
+    <div class="modal-body">
+
+        <form class="form-horizontal">
+            <fieldset>
+                <div class="control-group">
+                    <label class="control-label" for="input01">Email</label>
+                    <div class="controls">
+                        <input type="text" class="input-xlarge" id="password-email">
+                        <p class="help-block" id="password-email-check"></p>
+                        <!-- <p class="help-block">Supporting help text</p> -->
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+    </div>
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="attemptLogin();" class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">Send me a password reset link</button>
     </div>
 </div>
 
@@ -236,8 +268,8 @@ if (!isset($page_title_right)) $page_title_right = "";
 <div class="modal hide" id="follow-modal">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
-        <h2>Follow this album</h2>
-        <h3>We'll email you when photos are added</h3>
+        <h2>Follow this album&#8212;<b>no signup needed</b></h2>
+        <h3>Enter your email and we'll let you know when photos are added</h3>
     </div>
     <div class="modal-body">
 
@@ -276,6 +308,9 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
     <div class="row" style="margin-bottom:20px;">
-        <div class="span8"><h1><?php print($page_title); ?></h1></div>
+        <div class="span8">
+            <h1><?php print($page_title); ?></h1>
+            <h3 style="color:#999999;"><?php print($page_subtitle); ?></h3>
+        </div>
         <div class="span4" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

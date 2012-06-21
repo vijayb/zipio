@@ -69,7 +69,6 @@ $(function() {
         $("#header-alert-text").html(getAlert(alert)["text"]);
         $("#header-alert").addClass(getAlert(alert)["class"]);
         $("#header-alert").fadeIn();
-        window.location.hash = "";
     }
 
     // If the user is logged in but has not yet registered (i.e., set a
@@ -114,6 +113,14 @@ $(function() {
         captureLength: 0
     });
 
+    $("#password-email").typeWatch({
+        callback: function() { checkEmailIsUnique("password"); },
+        wait: 300,
+        highlight: true,
+        captureLength: 0
+    });
+
+
     $("#follow-modal input").keyup(function() {
         setFollowSubmitButton();
     });
@@ -121,6 +128,9 @@ $(function() {
     $("#signup-modal input").keyup(function() {
         setSignupSubmitButton();
     });
+
+    // Clear the hash if there was one
+    window.location.hash = "";
 
 });
 
