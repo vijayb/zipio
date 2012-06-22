@@ -43,10 +43,22 @@ function attemptLogin() {
                 window.location.replace(window.location.href.split('#')[0]);
             } else {
                 $("#login-error").show();
+                $("#login-submit").button("reset");
+                $("#login-submit").prop("disabled", true);
             }
         },
-        async: false
+        async: true
     });
+}
+
+
+function showLoginModal() {
+    $('#login-modal').modal('show');
+    $("#login-submit").button("reset");
+    $("#login-submit").prop("disabled", true);
+    $("#login-email-check").empty();
+    $('#login-password').val('');
+    $('#login-email').val('').focus();
 }
 
 function showFollowModal() {
@@ -82,7 +94,7 @@ function unfollowAlbum(user_id, album_id, token) {
                 // bad token
             }
         },
-        async: false
+        async: true
     });
 
 }
@@ -103,7 +115,7 @@ function submitForgotPassword($email) {
             $("#header-alert").addClass("alert-success");
             $("#header-alert").fadeIn();
         },
-        async: false
+        async: true
     });
 }
 
@@ -156,7 +168,7 @@ function saveUsernamePassword() {
                 window.location.replace(window.location.href.split('#')[0]);
             }
         },
-        async: false
+        async: true
     });
 
 }
@@ -187,7 +199,7 @@ function signupUser() {
         success: function(data) {
             window.location.replace(window.location.href.split('#')[0]);
         },
-        async: false
+        async: true
     });
 }
 
@@ -222,6 +234,29 @@ function setRegisterSubmitButton() {
         $("#register-submit").attr("disabled", true);
     }
 }
+
+function setLoginSubmitButton() {
+    $("#login-submit").attr("disabled", true);
+    if ($("#login-email-check").data("correct") == 1  &&
+        $("#login-password").val() != "") {
+        $("#login-submit").removeAttr("disabled");
+    } else {
+        $("#login-submit").attr("disabled", true);
+    }
+}
+
+function setPasswordSubmitButton() {
+    $("#password-submit").attr("disabled", true);
+    if ($("#password-email-check").data("correct")) {
+        $("#password-submit").removeAttr("disabled");
+    } else {
+        $("#password-submit").attr("disabled", true);
+    }
+}
+
+
+
+
 
 function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
@@ -286,7 +321,7 @@ function checkEmailIsOkay(prefix) {
                 }
             }
         },
-        async: false
+        async: true
     });
 }
 
@@ -324,7 +359,7 @@ function checkUsernameIsUnique(prefix) {
                 $("#" + prefix + "-username-check").html("<i class='icon-remove'></i> <b>" + usernameEntered + "</b> is already taken (sorry, try something else)");
             }
         },
-        async: false
+        async: true
     });
 }
 

@@ -24,7 +24,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    {$album_info["handle"]}<span style="color:#000000">@{$album_owner_info["username"]}.zipio.com</span>
+    {$album_info["handle"]}<span style="color:#000000">@{$album_owner_info["username"]}.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = <<<HTML

@@ -154,24 +154,36 @@ $(function() {
     // PASSWORD
 
     $("#password-email").typeWatch({
-        callback: function(e) { checkEmailIsOkay("password"); },
+        callback: function(e) { checkEmailIsOkay("password"); setPasswordSubmitButton(); },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0
-    }).keyup(function() {
-        $("#password-email-check").html("");
     });
 
-    $("#login-email").typeWatch({
-        callback: function() { checkEmailIsOkay("login"); },
-        wait: delayBeforeChecking,
-        highlight: true,
-        captureLength: 0
-    }).keyup(function() {
-        $("#login-email-check").html("");
+    $("#password-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#password-submit").attr("disabled")) {
+            $("#password-submit").click();
+        }
     });
 
     // -------------------------------------------------------------------------
+    // LOGIN
+
+    $("#login-email").typeWatch({
+        callback: function() { checkEmailIsOkay("login"); setLoginSubmitButton();},
+        wait: delayBeforeChecking,
+        highlight: true,
+        captureLength: 0
+    });
+
+    $("#login-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#login-submit").attr("disabled")) {
+            $("#login-submit").click();
+        } else {
+            setLoginSubmitButton();
+        }
+    });
+
 
     // Clear the hash if there was one
     window.location.hash = "";
