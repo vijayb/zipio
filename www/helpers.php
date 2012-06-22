@@ -225,10 +225,9 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     } else if ($filter == 4) { // lomo-fi
         exec("/usr/bin/convert $tmp_image_path -channel R -level 33% -channel G -level 33% $tmp_image_path");
     } else if ($filter == 5) { // toaster
-
+        exec("/usr/bin/convert $tmp_image_path -modulate 150,80,100 -gamma 1.2 -contrast -contrast $tmp_image_path");
     } else if ($filter == 6) { // nashville
-
-
+        exec("/usr/bin/convert $tmp_image_path -contrast -modulate 100,150,100 -auto-gamma $tmp_image_path");
     } else { // No filter
 
     }
@@ -279,7 +278,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-        for ($filter = 0; $filter <= 4; $filter++) {
+        for ($filter = 0; $filter <= 6; $filter++) {
             $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
             $failed = $failed || filterImageAndWriteToS3($tmpimage,
                                                          $path_to_photo,
@@ -299,7 +298,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $cropped_image = new imagick($cropped_path);
 
-    for ($filter = 0; $filter <= 0; $filter++) {
+    for ($filter = 0; $filter <= 6; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
                                                      $path_to_photo,
