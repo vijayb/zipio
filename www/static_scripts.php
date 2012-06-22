@@ -88,41 +88,46 @@ $(function() {
 
 
 
-    var delayBeforeChecking = 200;
+    var delayBeforeChecking = 300;
 
     // -------------------------------------------------------------------------
+    // REGISTER
 
     $("#register-username").typeWatch({
-        callback: function() { checkUsernameIsUnique("register") },
+        callback: function(e) { checkUsernameIsUnique("register") },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0
-    }).keyup(function() {
-        $("#register-email-check").html("");
+    });
+
+    $("#register-modal input").keyup(function(e) {
+        debug("hello");
+        if (e.keyCode == 13 && !$("#register-submit").attr("disabled")) {
+            $("#register-submit").click();
+        } else {
+            setRegisterSubmitButton();
+        }
     });
 
     // -------------------------------------------------------------------------
+    // SIGNUP
 
     $("#signup-username").typeWatch({
-        callback: function() { checkUsernameIsUnique("signup"); setSignupSubmitButton(); },
+        callback: function(e) { checkUsernameIsUnique("signup"); setSignupSubmitButton(); },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0
-    }).keyup(function() {
-        $("#signup-email-check").html("");
     });
 
     $("#signup-email").typeWatch({
-        callback: function() { checkEmailIsUnique("signup"); setSignupSubmitButton(); },
+        callback: function(e) { checkEmailIsOkay("signup"); setSignupSubmitButton(); },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0
-    }).keyup(function() {
-        $("#signup-email-check").html("");
     });
 
-    $("#signup-modal input").keyup(function() {
-        if (event.keyCode == 13 && !$("#signup-submit").attr("disabled")) {
+    $("#signup-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#signup-submit").attr("disabled")) {
             $("#signup-submit").click();
         } else {
             setSignupSubmitButton();
@@ -130,26 +135,26 @@ $(function() {
     });
 
     // -------------------------------------------------------------------------
+    // FOLLOW
 
     $("#follow-email").typeWatch({
-        callback: function() { checkEmailIsUnique("follow");  setFollowSubmitButton(); },
-        wait: delayBeforeChecking,
+        callback: function(e) { checkEmailIsOkay("follow");  setFollowSubmitButton(); },
+        wait: 0,
         highlight: true,
         captureLength: 0
     });
 
-    $("#follow-modal input").keyup(function() {
-        if (event.keyCode == 13 && !$("#follow-submit").attr("disabled")) {
+    $("#follow-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#follow-submit").attr("disabled")) {
             $("#follow-submit").click();
-        } else {
-            setFollowSubmitButton();
         }
     });
 
     // -------------------------------------------------------------------------
+    // PASSWORD
 
     $("#password-email").typeWatch({
-        callback: function() { checkEmailIsUnique("password"); },
+        callback: function(e) { checkEmailIsOkay("password"); },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0
@@ -158,7 +163,7 @@ $(function() {
     });
 
     $("#login-email").typeWatch({
-        callback: function() { checkEmailIsUnique("login"); },
+        callback: function() { checkEmailIsOkay("login"); },
         wait: delayBeforeChecking,
         highlight: true,
         captureLength: 0

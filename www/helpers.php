@@ -158,18 +158,16 @@ function is_friend($user_id, $potential_friend_id) {
     return 0;
 }
 
-function create_user($username, $usercode, $password_hash, $email) {
+function create_user($username, $password_hash, $email) {
 
     global $con;
 
     $query = "INSERT INTO Users (
                 email,
-                usercode,
                 username,
                 password_hash
               ) VALUES (
                 '$email',
-                '$usercode',
                 '$username',
                 '$password_hash'
               ) ON DUPLICATE KEY UPDATE id=id";
@@ -395,15 +393,16 @@ function is_following($logged_in_username, $album_id) {
 
 
 
-function album_exists($handle, $user_id_or_string) {
+function album_exists($handle, $user_id_or_username) {
 
     global $con;
 
-    // Check if argument is an ID
-    $user_id = get_user_id_from_userstring($user_id_or_string);
+    // Check if argument is a username
+    $user_id = get_user_id_from_username($user_id_or_username);
 
     if ($user_id == 0) {
-        $user_id = $user_id_or_string;
+        // No, the argument is not a username; it's an ID
+        $user_id = $user_id_or_username;
     }
 
     // Check if the album exists for the given user
@@ -430,11 +429,11 @@ function album_exists($handle, $user_id_or_string) {
 }
 
 
-function get_user_id_from_userstring($userstring) {
+function get_user_id_from_username($username) {
 
     global $con;
 
-    $query = "SELECT id FROM Users WHERE username='$userstring' OR usercode='$userstring' LIMIT 1";
+    $query = "SELECT id FROM Users WHERE username='$username' LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -464,51 +463,6 @@ function get_username_from_user_id($user_id) {
 
     return $username;
 
-}
-
-function get_usercode_from_user_id($user_id) {
-
-    global $con;
-
-    $query = "SELECT usercode FROM Users WHERE id='$user_id' LIMIT 1";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $usercode = "";
-
-    if ($row = mysql_fetch_assoc($result)) {
-        $usercode = $row["usercode"];
-    }
-
-    return $usercode;
-
-}
-
-function get_username_from_userstring($userstring) {
-
-    global $con;
-
-    $username = "";
-
-    $query = "SELECT username FROM Users WHERE usercode='$userstring' LIMIT 1";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    if ($row = mysql_fetch_assoc($result)) {
-        $username = $row["username"];
-        return $username;
-    }
-
-    $query = "SELECT username FROM Users WHERE username='$userstring' LIMIT 1";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    if ($row = mysql_fetch_assoc($result)) {
-        $username = $row["username"];
-        return $username;
-    }
-
-    return $username;
 }
 
 function get_user_info($user_id) {

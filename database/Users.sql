@@ -7,7 +7,6 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 CREATE TABLE IF NOT EXISTS `Users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `usercode` varchar(255) DEFAULT NULL,
   `username` varchar(255) DEFAULT NULL,
   `first_name` varchar(255) DEFAULT NULL,
   `last_name` varchar(255) DEFAULT NULL,
@@ -39,7 +38,6 @@ DELIMITER //
 CREATE TRIGGER `userstrigger` BEFORE INSERT ON `Users`
     FOR EACH ROW BEGIN
         SET NEW.email_hash = UNHEX(SHA1(NEW.email));
-        SET NEW.usercode_hash = UNHEX(SHA1(NEW.usercode));
         SET NEW.username_hash = UNHEX(SHA1(NEW.username));
     END;
 //
@@ -49,7 +47,6 @@ DELIMITER //
 CREATE TRIGGER `userstrigger2` BEFORE UPDATE ON `Users`
     FOR EACH ROW BEGIN
         SET NEW.email_hash = UNHEX(SHA1(NEW.email));
-        SET NEW.usercode_hash = UNHEX(SHA1(NEW.usercode));
         SET NEW.username_hash = UNHEX(SHA1(NEW.username));
     END;
 //

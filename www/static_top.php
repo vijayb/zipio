@@ -64,7 +64,7 @@ HTML;
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="$('#login-modal').modal('show'); $('#login-email').val('').focus();">Login</a></li>
-            <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show')">Sign up</a></li>
+            <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show'); $('#signup-username').focus();">Sign up</a></li>
         </ul>
 HTML;
 
@@ -110,42 +110,48 @@ if (!isset($page_title_right)) $page_title_right = "";
 <!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="register-modal">
+
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">×</button>
+        <a class="close" data-dismiss="modal">×</a>
         <h2>Hi, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
         <h3>Set a password and change your username (if you want)</h3>
     </div>
-    <div class="modal-body">
-        <form class="form-horizontal">
-            <fieldset>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Your username</label>
-                    <div class="controls">
-                        <div id="register-username-panel" style="display:none">
-                            <input type="text" class="input-xlarge" id="register-username" autocomplete="off">
-                            <p class="help-block" id="register-username-check"></p>
-                            <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">Cancel (I'll stick with <b><?php print($_SESSION["user_info"]["username"]); ?></b>)</a></p>
-                        </div>
 
-                        <div id="register-read-only-username-panel">
-                            <span class="input-xlarge uneditable-input"><?php print($_SESSION["user_info"]["username"]); ?></span>
-                            <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">Change my username</a></p>
-                        </div>
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="input01">Your username</label>
+                <div class="controls">
+                    <div id="register-username-panel" style="display:none">
+                        <input type="text" class="input-xlarge" id="register-username" autocomplete="off">
+                        <p class="help-block" id="register-username-check"></p>
+                        <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">Cancel (I'll stick with <b><?php print($_SESSION["user_info"]["username"]); ?></b>)</a></p>
+                    </div>
+
+                    <div id="register-read-only-username-panel">
+                        <span class="input-xlarge uneditable-input"><?php print($_SESSION["user_info"]["username"]); ?></span>
+                        <p class="help-block"><a href="javascript:void(0);" onclick="flipChangeUsername();">I want to change my username</a></p>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Pick a password</label>
-                    <div class="controls">
-                        <input type="password" class="input-xlarge" id="register-password">
-                    </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input01">Pick a password</label>
+                <div class="controls">
+                    <input type="password" class="input-xlarge" id="register-password">
                 </div>
-            </fieldset>
-        </form>
+            </div>
+        </div>
     </div>
+
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn" data-dismiss="modal">I'll do this later</a>
-        <button onclick="saveUsernamePassword();" class="btn btn-primary" id="register-submit" data-loading-text="Please wait...">Go</button>
+        <a href="#" class="btn" data-dismiss="modal">I'll set up a password later</a>
+        <button onclick="saveUsernamePassword();"
+                disabled
+                class="btn btn-primary" id="register-submit" data-loading-text="Please wait...">
+                Set my password
+        </button>
     </div>
+
 </div>
 
 <!----------------------------------------------------------------------------->
@@ -221,46 +227,51 @@ if (!isset($page_title_right)) $page_title_right = "";
 <!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="signup-modal">
+
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
         <h2>Signup for a Zipio account</h2>
     </div>
+
     <div class="modal-body">
         <div class = "hide" id="try-again">
             <div class = "alert alert-error"> Something went wrong. Please try again.</div>
         </div>
-        <form class="form-horizontal">
-            <fieldset>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Pick a username</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" id="signup-username" autocomplete="off">
-                        <p class="help-block" id="signup-username-check"></p>
-                        <!-- <p class="help-block">Supporting help text</p> -->
-                    </div>
+        <div class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label" for="input01">Pick a username</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="signup-username" autocomplete="off">
+                    <p class="help-block" id="signup-username-check"></p>
+                    <!-- <p class="help-block">Supporting help text</p> -->
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Your email</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" id="signup-email">
-                        <p class="help-block" id="signup-email-check"></p>
-                        <!-- <p class="help-block">Supporting help text</p> -->
-                    </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input01">Your email</label>
+                <div class="controls">
+                    <input type="text" class="input-xlarge" id="signup-email">
+                    <p class="help-block" id="signup-email-check"></p>
+                    <!-- <p class="help-block">Supporting help text</p> -->
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="input01">Create a password</label>
-                    <div class="controls">
-                        <input type="password" class="input-xlarge" id="signup-password">
-                    </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input01">Create a password</label>
+                <div class="controls">
+                    <input type="password" class="input-xlarge" id="signup-password">
                 </div>
-            </fieldset>
-        </form>
-
+            </div>
+        </div>
     </div>
+
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button disabled onclick="signupUser();" class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">Sign up</button>
+        <button onclick="signupUser();"
+                disabled
+                class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">
+                Sign up
+        </button>
     </div>
+
 </div>
 
 <!----------------------------------------------------------------------------->
@@ -287,7 +298,11 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button disabled onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);" class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">Follow</button>
+        <button onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);"
+                disabled
+                class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">
+                Follow
+        </button>
     </div>
 
 </div>

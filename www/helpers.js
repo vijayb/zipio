@@ -40,7 +40,7 @@ function attemptLogin() {
         url: urlString,
         success: function(data) {
             if (parseInt(data) != 0) {
-                window.location.replace(window.location.href);
+                window.location.replace(window.location.href.split('#')[0]);
             } else {
                 $("#login-error").show();
             }
@@ -152,7 +152,8 @@ function saveUsernamePassword() {
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                window.location.replace(window.location.href);
+                debug("username/password saved");
+                window.location.replace(window.location.href.split('#')[0]);
             }
         },
         async: false
@@ -184,7 +185,7 @@ function signupUser() {
         type: "GET",
         url: urlString,
         success: function(data) {
-            window.location.replace(window.location.href);
+            window.location.replace(window.location.href.split('#')[0]);
         },
         async: false
     });
@@ -193,22 +194,32 @@ function signupUser() {
 
 
 function setFollowSubmitButton() {
-    $("#follow-submit").attr("disabled", "");
+    $("#follow-submit").attr("disabled", true);
     if ($("#follow-email-check").data("correct") == 1) {
        $("#follow-submit").removeAttr("disabled");
     } else {
-       $("#follow-submit").attr("disabled", "");
+       $("#follow-submit").attr("disabled", true);
     }
 }
 
 function setSignupSubmitButton() {
-    $("#signup-submit").attr("disabled", "");
+    $("#signup-submit").attr("disabled", true);
     if ($("#signup-email-check").data("correct") == 1 &&
         $("#signup-username-check").data("correct") == 1 &&
         $("#signup-password").val() != "") {
         $("#signup-submit").removeAttr("disabled");
     } else {
-        $("#signup-submit").attr("disabled", "");
+        $("#signup-submit").attr("disabled", true);
+    }
+}
+
+function setRegisterSubmitButton() {
+    $("#register-submit").attr("disabled", true);
+    if (($("#register-username-check").data("correct") == 1 || !$("#register-username").is(":visible")) &&
+        $("#register-password").val() != "") {
+        $("#register-submit").removeAttr("disabled");
+    } else {
+        $("#register-submit").attr("disabled", true);
     }
 }
 
@@ -216,7 +227,6 @@ function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
         $('#register-username-panel').hide();
         $('#register-read-only-username-panel').show();
-
     } else {
         $('#register-username-panel').show();
         $('#register-read-only-username-panel').hide();
@@ -227,18 +237,11 @@ function flipChangeUsername() {
     }
 }
 
-
-
-
-
-
-function checkEmailIsUnique(prefix) {
-    debug("check email");
+function checkEmailIsOkay(prefix) {
 
     $("#" + prefix + "-email-check").data("correct", 0);
 
     var emailEntered = $("#" + prefix + "-email").val();
-
     if (emailEntered == "") {
         $("#" + prefix + "-email-check").html("Type in your email");
         return;

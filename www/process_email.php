@@ -66,15 +66,13 @@ if (mysql_num_rows($result) == 1) {
 
     $brand_new_user = 1;
 
-    $usercode = generate_username($sender);
+    $username = generate_username($sender);
     $query = "INSERT INTO Users (
                 email,
-                usercode,
                 username
               ) VALUES (
                 '$sender',
-                '$usercode',
-                '$usercode'
+                '$username'
               ) ON DUPLICATE KEY UPDATE last_seen=UTC_TIMESTAMP()";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
@@ -111,9 +109,9 @@ $s3_urls = array();
 
 // Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
 if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
-    $target_userstring = $matches[1];
-    debug("target_userstring: " . $target_userstring . "\n");
-    $target_user_id = get_user_id_from_userstring($target_userstring);
+    $target_username = $matches[1];
+    debug("target_username: " . $target_username . "\n");
+    $target_user_id = get_user_id_from_username($target_username);
 } else {
     $target_user_id = $user_id;
 }

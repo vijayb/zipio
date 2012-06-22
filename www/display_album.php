@@ -180,6 +180,8 @@ for ($i = 0; $i < count($photos_array); $i++) {
                                                                                 '{$photos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
+                <li class="divider"></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 0);">Original</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 1);">Tilt shift</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 2);">Gotham</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 3);">Kelvin</a></li>

@@ -11,7 +11,7 @@ check_request_for_login($_GET);
 if (!isset($_GET["username"])) {
     exit();
 } else {
-    $user_id = get_user_id_from_userstring($_GET["username"]);
+    $user_id = get_user_id_from_username($_GET["username"]);
     $username = get_username_from_user_id($user_id);
     print("<!-- user_id: $user_id -->\n");
     print("<!-- username: $username -->\n");
@@ -25,7 +25,7 @@ $page_title = <<<HTML
     {$username}
 HTML;
 
-$page_subtitle = "Create a new album by sending photos to <b>{album_name}@zipio.com</b>"
+$page_subtitle = "Create a new album by sending photos to <b><i>album_name</i>@zipio.com</b>"
 
 ?>
 
