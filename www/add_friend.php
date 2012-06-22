@@ -9,7 +9,6 @@ error_reporting(E_ALL | E_STRICT);
 require("db.php");
 require("helpers.php");
 
-debug("1");
 
 if (!isset($_GET["request"])) {
     exit();
@@ -34,7 +33,6 @@ $query = "INSERT INTO Friends (
             '$target_user_id'
           ) ON DUPLICATE KEY UPDATE id=id";
 $result = mysql_query($query, $con);
-debug($query);
 if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 
 

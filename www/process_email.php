@@ -159,7 +159,7 @@ if ($target_album_id > 0) {
         debug("-----TIME 6.1: " . (time() - $start_time));
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
-            add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+            add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
             array_push($s3_urls, $s3_url);
         }
         debug("-----TIME 6.2: " . (time() - $start_time));
@@ -190,7 +190,7 @@ EMAIL;
             // Add the photo to the friend's album
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
-                add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
             email_followers($target_album_info, $s3_urls);
@@ -220,7 +220,7 @@ EMAIL;
             // Add photo as invisible and send an email to the owner
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
-                add_photo($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
             // email_followers($target_album_info, $s3_urls);
@@ -270,12 +270,13 @@ EMAIL;
 
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
-            $current_photo_id = add_photo($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+            $current_albumphoto_id = add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
             array_push($s3_urls, $s3_url);
             if ($i == 0) {
                 // Set the first photo as the cover photo
-                debug("current_photo_id: $current_photo_id");
-                update_data("Albums", $target_album_id, array("cover_photo_id" => $current_photo_id));
+                debug("current_albumphoto_id: $current_albumphoto_id");
+                update_data("Albums", $target_album_id, array("cover_albumphoto_id" => $current_albumphoto_id));
+                debug("Adding albumphoto " . $current_albumphoto_id . " added to album " . $target_album_id);
             }
         }
         email_followers($target_album_info, $s3_urls);

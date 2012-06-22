@@ -9,6 +9,13 @@ require("helpers.php");
 check_request_for_login($_GET);
 print("<!--" . print_r($_SESSION, true) . "-->");
 
+
+
+
+$photo_info = get_albumphoto_info(23);
+print_r($photo_info);
+
+
 ?>
 
 

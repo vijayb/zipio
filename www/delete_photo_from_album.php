@@ -6,17 +6,11 @@ error_reporting(E_ALL | E_STRICT);
 require("db.php");
 require("helpers.php");
 
-if (!isset($_GET["photo_id"]) ||
-    !isset($_GET["album_id"]) ||
-    !isset($_GET["albumphoto_id"]) ||
-    !isset($_GET["cover_photo_id"]) ||
+if (!isset($_GET["albumphoto_id"]) ||
     !isset($_GET["token"])) {
     exit();
 } else {
-    $photo_id = $_GET["photo_id"];
-    $album_id = $_GET["album_id"];
     $albumphoto_id = $_GET["albumphoto_id"];
-    $cover_photo_id = $_GET["cover_photo_id"];
     $token = $_GET["token"];
 }
 
@@ -25,32 +19,11 @@ if (!check_token($albumphoto_id, $token, "AlbumPhotos")) {
     exit();
 }
 
-if ($cover_photo_id == $photo_id) {
-    $query = "SELECT photo_id FROM AlbumPhotos WHERE photo_id!='$photo_id' AND album_id='$album_id' LIMIT 1";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-    $row = mysql_fetch_array($result);
+$albumphoto_info = get_albumphoto_info($albumphoto_id);
 
-    $new_cover_photo_id = $row['photo_id'];
-    $query = "UPDATE Albums SET cover_photo_id = '$new_cover_photo_id' WHERE id='$album_id'";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-}
-
-$query = "DELETE FROM AlbumPhotos WHERE photo_id='$photo_id' AND album_id='$album_id'";
+$query = "DELETE FROM AlbumPhotos WHERE photo_id='" . $albumphoto_info["photo_id"] . "' AND album_id='" . $albumphoto_info["album_id"] . "'";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-$query = "SELECT * FROM AlbumPhotos WHERE album_id='$album_id'";
-$result = mysql_query($query, $con);
-if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-$count = mysql_num_rows($result);
-
-if ($count == 0) {
-    $query = "DELETE FROM Albums WHERE id='$album_id'";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-}
 
 print("1");
 

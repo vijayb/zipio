@@ -3,7 +3,8 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
-$s3_root = "https://s3.amazonaws.com/zipio_photos/photos";
+$s3_bucket_name = "zipio";
+$s3_root = "https://s3.amazonaws.com/" . $s3_bucket_name . "/photos";
 $www_root = "http://localhost";
 
 define('CACHE_PATH', 'opticrop-cache/');
@@ -201,11 +202,9 @@ function create_album($user_id, $handle) {
 
 function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     global $s3;
-
-    $bucket_name = "zipio_photos";
+    global $s3_bucket_name;
 
     $tmp_image_path = $image_path . "_tmp";
-    debug("Writing file: $tmp_image_path");
 
     $image->writeImage($tmp_image_path);
     if ($filter == 1) { // tilt shift
@@ -235,7 +234,7 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
 
     echo $tmp_image_path." ***<BR>\n";
     echo $s3_name." ***<BR>\n";
-    if (!$s3->putObjectFile($tmp_image_path, $bucket_name,
+    if (!$s3->putObjectFile($tmp_image_path, $s3_bucket_name,
                             "photos/" . $s3_name, S3::ACL_PUBLIC_READ)) {
         debug("Error in writing to S3");
         debug($tmp_image_path);
@@ -248,8 +247,8 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
 
 //$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
 
-function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
-                   $visible = 1, $path_to_photo, &$s3_url_parameter) {
+function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
+                        $visible = 1, $path_to_photo, &$s3_url_parameter) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -259,7 +258,6 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $visible_string = "";
     if (!$visible) $visible_string = "<b>invisible</b>";
-    debug("Adding $visible_string photo (owner $owner_user_id) to album $target_album_id");
 
     $s3_url =
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
@@ -279,7 +277,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-        for ($filter = 0; $filter <= 4; $filter++) {
+        for ($filter = 0; $filter <= 0; $filter++) {
             $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
             $failed = $failed || filterImageAndWriteToS3($tmpimage,
                                                          $path_to_photo,
@@ -308,7 +306,6 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
     }
 
     unlink($cropped_path);
-
 
     if (!$failed) {
         $query = "INSERT INTO Photos (
@@ -339,7 +336,8 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
-        return $photo_id;
+        $albumphoto_id = mysql_insert_id();
+        return $albumphoto_id;
 
     } else {
         echo "Failed to copy file.\n";
@@ -537,7 +535,11 @@ function get_following_albums_info($user_id) {
 
     global $con;
 
-    $query = "SELECT * FROM Followers LEFT JOIN Albums ON Followers.album_id = Albums.id WHERE Followers.follower_id = '$user_id'";
+    $query = "SELECT *
+              FROM Followers
+              LEFT JOIN Albums
+              ON Followers.album_id = Albums.id
+              WHERE Followers.follower_id = '$user_id'";
     $result = mysql_query($query, $con);
 
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -552,43 +554,47 @@ function get_following_albums_info($user_id) {
 }
 
 
-function get_photos_info($album_id) {
 
+function get_albumphotos_info($album_id) {
     global $con;
 
-    $query = "SELECT photo_id FROM AlbumPhotos WHERE album_id='$album_id'";
+    $query = "SELECT id
+              FROM AlbumPhotos
+              WHERE album_id='$album_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-    $photos_array = array();
+    $albumphotos_array = array();
     while ($row = mysql_fetch_assoc($result)) {
-        $photo = get_photo_info($row["photo_id"], $album_id);
-        array_push($photos_array, $photo);
+        $albumphoto = get_albumphoto_info($row["id"]);
+        array_push($albumphotos_array, $albumphoto);
     }
-    return $photos_array;
-
+    return $albumphotos_array;
 }
 
-// The album_is is required because a photo may have different properties (for
-// example, visibility) depending on which album it lives in
-function get_photo_info($photo_id, $album_id) {
-
+function get_albumphoto_info($albumphoto_id) {
     global $con;
 
-    $query = "SELECT * FROM Photos WHERE id='$photo_id' LIMIT 1";
+    $query = "SELECT
+                AlbumPhotos.id,
+                photo_id,
+                photo_owner_id,
+                album_id,
+                album_owner_id,
+                visible,
+                filter_code,
+                s3_url,
+                AlbumPhotos.created
+              FROM AlbumPhotos
+              LEFT JOIN Photos
+              ON AlbumPhotos.photo_id=Photos.id
+              WHERE AlbumPhotos.id='$albumphoto_id'
+              LIMIT 1";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
-        $inner_query = "SELECT * FROM AlbumPhotos WHERE photo_id='$photo_id' AND album_id='$album_id' LIMIT 1";
-        $inner_result = mysql_query($inner_query, $con);
-        if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-        if ($inner_row = mysql_fetch_assoc($inner_result)) {
-            $row["visible"] = $inner_row["visible"];
-            $row["filter_code"] = $inner_row["filter_code"];
-            $row["albumphoto_id"] = $inner_row["id"];
-        }
-        $row["token"] = calculate_token($row["id"], $row["created"]);
+        $row["albumphoto_token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
         return 0;

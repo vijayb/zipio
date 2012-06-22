@@ -8,7 +8,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 CREATE TABLE IF NOT EXISTS `Albums` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) unsigned NOT NULL,
-  `cover_photo_id` int(11) unsigned NOT NULL,
+  `cover_albumphoto_id` int(11) unsigned NOT NULL,
   `handle` varchar(100) DEFAULT NULL,
   `handle_hash` binary(20) NOT NULL,
   `title` varchar(500) DEFAULT NULL,

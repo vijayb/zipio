@@ -45,7 +45,7 @@ $albums_array = get_following_albums_info($user_id);
 
 for ($i = 0; $i < count($albums_array); $i++) {
 
-    $cover_photo_info = get_photo_info($albums_array[$i]["cover_photo_id"], $albums_array[$i]["id"]);
+    $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
     $album_owner_name = get_username_from_user_id($albums_array[$i]["user_id"]);
 
     $html = <<<HTML
@@ -62,7 +62,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
             <div class="tile-options" style="display:none">
                 <div class="btn-group">
                     <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                        <i class="icon-chevron-down icon-white"></i>
+                        <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a href=javascript:void(0) onclick = "unfollowAlbum({$_SESSION["user_id"]},

@@ -24,7 +24,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 $page_title = <<<HTML
-    {$album_info["handle"]}<span style="color:#000000">@{$album_owner_info["username"]}.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
+    {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = <<<HTML
@@ -139,62 +139,62 @@ HTML;
 
 <?php
 
-$photos_array = get_photos_info($album_to_display);
-$photos_array_js = "";
+$albumphotos_array = get_albumphotos_info($album_to_display);
+$albumphotos_array_js = "";
 
-for ($i = 0; $i < count($photos_array); $i++) {
-    if ($photos_array[$i]["visible"] == 0) {
-        continue;
-        // $opacity = "0.4";
+for ($i = 0; $i < count($albumphotos_array); $i++) {
+    if ($albumphotos_array[$i]["visible"] == 0) {
+        $opacity = "0.4";
     } else {
         $opacity = "1.0";
     }
 
-    $photos_array_js .= "'" . $s3_root . "/" . $photos_array[$i]["s3_url"] . "_800_0',";
+    $albumphotos_array_js .= "'" . $s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_800_" . $albumphotos_array[$i]["filter_code"] . "',";
 
     $html = <<<HTML
 
-<div class="item span3" id="photo-{$photos_array[$i]["id"]}">
-    <a id="fancybox-{$photos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$photos_array[$i]["s3_url"]}_800_{$photos_array[$i]["filter_code"]}">
-        <img id="image-{$photos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$photos_array[$i]["s3_url"]}_cropped_{$photos_array[$i]["filter_code"]}'>
+<div class="item span3" id="albumphoto-{$albumphotos_array[$i]["id"]}">
+
+    <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
+        <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
     </a>
 
     <!--
-    photo_id: {$photos_array[$i]["id"]}<br>
+    albumphoto_id: {$albumphotos_array[$i]["id"]}<br>
+    photo_id: {$albumphotos_array[$i]["photo_id"]}<br>
     album_id: {$album_to_display}<br>
-    cover_photo_id: {$album_info["cover_photo_id"]}<br>
-    albumphoto_id: {$photos_array[$i]["albumphoto_id"]}<br>
+    cover_albumphoto_id: {$album_info["cover_albumphoto_id"]}<br>
+    albumphoto_token: {$albumphotos_array[$i]["albumphoto_token"]}<br>
+    s3_url: {$albumphotos_array[$i]["s3_url"]}<br>
     -->
 
     <div class="tile-options" style="display:none;">
         <div class="btn-group">
             <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-chevron-down icon-white"></i>
+                <i class="icon-sort-down icon-white"></i>
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$photos_array[$i]["id"]},
-                                                                                {$album_to_display},
-                                                                                {$photos_array[$i]["albumphoto_id"]},
-                                                                                {$album_info["cover_photo_id"]},
-                                                                                '{$photos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
+                    <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]},
+                                                                                '{$albumphotos_array[$i]["albumphoto_token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
                 <li class="divider"></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 0);">Original</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 1);">Tilt shift</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 2);">Gotham</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$photos_array[$i]["id"]}, {$photos_array[$i]["albumphoto_id"]}, 3);">Kelvin</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 0);">Original</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 1);">Tilt shift</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 2);">Gotham</a></li>
+                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 3);">Kelvin</a></li>
           </ul>
         </div>
     </div>
+
 </div>
 
 HTML;
     print($html);
 }
 
-$photos_array_js = rtrim($photos_array_js, ",");
+$albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 ?>
 
@@ -270,7 +270,7 @@ $(function() {
 <?php
 
 $output_js = <<<HTML
-    preload([{$photos_array_js}]);
+    preload([{$albumphotos_array_js}]);
 HTML;
 
 print($output_js);

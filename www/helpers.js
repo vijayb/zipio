@@ -422,18 +422,15 @@ function preload(arrayOfImages) {
     });
 }
 
-function deletePhotoFromAlbum(photoID, albumID, albumPhotoID, coverPhotoID, token) {
-    var urlString = "/delete_photo_from_album.php?photo_id=" + photoID +
-                                                "&album_id=" + albumID +
-                                                "&albumphoto_id=" + albumPhotoID +
-                                                "&cover_photo_id=" + coverPhotoID +
+function deletePhotoFromAlbum(albumPhotoID, token) {
+    var urlString = "/delete_photo_from_album.php?albumphoto_id=" + albumPhotoID +
                                                 "&token=" + token;
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                $("#photo-" + photoID).remove();
+                $("#albumphoto-" + albumPhotoID).remove();
                 $("#masonry-container").masonry("reload");
             } else if (parseInt(data) == 0) {
                 debug("Could not delete photo because the token's wrong");

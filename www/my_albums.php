@@ -45,12 +45,12 @@ $albums_array = get_albums_info($user_id);
 
 for ($i = 0; $i < count($albums_array); $i++) {
 
-    $cover_photo_info = get_photo_info($albums_array[$i]["cover_photo_id"], $albums_array[$i]["id"]);
+    $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
 
     $html = <<<HTML
     <div class="item span3">
         <a href="/{$username}/{$albums_array[$i]["handle"]}">
-            <img src='{$s3_root}/{$cover_photo_info["s3_url"]}_cropped_0'>
+            <img src='{$s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
             <div class="album-details">
                 <span class="album-title">
                     {$albums_array[$i]["handle"]}
@@ -58,15 +58,17 @@ for ($i = 0; $i < count($albums_array); $i++) {
             </div>
         </a>
 
+<!--
             <div class="tile-options" style="display:none">
                 <div class="btn-group">
                     <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                        <i class="icon-chevron-down icon-white"></i>
+                        <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu">
                     </ul>
                 </div>
             </div>
+-->
 
     </div>
 HTML;
