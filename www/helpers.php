@@ -299,7 +299,7 @@ function add_photo($owner_user_id, $target_album_id, $target_album_owner_id,
 
     $cropped_image = new imagick($cropped_path);
 
-    for ($filter = 0; $filter <= 4; $filter++) {
+    for ($filter = 0; $filter <= 0; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
                                                      $path_to_photo,
@@ -379,11 +379,11 @@ EMAIL;
 /** return 1 if user is following album
  *  else returns 0
  **/
-function is_following($logged_in_username, $album_id) {
+function is_following($logged_in_user_id, $album_id) {
 
     global $con;
 
-    $query = "SELECT id FROM Followers WHERE follower_id='$logged_in_username' AND album_id='$album_id'";
+    $query = "SELECT id FROM Followers WHERE follower_id='$logged_in_user_id' AND album_id='$album_id'";
     $result = mysql_query($query);
     if(mysql_num_rows($result) == 1) { // user is following the album
         return 1;
@@ -531,6 +531,26 @@ function get_albums_info($user_id) {
     return $albums_array;
 
 }
+
+
+function get_following_albums_info($user_id) {
+    
+    global $con;
+    
+    $query = "SELECT * FROM Followers LEFT JOIN Albums ON Followers.album_id = Albums.id WHERE Followers.follower_id = '$user_id'";
+    $result = mysql_query($query, $con);
+    
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $albums_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $album = get_album_info($row["id"]);
+        array_push($albums_array, $album);
+    }
+    
+    return $albums_array;
+}
+
 
 function get_photos_info($album_id) {
 

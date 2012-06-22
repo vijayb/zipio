@@ -48,7 +48,8 @@ if (is_logged_in()) {
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
-                    <li><a href="#"><i class="icon-wrench"></i> Account settngs</a></li>
+                    <li><a href="/{$_SESSION["user_info"]["username"]}/_following"><i class="icon-eye-open"></i> Albums I'm Following</a></li>
+                    <li><a href="#"><i class="icon-wrench"></i> Account Settings</a></li>
                     <li class="divider"></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
                 </ul>
