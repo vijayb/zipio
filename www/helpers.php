@@ -276,7 +276,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         $tmpimage = clone $image;
         $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
 
-        for ($filter = 0; $filter <= 6; $filter++) {
+        for ($filter = 0; $filter <= 0; $filter++) {
             $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
             $failed = $failed || filterImageAndWriteToS3($tmpimage,
                                                          $path_to_photo,
@@ -296,7 +296,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
     $cropped_image = new imagick($cropped_path);
 
-    for ($filter = 0; $filter <= 6; $filter++) {
+    for ($filter = 0; $filter <= 0; $filter++) {
         $s3_name = $s3_url."_cropped_" . $filter;
         $failed = $failed || filterImageAndWriteToS3($cropped_image,
                                                      $path_to_photo,

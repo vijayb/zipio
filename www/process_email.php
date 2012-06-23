@@ -91,7 +91,7 @@ debug("-----TIME 3: " . (time() - $start_time));
 
 
 $parts = explode('@', $recipient);
-$target_album_handle = $parts[0];
+$target_album_handle = preg_replace("/[^A-Za-z0-9]/", "", $parts[0]);
 $recipient_domain = $parts[1];
 
 debug("target_album_handle: " . $target_album_handle . "\n");
