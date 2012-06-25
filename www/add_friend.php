@@ -2,7 +2,7 @@
 
 // USER is the one who added the photos to TARGET USER's album
 // TARGET USER clicks on the link in his email to add USER as a friend
-
+session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -51,9 +51,6 @@ EMAIL;
 
 print($output);
 
-
-
-
 $display_album_ra = array();
 $display_album_ra["user_id"] = $user_info["id"];
 $display_album_ra["token"] = $user_info["token"];
@@ -78,6 +75,12 @@ EMAIL;
 send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
 send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
 
+$url =  "http://localhost/" .  $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
 
+login_user($target_user_id);
+
+create_follower($target_user_id, $user_id, $album_info["id"]);
+
+header("Location: $url");
 
 ?>

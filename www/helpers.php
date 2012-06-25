@@ -515,7 +515,26 @@ function get_albums_info($user_id) {
 
     global $con;
 
-    $query = "SELECT * FROM Albums WHERE user_id='$user_id'";
+    $query = "SELECT * FROM Albums WHERE user_id='$user_id' AND view_permissions=0"; // view_permission = 0 => public
+
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $albums_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $album = get_album_info($row["id"]);
+        array_push($albums_array, $album);
+    }
+    return $albums_array;
+
+}
+
+
+function get_private_albums_info($user_id) {
+
+    global $con;
+
+    $query = "SELECT * FROM Albums WHERE user_id='$user_id' AND view_permissions=1"; // view_permission = 1 => private
 
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());

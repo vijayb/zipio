@@ -165,7 +165,8 @@ function saveUsernamePassword() {
         success: function(data) {
             if (parseInt(data) == 1) {
                 debug("username/password saved");
-                window.location.replace(window.location.href.split('#')[0]);
+                var split = window.location.href.split('/');
+                window.location.replace(split[0] + "/" + username + "/" + split[4]);
             }
         },
         async: true
@@ -444,8 +445,33 @@ function deletePhotoFromAlbum(albumPhotoID, token) {
 }
 
 
+function makeAlbumPrivate(albumID, token) {
+    
+    var urlString = "/change_album_visibility.php?album_id=" + albumID +
+                                                "&token=" + token + "&vis=1";
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+                window.location.replace(window.location.href);
+        },
+        async: true
+    });
+}
 
-
+function makeAlbumPublic(albumID, token) {
+    
+    var urlString = "/change_album_visibility.php?album_id=" + albumID +
+                                                "&token=" + token + "&vis=0";
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            window.location.replace(window.location.href);
+        },
+        async: true
+    });
+}
 
 
 function validateEmail(email) {
@@ -467,6 +493,10 @@ function getAlert(alert) {
     } else if (alert == 2) {
         returnArr["title"] = "You're no longer following this album.";
         returnArr["text"] = "";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 3) {
+        returnArr["title"] = "You successfully added a friend!";
+        returnArr["text"] = "Your friend can now add photos to this album.";
         returnArr["class"] = "alert-success";
     }
 

@@ -27,6 +27,18 @@ $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
+
+if ($album_info["view_permissions"] == 1 && (!is_logged_in() || (is_logged_in() && $_SESSION["user_id"] != $album_info["user_id"]) )) {
+    
+    $page_title = <<<HTML
+HTML;
+    
+    $page_subtitle = <<<HTML
+    This is a private album.
+HTML;
+   // exit();
+}
+else {
 $page_subtitle = <<<HTML
     To add photos, email them to the address above
 HTML;
@@ -101,9 +113,9 @@ HTML;
     }
 }
 
+}
+
 ?>
-
-
 
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_top.php"); ?>
@@ -138,6 +150,8 @@ HTML;
 <div class="row" id="masonry-container">
 
 <?php
+
+if ($album_info["view_permissions"] == 0 || ($album_info["view_permissions"] == 1 && is_logged_in() && $_SESSION["user_id"] == $user_id)) {
 
 $albumphotos_array = get_albumphotos_info($album_to_display);
 $albumphotos_array_js = "";
@@ -195,6 +209,10 @@ HTML;
 }
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
+
+} else {
+    
+}
 
 ?>
 

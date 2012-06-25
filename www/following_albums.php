@@ -8,6 +8,7 @@ require("helpers.php");
 
 check_request_for_login($_GET);
 
+
 if (!isset($_GET["username"])) {
     exit();
 } else {
@@ -16,6 +17,7 @@ if (!isset($_GET["username"])) {
     print("<!-- user_id: $user_id -->\n");
     print("<!-- username: $username -->\n");
 }
+
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
@@ -51,7 +53,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $html = <<<HTML
     <div class="item span3">
         <a href="/{$album_owner_name}/{$albums_array[$i]["handle"]}">
-            <img src='{$s3_root}/{$cover_photo_info["s3_url"]}_cropped_0'>
+            <img src='{$s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
             <div class="album-details">
                 <span class="album-title">
                     {$albums_array[$i]["handle"]}
