@@ -185,74 +185,85 @@ EMAIL;
         // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
 
         $is_friend = is_friend($target_user_id, $user_id);
-        if ($is_friend == 1) {
-            debug("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"], "green");
-            // Add the photo to the friend's album
-            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                $s3_url = "";
-                add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
-                array_push($s3_urls, $s3_url);
-            }
-            email_followers($target_album_info, $s3_urls);
 
-            $display_album_ra = array();
-            $display_album_ra["user_id"] = $user_info["id"];
-            $display_album_ra["timestamp"] = time();
-            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
-
-
+        if (($target_album_info["permissions"] == 1)
+            ||
+            ($target_album_info["permissions"] == 2 && $is_friend == 0)) {
 
             $user_email_body = <<<EMAIL
-                You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                <a href='{$display_album_link}'>See the album!</a>
+                You tried to add a photo to <b>{$target_user_info["username"]}</b>'s <b>{$target_album_info["handle"]}</b> album.
+                That album either doesn't exist or you don't have permission to add photos to it.
 EMAIL;
 
-            $target_user_email_body = <<<EMAIL
-                {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                 <a href='{$display_album_link}'>See the album!</a>
+        } else {
+
+            if ($is_friend == 1) {
+                debug("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"], "green");
+                // Add the photo to the friend's album
+                for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                    $s3_url = "";
+                    add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+                    array_push($s3_urls, $s3_url);
+                }
+                email_followers($target_album_info, $s3_urls);
+
+                $display_album_ra = array();
+                $display_album_ra["user_id"] = $user_info["id"];
+                $display_album_ra["timestamp"] = time();
+                $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+
+                $user_email_body = <<<EMAIL
+                    You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
+                    <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
-            debug("-----TIME 8: " . (time() - $start_time));
+                $target_user_email_body = <<<EMAIL
+                    {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
+                     <a href='{$display_album_link}'>See the album!</a>
+EMAIL;
+
+                debug("-----TIME 8: " . (time() - $start_time));
 
 
-        } else if ($is_friend == 0) {
-            debug("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"], "red");
-            // Add photo as invisible and send an email to the owner
-            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                $s3_url = "";
-                add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
-                array_push($s3_urls, $s3_url);
+            } else if ($is_friend == 0) {
+
+                debug("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"], "red");
+                // Add photo as invisible and send an email to the owner
+                for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                    $s3_url = "";
+                    add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
+                    array_push($s3_urls, $s3_url);
+                }
+                // email_followers($target_album_info, $s3_urls);
+
+                $display_album_ra = array();
+                $display_album_ra["user_id"] = $user_info["id"];
+                $display_album_ra["timestamp"] = time();
+                $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
+
+                $user_email_body = <<<EMAIL
+                    You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
+                    <br><br>
+                    Your photo will appear in the album once <b>{$target_user_info["username"]}</b> approves you as a friend.
+                    <a href='{$display_album_link}'>See the album!</a>
+EMAIL;
+
+                $add_friend_ra = array();
+                $add_friend_ra["user_id"] = $user_info["id"];
+                $add_friend_ra["target_user_id"] = $target_user_info["id"];
+                $add_friend_ra["album_id"] = $target_album_id;
+                $add_friend_ra["action"] = "add_friend";
+                $add_friend_ra["timestamp"] = time();
+                $add_friend_link = $www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
+
+                $target_user_email_body = <<<EMAIL
+                    {$user_info["email"]} tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
+                    Add as a friend?
+                    <a href='{$add_friend_link}'>Yes</a>
+                    <a href='#'>No</a>
+EMAIL;
+
             }
-            // email_followers($target_album_info, $s3_urls);
-
-            $display_album_ra = array();
-            $display_album_ra["user_id"] = $user_info["id"];
-            $display_album_ra["timestamp"] = time();
-            $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
-
-            $user_email_body = <<<EMAIL
-                You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
-                <br><br>
-                Your photo will appear in the album once <b>{$target_user_info["username"]}</b> approves you as a friend.
-                <a href='{$display_album_link}'>See the album!</a>
-EMAIL;
-
-            $add_friend_ra = array();
-            $add_friend_ra["user_id"] = $user_info["id"];
-            $add_friend_ra["target_user_id"] = $target_user_info["id"];
-            $add_friend_ra["album_id"] = $target_album_id;
-            $add_friend_ra["action"] = "add_friend";
-            $add_friend_ra["timestamp"] = time();
-            $add_friend_link = $www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
-
-            $target_user_email_body = <<<EMAIL
-                {$user_info["email"]} tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
-                Add as a friend?
-                <a href='{$add_friend_link}'>Yes</a>
-                <a href='#'>No</a>
-
-EMAIL;
-
         }
     }
 

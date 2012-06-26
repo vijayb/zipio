@@ -78,6 +78,31 @@ function showFollowModal() {
     }
 }
 
+function showAlbumSettingsModal() {
+    var currSetting = parseInt(gAlbum["permissions"]);
+    $("input[id='album-setting-" + currSetting + "']").attr("checked", true);
+    $('#album-settings-modal').modal('show');
+}
+
+function submitAlbumSettings() {
+    var newSetting = parseInt($('input[name=album-settings-radios]:checked').val());
+    var urlString = "/change_album_permissions.php?album_id=" + gAlbum['id'] + "&permissions=" + newSetting + "&token=" + gAlbum['token'];
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                window.location.replace(window.location.href.split('#')[0] + "#alert=4&permissions=" + newSetting);
+                window.location.reload(true);
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+}
+
 function unfollowAlbum(user_id, album_id, token) {
     $("#unfollow-submit").button("loading");
 
@@ -445,34 +470,6 @@ function deletePhotoFromAlbum(albumPhotoID, token) {
 }
 
 
-function makeAlbumPrivate(albumID, token) {
-    
-    var urlString = "/change_album_visibility.php?album_id=" + albumID +
-                                                "&token=" + token + "&vis=1";
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-                window.location.replace(window.location.href);
-        },
-        async: true
-    });
-}
-
-function makeAlbumPublic(albumID, token) {
-    
-    var urlString = "/change_album_visibility.php?album_id=" + albumID +
-                                                "&token=" + token + "&vis=0";
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            window.location.replace(window.location.href);
-        },
-        async: true
-    });
-}
-
 
 function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -488,15 +485,19 @@ function getAlert(alert) {
 
     if (alert == 1) {
         returnArr["title"] = "You're now following this album!";
-        returnArr["text"] = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (Requires the album owner to approve you.)";
+        returnArr["text"] = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (May require the album owner to approve you.)";
         returnArr["class"] = "alert-success";
     } else if (alert == 2) {
         returnArr["title"] = "You're no longer following this album.";
         returnArr["text"] = "";
         returnArr["class"] = "alert-success";
     } else if (alert == 3) {
-        returnArr["title"] = "You successfully added a friend!";
+        returnArr["title"] = "You successfully added a friend.";
         returnArr["text"] = "Your friend can now add photos to this album.";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 4) {
+        returnArr["title"] = "Album settings have been saved.";
+        returnArr["text"] = "";
         returnArr["class"] = "alert-success";
     }
 

@@ -7,7 +7,7 @@ require("db.php");
 require("helpers.php");
 
 check_request_for_login($_GET);
-print("<!--" . print_r($_SESSION, true) . "-->");
+print("<!-- session: " . print_r($_SESSION, true) . "-->");
 
 if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     exit();
@@ -17,28 +17,49 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_owner_info = get_user_info($album_info["user_id"]);
     print("<!-- album_id: $album_to_display -->\n");
     print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
+    print("<!-- album_info: " . print_r($album_info, true) . "-->");
+
 }
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
+
+$has_permission_to_view_album = 0;
+
+if ($album_info["permissions"] == 1) {
+    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+        // Viewer is the owner of the album
+        $has_permission_to_view_album = 1;
+    }
+} else if ($album_info["permissions"] == 2) {
+    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+        // Viewer is the owner of the album
+        $has_permission_to_view_album = 1;
+    } else if (is_logged_in() && in_array($_SESSION["user_id"], $album_owner_info["friends"])) {
+        // Viewer is a friend of the album owner
+        $has_permission_to_view_album = 1;
+    }
+} else if ($album_info["permissions"] == 3) {
+    // Anyone can see this album...
+    $has_permission_to_view_album = 1;
+}
+
+if (!$has_permission_to_view_album) {
+    header("Location: $error_404");
+}
+
+
+
+
+
+
+
 
 $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
-
-if ($album_info["view_permissions"] == 1 && (!is_logged_in() || (is_logged_in() && $_SESSION["user_id"] != $album_info["user_id"]) )) {
-    
-    $page_title = <<<HTML
-HTML;
-    
-    $page_subtitle = <<<HTML
-    This is a private album.
-HTML;
-   // exit();
-}
-else {
 $page_subtitle = <<<HTML
     To add photos, email them to the address above
 HTML;
@@ -113,45 +134,70 @@ HTML;
     }
 }
 
-}
-
 ?>
+
+
 
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
-<?php if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"] && false) { ?>
+<?php
 
-<div class="row">
+if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+
+    $permissions_title = "";
+    $permissions_string = "";
+
+    if ($album_info["permissions"] == 1) {
+        $permissions_title = "Private album.";
+        $permissions_string = <<<HTML
+Only you can see or add photos to this album.
+HTML;
+
+    } else if ($album_info["permissions"] == 2) {
+        $permissions_title = "Friends album.";
+        $permissions_string = <<<HTML
+Only you and your friends can see and add photos to this album.
+HTML;
+
+    } else if ($album_info["permissions"] == 3) {
+        $permissions_title = "Public album.";
+        $permissions_string = <<<HTML
+Anyone can see this album, but only you and your friends can add photos (if anyone else tries to add a photo, we'll ask you first).
+HTML;
+
+}
+
+    $html = <<<HTML
+
+<div class="row" style="margin-bottom:20px">
     <div class="span12">
-        <div class="accordion" id="accordion2">
-            <div class="accordion-group">
-
-                <div class="accordion-heading">
-                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
-                        Album Settings
-                    </a>
-                </div>
-
-                <div id="collapseThree" class="accordion-body collapse" style="height: 0px; ">
-                    <div class="accordion-inner">
-                        Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                    </div>
-                </div>
-
-            </div>
+        <div class="well well-small">
+            <strong>$permissions_title</strong>
+            {$permissions_string}
+            <a href="javascript:void(0);" onclick="showAlbumSettingsModal();">
+                Change
+            </a>
         </div>
     </div>
 </div>
 
-<? } ?>
+HTML;
+
+print($html);
+
+}
+
+?>
+
+
+
+
 
 <div class="row" id="masonry-container">
 
 <?php
-
-if ($album_info["view_permissions"] == 0 || ($album_info["view_permissions"] == 1 && is_logged_in() && $_SESSION["user_id"] == $user_id)) {
 
 $albumphotos_array = get_albumphotos_info($album_to_display);
 $albumphotos_array_js = "";
@@ -209,10 +255,6 @@ HTML;
 }
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
-
-} else {
-    
-}
 
 ?>
 

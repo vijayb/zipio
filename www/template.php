@@ -12,10 +12,6 @@ print("<!--" . print_r($_SESSION, true) . "-->");
 
 
 
-$photo_info = get_albumphoto_info(23);
-print_r($photo_info);
-
-
 ?>
 
 

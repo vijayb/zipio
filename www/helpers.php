@@ -6,6 +6,7 @@ error_reporting(E_ALL | E_STRICT);
 $s3_bucket_name = "zipio";
 $s3_root = "https://s3.amazonaws.com/" . $s3_bucket_name . "/photos";
 $www_root = "http://localhost";
+$error_404 = $www_root . "/template.php";
 
 define('CACHE_PATH', 'opticrop-cache/');
 
@@ -187,10 +188,12 @@ function create_album($user_id, $handle) {
 
     $query = "INSERT INTO Albums (
                   user_id,
-                  handle
+                  handle,
+                  permissions
               ) VALUES (
                   '$user_id',
-                  '$handle'
+                  '$handle',
+                  3
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ .
@@ -471,6 +474,16 @@ function get_user_info($user_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
+
+        $inner_query = "SELECT friend_id FROM Friends WHERE user_id='$user_id'";
+        $inner_result = mysql_query($inner_query, $con);
+        if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+        $row["friends"] = array();
+
+        while ($inner_row = mysql_fetch_assoc($inner_result)) {
+            array_push($row["friends"], $inner_row["friend_id"]);
+        }
+
         $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
@@ -515,7 +528,7 @@ function get_albums_info($user_id) {
 
     global $con;
 
-    $query = "SELECT * FROM Albums WHERE user_id='$user_id' AND view_permissions=0"; // view_permission = 0 => public
+    $query = "SELECT * FROM Albums WHERE user_id='$user_id'";
 
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -528,26 +541,6 @@ function get_albums_info($user_id) {
     return $albums_array;
 
 }
-
-
-function get_private_albums_info($user_id) {
-
-    global $con;
-
-    $query = "SELECT * FROM Albums WHERE user_id='$user_id' AND view_permissions=1"; // view_permission = 1 => private
-
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $albums_array = array();
-    while ($row = mysql_fetch_assoc($result)) {
-        $album = get_album_info($row["id"]);
-        array_push($albums_array, $album);
-    }
-    return $albums_array;
-
-}
-
 
 function get_following_albums_info($user_id) {
 
@@ -620,19 +613,6 @@ function get_albumphoto_info($albumphoto_id) {
 }
 
 
-function update_record($id, $table_name, $column_names, $values) {
-    if (count($column_names) != count($values)) {
-        debug("ERROR: Mismatch in number of columns and values", "red");
-    }
-}
-
-
-// Make all of user_id's photos in $album_id visible
-function make_visible($user_id, $album_id) {
-    // Get a list of photos owned by $user_id in album with id $album_id
-
-
-}
 
 
 

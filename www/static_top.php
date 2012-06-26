@@ -316,6 +316,60 @@ if (!isset($page_title_right)) $page_title_right = "";
 </div>
 
 <!----------------------------------------------------------------------------->
+
+<div class="modal hide" id="album-settings-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Who can see and add photos to this album?</h2>
+    </div>
+
+    <div class="modal-body">
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
+            <b>Private album</b>
+        </label>
+        <p style="margin-left:20px">
+            Only you can see and add photos to this album.
+        </p>
+
+        <br>
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
+            <b>Friends album</b>
+        </label>
+        <p style="margin-left:20px">
+            Only you and your friends can see and add photos to this album.
+            <br>
+            <a href="">See a list of my friends</a>
+        </p>
+
+        <br>
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
+            <b>Public album</b>
+        </label>
+        <p style="margin-left:20px">
+            Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
+        </p>
+
+
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitAlbumSettings();"
+                class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">
+                Save album settings
+        </button>
+    </div>
+
+</div>
+
+<!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
