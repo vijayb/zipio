@@ -211,6 +211,11 @@ EMAIL;
                 $display_album_ra["user_id"] = $user_info["id"];
                 $display_album_ra["timestamp"] = time();
                 $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+                
+                $owner_display_album_ra = array();
+                $owner_display_album_ra["user_id"] = $target_album_info["user_id"];
+                $owner_display_album_ra["timestamp"] = time();
+                $owner_display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
 
                 $user_email_body = <<<EMAIL
                     You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
@@ -219,7 +224,7 @@ EMAIL;
 
                 $target_user_email_body = <<<EMAIL
                     {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                     <a href='{$display_album_link}'>See the album!</a>
+                     <a href='{$owner_display_album_link}'>See the album!</a>
 EMAIL;
 
                 debug("-----TIME 8: " . (time() - $start_time));

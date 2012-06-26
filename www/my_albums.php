@@ -64,6 +64,8 @@ for ($i = 0; $i < count($albums_array); $i++) {
     } else if ($albums_array[$i]["permissions"] == 3) {
         // Anyone can see this album...
     }
+    
+    
 
     $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
 

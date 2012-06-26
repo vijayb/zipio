@@ -613,6 +613,42 @@ function get_albumphoto_info($albumphoto_id) {
 }
 
 
+function get_friends_info($user_id) {
+    
+   global $con;
+   
+   $query = "SELECT friend_id
+              FROM Friends
+              WHERE user_id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());    
+    
+    $friends_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $friend = get_friend_info($row["friend_id"]);
+        array_push($friends_array, $friend);
+    }
+    return $friends_array;
+    
+}
+
+function get_friend_info($friend_id) {
+    
+    global $con;
+
+    $query = "SELECT username, email, id FROM Users WHERE id='$friend_id' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        return $row;
+    } else {
+        return 0;
+    }
+    
+}
+
+
 
 
 

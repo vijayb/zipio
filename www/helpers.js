@@ -124,6 +124,23 @@ function unfollowAlbum(user_id, album_id, token) {
 
 }
 
+function unfriend(user_id, friend_id) {
+    $("#unfriend-" + friend_id).button("loading");
+    var urlString = "/unfriend.php?friend_id=" + friend_id +"&user_id=" + user_id;
+    
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            $("#friend-listing-" + friend_id).remove();
+            $("#friends-table").load("_friends #friends-table")
+        },
+        async: true
+    });
+    
+    
+}
+
 
 function submitForgotPassword($email) {
     $("#password-submit").button("loading");

@@ -46,6 +46,25 @@ $page_subtitle = "To unfollow any album, use the drop-down button on that album"
 $albums_array = get_following_albums_info($user_id);
 
 for ($i = 0; $i < count($albums_array); $i++) {
+    
+      if ($albums_array[$i]["permissions"] == 1) {
+        if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
+            // Viewer is the owner of the gallery
+        } else {
+            continue;
+        }
+    } else if ($albums_array[$i]["permissions"] == 2) {
+        $owner_info = get_user_info($albums_array[$i]["user_id"]);
+        if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
+            // Viewer is the owner of the albums
+        } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
+            // View is a friend of the owner of the albums
+        } else {
+            continue;
+        }
+    } else if ($albums_array[$i]["permissions"] == 3) {
+        // Anyone can see this album...
+    }
 
     $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
     $album_owner_name = get_username_from_user_id($albums_array[$i]["user_id"]);
