@@ -15,6 +15,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
     $album_owner_info = get_user_info($album_info["user_id"]);
+    print("<!-- GET: " . print_r($_GET, true) . "-->");
     print("<!-- album_id: $album_to_display -->\n");
     print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
     print("<!-- album_info: " . print_r($album_info, true) . "-->");
@@ -25,44 +26,64 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
-$has_permission_to_view_album = 0;
-
-if ($album_info["permissions"] == 1) {
-    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-        // Viewer is the owner of the album
-        $has_permission_to_view_album = 1;
-    }
-} else if ($album_info["permissions"] == 2) {
-    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-        // Viewer is the owner of the album
-        $has_permission_to_view_album = 1;
-    } else if (is_logged_in() && in_array($_SESSION["user_id"], $album_owner_info["friends"])) {
-        // Viewer is a friend of the album owner
-        $has_permission_to_view_album = 1;
-    }
-} else if ($album_info["permissions"] == 3) {
-    // Anyone can see this album...
-    $has_permission_to_view_album = 1;
-}
-
-if (!$has_permission_to_view_album) {
-    header("Location: $error_404");
-}
-
-
-
-
-
-
-
 
 $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
-$page_subtitle = <<<HTML
-    To add photos, email them to the address above
-HTML;
+$has_permission_to_view_album = 0;
+
+if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+    $viewer_relationship = "OWNER";
+} else if (is_logged_in() && isset($album_owner_info["friends"]) && in_array($_SESSION["user_id"], $album_owner_info["friends"])) {
+    $viewer_relationship = "FRIEND";
+} else {
+    $viewer_relationship = "STRANGER";
+}
+
+
+if ($album_info["permissions"] == 1) {
+    if ($viewer_relationship == "OWNER") {
+        $has_permission_to_view_album = 1;
+        $page_subtitle = "Add photos by emailing them to the above address";
+    } else if ($viewer_relationship == "FRIEND") {
+        // NO PERMISSION TO VIEW
+    } else if ($viewer_relationship == "STRANGER") {
+        // NO PERMISSION TO VIEW
+    }
+
+} else if ($album_info["permissions"] == 2) {
+    if ($viewer_relationship == "OWNER") {
+        $has_permission_to_view_album = 1;
+        $page_subtitle = "Add photos by emailing them to the above address";
+    } else if ($viewer_relationship == "FRIEND") {
+        $has_permission_to_view_album = 1;
+        $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
+    } else if ($viewer_relationship == "STRANGER") {
+        // NO PERMISSION TO VIEW
+    }
+
+} else if ($album_info["permissions"] == 3) {
+    $has_permission_to_view_album = 1;
+
+    if ($viewer_relationship == "OWNER") {
+        $page_subtitle = "Add photos by emailing them to the above address";
+    } else if ($viewer_relationship == "FRIEND") {
+        $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
+    } else if ($viewer_relationship == "STRANGER") {
+        $page_subtitle = "Add photos by emailing them to the above address <b>(" . $album_owner_info['username'] . " will have to approve you first)</b>";
+    }
+}
+
+
+
+
+
+
+if (!$has_permission_to_view_album) {
+    goto_homepage();
+}
+
 
 if (!is_logged_in()) {
     // User is not logged in, so show the follow button since we don't know
@@ -239,11 +260,13 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                                                                                 '{$albumphotos_array[$i]["albumphoto_token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
+                <!--
                 <li class="divider"></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 0);">Original</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 1);">Tilt shift</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 2);">Gotham</a></li>
                 <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 3);">Kelvin</a></li>
+                -->
           </ul>
         </div>
     </div>

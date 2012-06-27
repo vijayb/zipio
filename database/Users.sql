@@ -25,7 +25,6 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `last_emailed` datetime DEFAULT NULL,
   `email_frequency` int(11) NOT NULL DEFAULT '86400',
   `referrer` int(11) DEFAULT NULL,
-  `usercode_hash` binary(20) NOT NULL,
   `username_hash` binary(20) NOT NULL,
   `email_hash` binary(20) NOT NULL,
   PRIMARY KEY (`id`),

@@ -21,7 +21,7 @@ body {
 
 .album-details {
     position: absolute;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.7);
     bottom: 0px;
     padding: 5px;
 }
@@ -42,3 +42,10 @@ body {
     font-size:26px;
 }
 
+.album-privacy {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    top: 0px;
+    padding: 5px;
+    color: #ffffff;
+}

@@ -5,11 +5,17 @@ error_reporting(E_ALL | E_STRICT);
 
 $s3_bucket_name = "zipio";
 $s3_root = "https://s3.amazonaws.com/" . $s3_bucket_name . "/photos";
-$www_root = "http://localhost";
-$error_404 = $www_root . "/template.php";
+$www_root = "http://zipio.com";
 
 define('CACHE_PATH', 'opticrop-cache/');
 
+$album_privacy_contants[1] = "Private";
+$album_privacy_contants[2] = "Friends";
+$album_privacy_contants[3] = "Public";
+
+function goto_homepage() {
+    header("Location: $www_root" . "/template.php");
+}
 
 function login_user($user_id) {
     session_regenerate_id();
@@ -612,45 +618,24 @@ function get_albumphoto_info($albumphoto_id) {
     }
 }
 
-
 function get_friends_info($user_id) {
-    
+
    global $con;
-   
+
    $query = "SELECT friend_id
-              FROM Friends
-              WHERE user_id='$user_id'";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());    
-    
-    $friends_array = array();
-    while ($row = mysql_fetch_assoc($result)) {
-        $friend = get_friend_info($row["friend_id"]);
-        array_push($friends_array, $friend);
-    }
-    return $friends_array;
-    
-}
-
-function get_friend_info($friend_id) {
-    
-    global $con;
-
-    $query = "SELECT username, email, id FROM Users WHERE id='$friend_id' LIMIT 1";
+             FROM Friends
+             WHERE user_id='$user_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-    if ($row = mysql_fetch_assoc($result)) {
-        return $row;
-    } else {
-        return 0;
+    $friends_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $friend = get_user_info($row["friend_id"]);
+        array_push($friends_array, $friend);
     }
-    
+    return $friends_array;
+
 }
-
-
-
-
 
 function update_data($table, $id, $key_values) {
 

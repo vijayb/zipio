@@ -75,7 +75,7 @@ EMAIL;
 send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
 send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
 
-$url =  "http://localhost/" .  $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
+$url =  $www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
 
 login_user($target_user_id);
 

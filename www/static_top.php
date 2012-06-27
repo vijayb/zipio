@@ -49,6 +49,7 @@ if (is_logged_in()) {
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
                     <li><a href="/{$_SESSION["user_info"]["username"]}/_following"><i class="icon-eye-open"></i> Albums I'm Following</a></li>
+                    <li><a href="/{$_SESSION["user_info"]["username"]}/_friends"><i class="icon-group"></i> My Friends</a></li>
                     <li><a href="#"><i class="icon-wrench"></i> Account Settings</a></li>
                     <li class="divider"></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
@@ -146,7 +147,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">I'll set up a password later</a>
-        <button onclick="saveUsernamePassword();"
+        <button onclick="submitUsernamePassword();"
                 disabled
                 class="btn btn-primary" id="register-submit" data-loading-text="Please wait...">
                 Set my password
@@ -225,7 +226,7 @@ if (!isset($page_title_right)) $page_title_right = "";
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="submitForgotPassword();"
                 disabled
-                class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">
+                class="btn btn-primary" id="password-submit" data-loading-text="Please wait...">
                 Send me a password reset link
         </button>
     </div>
@@ -343,7 +344,7 @@ if (!isset($page_title_right)) $page_title_right = "";
         <p style="margin-left:20px">
             Only you and your friends can see and add photos to this album.
             <br>
-            <a href="">See a list of my friends</a>
+            <a href="/<?php print($_SESSION["user_info"]["username"]); ?>/_friends">See a list of my friends</a>
         </p>
 
         <br>
@@ -386,9 +387,9 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
     <div class="row" style="margin-bottom:20px;">
-        <div class="span8">
+        <div class="span9">
             <h1><?php print($page_title); ?></h1>
             <h3 style="color:#999999;"><?php print($page_subtitle); ?></h3>
         </div>
-        <div class="span4" style="text-align:right"><?php print($page_title_right); ?></div>
+        <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

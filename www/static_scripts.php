@@ -94,18 +94,18 @@ $(function() {
     // REGISTER
 
     $("#register-username").typeWatch({
-        callback: function(e) { checkUsernameIsUnique("register") },
+        callback: function(e) { checkUsernameIsUnique("register"); setRegisterSubmitButton() },
         wait: delayBeforeChecking,
-        highlight: true,
         captureLength: 0
     });
 
+    $("#register-password").keyup(function(e) {
+        setRegisterSubmitButton();
+    });
+
     $("#register-modal input").keyup(function(e) {
-        debug("hello");
         if (e.keyCode == 13 && !$("#register-submit").attr("disabled")) {
             $("#register-submit").click();
-        } else {
-            setRegisterSubmitButton();
         }
     });
 
@@ -115,22 +115,22 @@ $(function() {
     $("#signup-username").typeWatch({
         callback: function(e) { checkUsernameIsUnique("signup"); setSignupSubmitButton(); },
         wait: delayBeforeChecking,
-        highlight: true,
         captureLength: 0
     });
 
     $("#signup-email").typeWatch({
         callback: function(e) { checkEmailIsOkay("signup"); setSignupSubmitButton(); },
         wait: delayBeforeChecking,
-        highlight: true,
         captureLength: 0
+    });
+
+    $("#signup-password").keyup(function(e) {
+        setSignupSubmitButton();
     });
 
     $("#signup-modal input").keyup(function(e) {
         if (e.keyCode == 13 && !$("#signup-submit").attr("disabled")) {
             $("#signup-submit").click();
-        } else {
-            setSignupSubmitButton();
         }
     });
 
@@ -140,7 +140,6 @@ $(function() {
     $("#follow-email").typeWatch({
         callback: function(e) { checkEmailIsOkay("follow");  setFollowSubmitButton(); },
         wait: 0,
-        highlight: true,
         captureLength: 0
     });
 
@@ -156,7 +155,6 @@ $(function() {
     $("#password-email").typeWatch({
         callback: function(e) { checkEmailIsOkay("password"); setPasswordSubmitButton(); },
         wait: delayBeforeChecking,
-        highlight: true,
         captureLength: 0
     });
 
@@ -172,15 +170,16 @@ $(function() {
     $("#login-email").typeWatch({
         callback: function() { checkEmailIsOkay("login"); setLoginSubmitButton();},
         wait: delayBeforeChecking,
-        highlight: true,
         captureLength: 0
+    });
+
+    $("#login-password").keyup(function(e) {
+        setLoginSubmitButton();
     });
 
     $("#login-modal input").keyup(function(e) {
         if (e.keyCode == 13 && !$("#login-submit").attr("disabled")) {
             $("#login-submit").click();
-        } else {
-            setLoginSubmitButton();
         }
     });
 

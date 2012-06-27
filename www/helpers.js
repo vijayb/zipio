@@ -93,7 +93,7 @@ function submitAlbumSettings() {
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                window.location.replace(window.location.href.split('#')[0] + "#alert=4&permissions=" + newSetting);
+                window.location.replace(window.location.href.split('#')[0] + "#alert=4");
                 window.location.reload(true);
             } else {
                 // bad token
@@ -127,7 +127,7 @@ function unfollowAlbum(user_id, album_id, token) {
 function unfriend(user_id, friend_id) {
     $("#unfriend-" + friend_id).button("loading");
     var urlString = "/unfriend.php?friend_id=" + friend_id +"&user_id=" + user_id;
-    
+
     jQuery.ajax({
         type: "GET",
         url: urlString,
@@ -137,8 +137,8 @@ function unfriend(user_id, friend_id) {
         },
         async: true
     });
-    
-    
+
+
 }
 
 
@@ -185,7 +185,7 @@ function submitEmailToFollow(album_id) {
 }
 
 
-function saveUsernamePassword() {
+function submitUsernamePassword() {
 
     // Put the "Go" button in a loading state
     $("#register-submit").button("loading");
@@ -206,9 +206,9 @@ function saveUsernamePassword() {
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                debug("username/password saved");
-                var split = window.location.href.split('/');
-                window.location.replace(split[0] + "/" + username + "/" + split[4]);
+                var oldURL = window.location.href;
+                forwardURL = oldURL.replace("/" + gUser["username"], "/" + username);
+                window.location.replace(forwardURL.split('#')[0]);
             }
         },
         async: true
@@ -222,6 +222,8 @@ function showForgotPassword() {
     $("#password-modal").modal('show');
     $("#password-email").val($("#login-email").val());
     $("#password-email").focus();
+    checkEmailIsOkay("password");
+    setPasswordSubmitButton();
 }
 
 function signupUser() {
@@ -258,6 +260,7 @@ function setFollowSubmitButton() {
 }
 
 function setSignupSubmitButton() {
+    debug("setSignupSubmitButton called");
     $("#signup-submit").attr("disabled", true);
     if ($("#signup-email-check").data("correct") == 1 &&
         $("#signup-username-check").data("correct") == 1 &&
@@ -269,6 +272,7 @@ function setSignupSubmitButton() {
 }
 
 function setRegisterSubmitButton() {
+    debug("setRegisterSubmitButton()");
     $("#register-submit").attr("disabled", true);
     if (($("#register-username-check").data("correct") == 1 || !$("#register-username").is(":visible")) &&
         $("#register-password").val() != "") {
@@ -364,7 +368,7 @@ function checkEmailIsOkay(prefix) {
                 }
             }
         },
-        async: true
+        async: false
     });
 }
 
@@ -402,7 +406,7 @@ function checkUsernameIsUnique(prefix) {
                 $("#" + prefix + "-username-check").html("<i class='icon-remove'></i> <b>" + usernameEntered + "</b> is already taken (sorry, try something else)");
             }
         },
-        async: true
+        async: false
     });
 }
 
