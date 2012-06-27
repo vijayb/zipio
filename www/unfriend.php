@@ -14,7 +14,9 @@ if (!isset($_GET["friend_id"]) ||
     $user_id = $_GET["user_id"];
 }
 
-$query = "DELETE FROM Friends WHERE friend_id='" . $friend_id. "' AND user_id='" . $user_id . "'";
+$query = "DELETE FROM Friends WHERE (friend_id = '$friend_id' AND user_id = '$user_id') OR
+                                    (friend_id = '$user_id' AND user_id = '$friend_id');";
+
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
