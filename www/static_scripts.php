@@ -2,10 +2,10 @@
 
 <script src="/lib/jquery-1.7.2.min.js"></script>
 <script src="/lib/jquery-ui-1.8.21.custom.min.js"></script>
-<script src="/lib/jquery.masonry.min.js"></script>
-<script src="/lib/modernizr.js"></script>
 <script src="/lib/jquery.typewatch.js"></script>
+<script src="/lib/filtrr.js"></script>
 <script src="/helpers.js"></script>
+
 
 
 <script src="/bootstrap/js/bootstrap-alert.js"></script>
@@ -40,6 +40,17 @@ var gUser;
 
 var gAlerts = new Array();
 
+var hashParams = {};
+(function () {
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.hash.substring(1);
+    while (match = search.exec(query))
+       hashParams[decode(match[1])] = decode(match[2]);
+})();
+
 $(function() {
 
     // This PHP code populates gUser in the case that there is a logged in
@@ -54,17 +65,22 @@ $(function() {
 
     ?>
 
+    /*
+
+    // Used to vertically center all modals, but it interferes with Bootstrap's
+    // native handling of screens lower than 480px in width.
+
     $('.modal').on('shown', function(e) {
         var modal = $(this);
         modal.css('margin-top', (modal.outerHeight() / 2) * -1)
              .css('margin-left', (modal.outerWidth() / 2) * -1);
         return this;
     });
+    */
 
     // If there is an alert URL parameter, show the alert
     var alert = getURLHashParameter("alert");
     if (alert != "null") {
-        debug("Showing an alert!")
         alert = parseInt(alert);
         $("#header-alert-title").html(getAlert(alert)["title"]);
         $("#header-alert-text").html(getAlert(alert)["text"]);
@@ -74,7 +90,9 @@ $(function() {
 
     // If the user is logged in but has not yet registered (i.e., set a
     // password), AND there's a hash variable register set to true
-    if (isLoggedIn() && gUser["password_hash"] == "" && getURLHashParameter("register") == "true") {
+    if ((isLoggedIn() && gUser["password_hash"] == "" && getURLHashParameter("register") == "true")
+        ||
+        (isLoggedIn() && getURLHashParameter("register") == "force")) {
         $('#register-modal').modal('show');
     }
 
@@ -186,6 +204,7 @@ $(function() {
 
     // Clear the hash if there was one
     window.location.hash = "";
+    removeHash();
 
 });
 

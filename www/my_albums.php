@@ -8,11 +8,11 @@ require("helpers.php");
 
 check_request_for_login($_GET);
 
-if (!isset($_GET["owner_username"]) && !isset($_GET["username"])) {
+if (!isset($_GET["owner_username"]) && !isset($_GET["follower_username"])) {
     exit();
 } else {
     if (isset($_GET["following"])) {
-        $owner_id = get_user_id_from_username($_GET["username"]);
+        $owner_id = get_user_id_from_username($_GET["follower_username"]);
         $albums_array = get_following_albums_info($owner_id);
         if ($_SESSION["user_id"] != $owner_id) {
             goto_homepage();
@@ -34,7 +34,7 @@ if (!isset($_GET["owner_username"]) && !isset($_GET["username"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
 if ($owner_id == 0) {
-    goto_homepage();
+    goto_homepage("#alert=5&username=" . $_GET["owner_username"]);
 }
 
 if (!isset($_GET["following"])) {
@@ -84,8 +84,7 @@ HTML;
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
 
-<div class="row" id="masonry-container">
-
+<div class="row">
 <?php
 
 for ($i = 0; $i < count($albums_array); $i++) {
@@ -112,8 +111,10 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
     $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
 
+    $upper_left = $album_owner_info["email"];
+
     $html = <<<HTML
-    <div class="item span3">
+    <div class="tile span3">
         <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
             <img src='{$s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
             <div class="album-details">
@@ -122,6 +123,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
                 </span>
             </div>
             <div class="album-privacy">
+                {$upper_left}
             </div>
         </a>
     </div>
@@ -131,7 +133,6 @@ HTML;
 }
 
 ?>
-
 </div>
 
 
@@ -151,18 +152,9 @@ HTML;
 
 <script>
 
-var span3Width = 0;
-
 $(function() {
 
-    resizeWindow();
-    span3Width = $(".span3").width();
-
-    $(window).resize(function () {
-        resizeWindow();
-    });
-
-    $(".item").each(function(index) {
+    $(".tile").each(function(index) {
         $(this).mouseenter(function() {
             $(this).find(".tile-options").stop(true, true).show();
         });

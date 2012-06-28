@@ -1,5 +1,8 @@
-// Functions that we've written ourselves
+var albumPrivacyContants = [];
 
+albumPrivacyContants[1] = "Private";
+albumPrivacyContants[2] = "Friends";
+albumPrivacyContants[3] = "Public";
 
 function changeFilter(photoID, albumphotoID, filter) {
     var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
@@ -13,44 +16,17 @@ function changeFilter(photoID, albumphotoID, filter) {
     imageSrc = imageSrc.replace(/_[0-9]+$/gi, "_" + filter);
     debug(imageSrc);
     $("#image-" + photoID).attr("src", imageSrc);
-
-/*
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-        },
-        async: false
-    });
-*/
 }
 
-function attemptLogin() {
+////////////////////////////////////////////////////////////////////////////////
+// SHOW MODALS
+////////////////////////////////////////////////////////////////////////////////
 
-    // Put the "Go" button in a loading state
-    $("#login-submit").button("loading");
 
-    var passwordHash = sha1($("#login-password").val());
-    var email = $("#login-email").val();
-
-    var urlString = "/attempt_login.php?email=" + email + "&password_hash=" + passwordHash;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            if (parseInt(data) != 0) {
-                window.location.replace(window.location.href.split('#')[0]);
-            } else {
-                $("#login-error").show();
-                $("#login-submit").button("reset");
-                $("#login-submit").prop("disabled", true);
-            }
-        },
-        async: true
-    });
+function showSignupModal() {
+    $('#signup-modal').modal('show');
+    $('#signup-username').focus();
 }
-
 
 function showLoginModal() {
     $('#login-modal').modal('show');
@@ -84,65 +60,44 @@ function showAlbumSettingsModal() {
     $('#album-settings-modal').modal('show');
 }
 
-function submitAlbumSettings() {
-    var newSetting = parseInt($('input[name=album-settings-radios]:checked').val());
-    var urlString = "/change_album_permissions.php?album_id=" + gAlbum['id'] + "&permissions=" + newSetting + "&token=" + gAlbum['token'];
+function showForgotPasswordModal() {
+    $(".modal").modal('hide');
+    $("#password-email-check").html("");
+    $("#password-modal").modal('show');
+    $("#password-email").val($("#login-email").val());
+    $("#password-email").focus();
+    checkEmailIsOkay("password");
+    setPasswordSubmitButton();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// SUBMIT MODALS
+////////////////////////////////////////////////////////////////////////////////
+
+function submitLogin() {
+    $("#login-submit").button("loading");
+    var passwordHash = sha1($("#login-password").val());
+    var email = $("#login-email").val();
+    var urlString = "/attempt_login.php?email=" + email + "&password_hash=" + passwordHash;
 
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
-            if (parseInt(data) == 1) {
-                window.location.replace(window.location.href.split('#')[0] + "#alert=4");
-                window.location.reload(true);
+            if (parseInt(data) != 0) {
+                window.location.replace(window.location.href.split('#')[0]);
             } else {
-                // bad token
+                $("#login-error").show();
+                $("#login-submit").button("reset");
+                $("#login-submit").prop("disabled", true);
             }
         },
         async: true
     });
 }
 
-function unfollowAlbum(user_id, album_id, token) {
-    $("#unfollow-submit").button("loading");
-
-    var urlString = "/unfollow_album.php?user_id=" + user_id + "&album_id=" + album_id + "&token=" + token;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            if (parseInt(data) == 1) {
-                window.location.replace(window.location.href.split('#')[0] + "#alert=2");
-                window.location.reload(true);
-            } else {
-                // bad token
-            }
-        },
-        async: true
-    });
-
-}
-
-function unfriend(user_id, friend_id) {
-    $("#unfriend-" + friend_id).button("loading");
-    var urlString = "/unfriend.php?friend_id=" + friend_id +"&user_id=" + user_id;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            $("#friend-listing-" + friend_id).remove();
-            $("#friends-table").load("_friends #friends-table")
-        },
-        async: true
-    });
-
-
-}
-
-
-function submitForgotPassword($email) {
+function submitForgotPassword() {
     $("#password-submit").button("loading");
     var email = $("#password-email").val();
     var urlString = "/send_password_email.php?email=" + email;
@@ -160,8 +115,6 @@ function submitForgotPassword($email) {
         async: true
     });
 }
-
-
 
 function submitEmailToFollow(album_id) {
     $("#follow-submit").button("loading");
@@ -184,12 +137,8 @@ function submitEmailToFollow(album_id) {
     });
 }
 
-
 function submitUsernamePassword() {
-
-    // Put the "Go" button in a loading state
     $("#register-submit").button("loading");
-
     var username = gUser["username"];
     var passwordHash = sha1($("#register-password").val());
 
@@ -216,21 +165,28 @@ function submitUsernamePassword() {
 
 }
 
-function showForgotPassword() {
-    $(".modal").modal('hide');
-    $("#password-email-check").html("");
-    $("#password-modal").modal('show');
-    $("#password-email").val($("#login-email").val());
-    $("#password-email").focus();
-    checkEmailIsOkay("password");
-    setPasswordSubmitButton();
+function submitAlbumSettings() {
+    $("#album-settings-submit").button("loading");
+    var newSetting = parseInt($('input[name=album-settings-radios]:checked').val());
+    var urlString = "/change_album_permissions.php?album_id=" + gAlbum['id'] + "&permissions=" + newSetting + "&token=" + gAlbum['token'];
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                window.location.replace(window.location.href.split('#')[0] + "#alert=4&setting=" + newSetting);
+                window.location.reload(true);
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
 }
 
-function signupUser() {
-
-    // Put the "Go" button in a loading state
+function submitSignup() {
     $("#signup-submit").button("loading");
-
     var username = $("#signup-username").val();
     var passwordHash = sha1($("#signup-password").val());
     var email = $("#signup-email").val();
@@ -248,6 +204,9 @@ function signupUser() {
     });
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// SET MODAL BUTTONS
+////////////////////////////////////////////////////////////////////////////////
 
 
 function setFollowSubmitButton() {
@@ -304,6 +263,46 @@ function setPasswordSubmitButton() {
 
 
 
+
+
+
+
+
+function unfollowAlbum(user_id, album_id, token) {
+    $("#unfollow-submit").button("loading");
+
+    var urlString = "/unfollow_album.php?user_id=" + user_id + "&album_id=" + album_id + "&token=" + token;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                window.location.replace(window.location.href.split('#')[0] + "#alert=2");
+                window.location.reload(true);
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+
+}
+
+function unfriend(user_id, friend_id) {
+    $("#unfriend-" + friend_id).button("loading");
+    var urlString = "/unfriend.php?friend_id=" + friend_id +"&user_id=" + user_id;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            $("#friend-listing-" + friend_id).remove();
+            $("#friends-table").load("_friends #friends-table")
+        },
+        async: true
+    });
+}
 
 function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
@@ -432,37 +431,6 @@ function debug(string) {
 
 }
 
-function resizeWindow() {
-    if (span3Width != $(".span3").width()) {
-        setMasonry();
-        $(".item").css("margin-bottom", $(".span3").css("margin-left"));
-        span3Width = $(".span3").width();
-    }
-}
-
-function setMasonry() {
-    var container = $("#masonry-container");
-    var mobileWidth = 480;
-    var maxWidth = 768;
-
-    $(container).imagesLoaded(function() {
-        $(container).masonry({
-            itemSelector : '.item',
-            isAnimated: true,
-            animationOptions: {
-                duration: 100,
-                queue: false
-            },
-            columnWidth: function() {
-                // Get the width of each span3 + the margin on the left
-                // because the Masonry column width includes the space
-                // "between" columns.
-                return $(".span3").width() + parseInt($(".span3").css("margin-left").match(/\d+/));
-            }
-        });
-    });
-}
-
 function preload(arrayOfImages) {
     $(arrayOfImages).each(function(){
         $('<img/>')[0].src = this;
@@ -478,7 +446,6 @@ function deletePhotoFromAlbum(albumPhotoID, token) {
         success: function(data) {
             if (parseInt(data) == 1) {
                 $("#albumphoto-" + albumPhotoID).remove();
-                $("#masonry-container").masonry("reload");
             } else if (parseInt(data) == 0) {
                 debug("Could not delete photo because the token's wrong");
                 return;
@@ -505,21 +472,25 @@ function getAlert(alert) {
     var returnArr = new Array();
 
     if (alert == 1) {
-        returnArr["title"] = "You're now following this album!";
-        returnArr["text"] = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (May require the album owner to approve you.)";
+        returnArr["title"] = "You're now following this album.";
+        returnArr["text"]  = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (May require the album owner to approve you.)";
         returnArr["class"] = "alert-success";
     } else if (alert == 2) {
         returnArr["title"] = "You're no longer following this album.";
-        returnArr["text"] = "";
+        returnArr["text"]  = "";
         returnArr["class"] = "alert-success";
     } else if (alert == 3) {
-        returnArr["title"] = "You successfully added a friend.";
-        returnArr["text"] = "Your friend can now add photos to this album.";
+        returnArr["title"] = "You've successfully added a friend.";
+        returnArr["text"]  = "Your friend can now add photos to this album.";
         returnArr["class"] = "alert-success";
     } else if (alert == 4) {
         returnArr["title"] = "Album settings have been saved.";
-        returnArr["text"] = "";
+        returnArr["text"]  = "This is now a " + albumPrivacyContants[hashParams["setting"]] + " album.";
         returnArr["class"] = "alert-success";
+    } else if (alert == 5) {
+        returnArr["title"] = "The user '" + hashParams["username"] + "' doesn't exist.";
+        returnArr["text"]  = "";
+        returnArr["class"] = "alert-error";
     }
 
     return returnArr;
@@ -746,4 +717,22 @@ function utf8_encode (argString) {
     }
 
     return utftext;
+}
+
+
+function removeHash () {
+    var scrollV, scrollH, loc = window.location;
+    if ("pushState" in history)
+        history.pushState("", document.title, loc.pathname + loc.search);
+    else {
+        // Prevent scrolling by storing the page's current scroll offset
+        scrollV = document.body.scrollTop;
+        scrollH = document.body.scrollLeft;
+
+        loc.hash = "";
+
+        // Restore the scroll offset, should be flicker free
+        document.body.scrollTop = scrollV;
+        document.body.scrollLeft = scrollH;
+    }
 }

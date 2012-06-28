@@ -71,7 +71,7 @@ if ($album_info["permissions"] == 1) {
     } else if ($viewer_relationship == "FRIEND") {
         $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
     } else if ($viewer_relationship == "STRANGER") {
-        $page_subtitle = "Add photos by emailing them to the above address <b>(" . $album_owner_info['username'] . " will have to approve you first)</b>";
+        $page_subtitle = "Add photos by emailing them to the above address (" . $album_owner_info['username'] . " will have to approve you first)";
     }
 }
 
@@ -90,7 +90,7 @@ if (!is_logged_in()) {
     // whether they are following the album or not. The follow button will open
     // the follow modal so the user can enter his email address.
     $page_title_right = <<<HTML
-        <button class="btn btn-large btn-success"
+        <button class="btn btn-large btn-success follow-button"
                 onclick="showFollowModal();"
                 id="follow-submit"
                 data-loading-text="Please wait...">
@@ -130,7 +130,7 @@ HTML;
             // Logged in user is already following this album, so show the
             // unfollow button.
             $page_title_right = <<<HTML
-                <button class="btn btn-large"
+                <button class="btn btn-large follow-button"
                         onclick="unfollowAlbum({$_SESSION["user_id"]},
                                                {$album_info["id"]},
                                                '{$_SESSION["user_info"]["token"]}');"
@@ -144,7 +144,7 @@ HTML;
             // button, but the onclick will immediately cause the user to be
             // following the album rather than asking for an email address.
             $page_title_right = <<<HTML
-                <button class="btn btn-large btn-success"
+                <button class="btn btn-large btn-success follow-button"
                         onclick="$(this).button('loading'); window.location.replace('{$follow_album_link}');"
                         id="follow-submit"
                         data-loading-text="Please wait...">
@@ -185,7 +185,7 @@ HTML;
     } else if ($album_info["permissions"] == 3) {
         $permissions_title = "Public album.";
         $permissions_string = <<<HTML
-Anyone can see this album, but only you and your friends can add photos (if anyone else tries to add a photo, we'll ask you first).
+Anyone on the web can see this album, but only you and your friends can add photos (if anyone else tries to add a photo, we'll ask you first).
 HTML;
 
 }
@@ -216,7 +216,7 @@ print($html);
 
 
 
-<div class="row" id="masonry-container">
+<div class="row">
 
 <?php
 
@@ -234,7 +234,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
     $html = <<<HTML
 
-<div class="item span3" id="albumphoto-{$albumphotos_array[$i]["id"]}">
+<div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
 
     <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
         <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
@@ -260,16 +260,20 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                                                                                 '{$albumphotos_array[$i]["albumphoto_token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
-                <!--
-                <li class="divider"></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 0);">Original</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 1);">Tilt shift</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 2);">Gotham</a></li>
-                <li><a href="javascript:void(0);" onclick="changeFilter({$albumphotos_array[$i]["photo_id"]}, {$albumphotos_array[$i]["id"]}, 3);">Kelvin</a></li>
-                -->
-          </ul>
+            </ul>
         </div>
     </div>
+
+    <!--
+    <div class="filter-buttons">
+        <div class="btn-group">
+            <button class="btn btn-inverse">1</button>
+            <button class="btn btn-inverse">2</button>
+            <button class="btn btn-inverse">3</button>
+            <button class="btn btn-inverse">4</button>
+        </div>
+    </div>
+    -->
 
 </div>
 
@@ -280,12 +284,6 @@ HTML;
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 ?>
-
-
-
-
-
-
 </div>
 
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
@@ -297,9 +295,6 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 <script>
 
-
-
-var span3Width = 0;
 var gAlbum;
 
 $(function() {
@@ -310,13 +305,6 @@ $(function() {
     print("gAlbum = " . json_encode($album_info));
 
     ?>
-
-    resizeWindow();
-    span3Width = $(".span3").width();
-
-    $(window).resize(function () {
-        resizeWindow();
-    });
 
     $(".fancybox").fancybox({
         prevEffect: 'none',
@@ -340,7 +328,7 @@ $(function() {
     });
 
     if (isLoggedIn() && gUser["id"] == gAlbum["user_id"]) {
-        $(".item").each(function(index) {
+        $(".tile").each(function(index) {
             $(this).mouseenter(function() {
                 $(this).find(".tile-options").stop(true, true).show();
             });

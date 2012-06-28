@@ -22,7 +22,7 @@ $user_info = get_user_info_from_email($email);
 $logged_in_link_ra = array();
 $logged_in_link_ra["user_id"] = $user_info["id"];
 $logged_in_link_ra["timestamp"] = time();
-$logged_in_link_link = $www_root . "/" . $user_info["username"] . "?request=" . urlencode(encrypt_json($logged_in_link_ra)) . "#register=true";
+$logged_in_link_link = $www_root . "/" . $user_info["username"] . "?request=" . urlencode(encrypt_json($logged_in_link_ra)) . "#register=force";
 
 $email_body = <<<EMAIL
     <a href="$logged_in_link_link">Reset your password</a>

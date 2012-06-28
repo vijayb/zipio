@@ -9,14 +9,13 @@ body {
     background-image: url("/tile.png");
 }
 
-.item {
-    margin: 0px;
-    float: left;
+.tile {
+    position: relative;
+    margin-bottom: 20px;
 }
 
-.item img {
+.tile img {
     width: 100%;
-    display: block;
 }
 
 .album-details {
@@ -33,6 +32,14 @@ body {
     padding: 5px;
 }
 
+.filter-buttons {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 5px;
+}
+
+
 .album-title {
     color: #ffffff;
     font-size: 24px;
@@ -48,4 +55,8 @@ body {
     top: 0px;
     padding: 5px;
     color: #ffffff;
+}
+
+.follow-button {
+    width: 100%;
 }

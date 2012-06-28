@@ -50,7 +50,6 @@ if (is_logged_in()) {
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
                     <li><a href="/{$_SESSION["user_info"]["username"]}/_following"><i class="icon-eye-open"></i> Albums I'm Following</a></li>
                     <li><a href="/{$_SESSION["user_info"]["username"]}/_friends"><i class="icon-group"></i> My Friends</a></li>
-                    <li><a href="#"><i class="icon-wrench"></i> Account Settings</a></li>
                     <li class="divider"></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
                 </ul>
@@ -66,7 +65,7 @@ HTML;
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Login</a></li>
-            <li><a href="javascript:void(0);" onclick="$('#signup-modal').modal('show'); $('#signup-username').focus();">Sign up</a></li>
+            <li><a href="javascript:void(0);" onclick="showSignupModal();">Sign up</a></li>
         </ul>
 HTML;
 
@@ -88,26 +87,6 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 <body>
-
-<div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-
-            <a class="brand" href="#">
-                <?php print($brand_name); ?>
-            </a>
-
-            <?php print($logged_in_status); ?>
-
-        </div>
-    </div>
-</div>
 
 <!----------------------------------------------------------------------------->
 
@@ -183,7 +162,7 @@ if (!isset($page_title_right)) $page_title_right = "";
                 <label class="control-label" for="input01">Password</label>
                 <div class="controls">
                     <input type="password" class="input-xlarge" id="login-password">
-                    <p class="help-block"><a href="javascript:void(0);" onclick="showForgotPassword();">Forgot or haven't yet set your password?</a></p>
+                    <p class="help-block"><a href="javascript:void(0);" onclick="showForgotPasswordModal();">Forgot or haven't yet set your password?</a></p>
                 </div>
             </div>
         </div>
@@ -191,7 +170,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="attemptLogin();"
+        <button onclick="submitLogin();"
                 disabled
                 class="btn btn-primary" id="login-submit" data-loading-text="Please wait...">
                 Login
@@ -274,7 +253,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="signupUser();"
+        <button onclick="submitSignup();"
                 disabled
                 class="btn btn-primary" id="signup-submit" data-loading-text="Please wait...">
                 Sign up
@@ -363,7 +342,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="submitAlbumSettings();"
-                class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">
+                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
                 Save album settings
         </button>
     </div>
@@ -373,6 +352,29 @@ if (!isset($page_title_right)) $page_title_right = "";
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+
+
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </a>
+
+            <a class="brand" href="/">
+                <?php print($brand_name); ?>
+            </a>
+
+            <?php print($logged_in_status); ?>
+
+        </div>
+    </div>
+</div>
+
 
 <div class="container">
 
@@ -389,7 +391,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     <div class="row" style="margin-bottom:20px;">
         <div class="span9">
             <h1><?php print($page_title); ?></h1>
-            <h3 style="color:#999999;"><?php print($page_subtitle); ?></h3>
+            <h3 style="color:#999999; margin-bottom:10px;"><?php print($page_subtitle); ?></h3>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

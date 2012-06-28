@@ -3,8 +3,8 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
-$s3_bucket_name = "zipio";
-$s3_root = "https://s3.amazonaws.com/" . $s3_bucket_name . "/photos";
+$s3_bucket_name = "s3.zipio.com";
+$s3_root = "http://s3.zipio.com/photos";
 $www_root = "http://zipio.com";
 
 define('CACHE_PATH', 'opticrop-cache/');
@@ -13,8 +13,9 @@ $album_privacy_contants[1] = "Private";
 $album_privacy_contants[2] = "Friends";
 $album_privacy_contants[3] = "Public";
 
-function goto_homepage() {
-    header("Location: $www_root" . "/template.php");
+function goto_homepage($args) {
+    if (!isset($args)) $args = "";
+    header("Location: $www_root/index.php$args");
 }
 
 function login_user($user_id) {
