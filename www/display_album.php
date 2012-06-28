@@ -121,7 +121,19 @@ HTML;
 
     if ($logged_in_username == $album_owner_info["username"]) {
         // Logged in user is the album owner
-        $page_title_right = "";
+
+        if ($album_info["permissions"] == 3) {
+        $page_title_right = <<<HTML
+            <button class="btn btn-large btn-primary follow-button"
+                    onclick="showInviteModal();"
+                    id="invite-submit"
+                    data-loading-text="Please wait...">
+                Invite people to follow this public album!<br><span style="font-size:12px;">They'll get an email when photos are added</a>
+            </button>
+HTML;
+        } else {
+            $page_title_right = "";
+        }
 
     } else {
         // Logged in user is viewing someone else's album
@@ -185,7 +197,7 @@ HTML;
     } else if ($album_info["permissions"] == 3) {
         $permissions_title = "Public album.";
         $permissions_string = <<<HTML
-Anyone on the web can see this album, but only you and your friends can add photos (if anyone else tries to add a photo, we'll ask you first).
+Anyone on the web can see this album, but only you and your friends can add photos (anyone else can try to add photos, too, but we'll ask you first).
 HTML;
 
 }
@@ -249,7 +261,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     s3_url: {$albumphotos_array[$i]["s3_url"]}<br>
     -->
 
-    <div class="tile-options" style="display:none;">
+    <div class="tile-options">
         <div class="btn-group">
             <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
                 <i class="icon-sort-down icon-white"></i>
@@ -327,6 +339,7 @@ $(function() {
         }
     });
 
+    /*
     if (isLoggedIn() && gUser["id"] == gAlbum["user_id"]) {
         $(".tile").each(function(index) {
             $(this).mouseenter(function() {
@@ -337,6 +350,7 @@ $(function() {
             });
         });
     }
+    */
 
 <?php
 

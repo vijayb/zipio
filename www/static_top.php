@@ -125,7 +125,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">I'll set up a password later</a>
+        <a href="#" class="btn" data-dismiss="modal">Not now</a>
         <button onclick="submitUsernamePassword();"
                 disabled
                 class="btn btn-primary" id="register-submit" data-loading-text="Please wait...">
@@ -348,6 +348,33 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
 </div>
+
+
+<!----------------------------------------------------------------------------->
+
+
+<div class="modal hide" id="invite-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Invite people to follow this album</h2>
+        <h3></h3>
+    </div>
+
+    <div class="modal-body">
+        <p>
+            When someone follows your album, they get an email any time photos are added (with the photos included).
+        </p>
+
+        <p>
+            To invite people to follow you, ask them to go to visit
+            <div id="invite-modal-album-url" class="well well-small" style="font-weight:bold; font-size:16px; text-align:center; margin-bottom:10px;"></div>
+            and click the green "Follow this album" button. There's no signup required of them!
+        </p>
+    </div>
+
+</div>
+
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

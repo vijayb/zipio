@@ -72,8 +72,8 @@ $user_email_body = <<<EMAIL
     <a href='{$display_album_link}'>See album</a>
 EMAIL;
 
-send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
-send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
+send_email($target_user_info["email"], $founders_email_address, "Zipio activity notification", $target_user_email_body);
+send_email($user_info["email"], $founders_email_address, "Zipio activity notification", $user_email_body);
 
 $url =  $www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
 

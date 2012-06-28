@@ -6,6 +6,7 @@ error_reporting(E_ALL | E_STRICT);
 $s3_bucket_name = "s3.zipio.com";
 $s3_root = "http://s3.zipio.com/photos";
 $www_root = "http://zipio.com";
+$founders_email_address = "Zipio <founders@zipio.com>";
 
 define('CACHE_PATH', 'opticrop-cache/');
 
@@ -99,8 +100,10 @@ function debug($string, $color = "black") {
 
 function send_email($to, $from, $subject, $html) {
 
+    global $founders_email_address;
+
     if ($from == "") {
-        $from = "Zipio <founders@zipio.com>";
+        $from = $founders_email_address;
     }
 
     $request = new HttpRequest('https://api.mailgun.net/v2/zipio.com/messages', HttpRequest::METH_POST);
@@ -377,7 +380,7 @@ EMAIL;
     }
 
     while ($row = mysql_fetch_assoc($result)) {
-        send_email($row["email"], "founders@zipio.com", "New photos!", $follower_email_body);
+        send_email($row["email"], $founders_email_address, "New photos!", $follower_email_body);
     }
 
 }

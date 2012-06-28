@@ -28,7 +28,7 @@ $email_body = <<<EMAIL
     <a href="$logged_in_link_link">Reset your password</a>
 EMAIL;
 
-send_email($email, "founders@zipio.com", "Reset your password", $email_body);
+send_email($email, $founders_email_address, "Reset your password", $email_body);
 
 
 

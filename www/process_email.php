@@ -211,7 +211,7 @@ EMAIL;
                 $display_album_ra["user_id"] = $user_info["id"];
                 $display_album_ra["timestamp"] = time();
                 $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
-                
+
                 $owner_display_album_ra = array();
                 $owner_display_album_ra["user_id"] = $target_album_info["user_id"];
                 $owner_display_album_ra["timestamp"] = time();
@@ -327,14 +327,13 @@ EMAIL;
 
 
 if ($brand_new_user) {
-
     $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
 }
 
 if (!preg_match("/zipio.com$/", $sender)) {
-    send_email($user_info["email"], 'founders@zipio.com', "Zipio activity notification", $user_email_body);
+    send_email($user_info["email"], $founders_email_address, "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
-        send_email($target_user_info["email"], 'founders@zipio.com', "Zipio activity notification", $target_user_email_body);
+        send_email($target_user_info["email"], $founders_email_address, "Zipio activity notification", $target_user_email_body);
         debug($target_user_email_body);
     }
 }
@@ -345,7 +344,7 @@ debug("-----TIME 11: " . (time() - $start_time));
 $contents = ob_get_flush();
 
 if (!preg_match("/zipio.com$/", $sender)) {
-    send_email("sanjay@gmail.com", 'founders@zipio.com', $confirmation_number . " - process_email", $contents);
+    send_email("sanjay@gmail.com", $founders_email_address, $confirmation_number . " - process_email", $contents);
 }
 
 ?>

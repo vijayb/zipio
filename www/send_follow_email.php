@@ -63,7 +63,7 @@ $follower_email_body = <<<EMAIL
 EMAIL;
 
 
-send_email($email, "founders@zipio.com", "Confirm album following", $follower_email_body);
+send_email($email, $founders_email_address, "Confirm album following", $follower_email_body);
 
 
 

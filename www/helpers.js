@@ -70,6 +70,12 @@ function showForgotPasswordModal() {
     setPasswordSubmitButton();
 }
 
+function showInviteModal() {
+    $(".modal").modal('hide');
+    $("#invite-modal-album-url").html(window.location.href);
+    $("#invite-modal").modal('show');
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // SUBMIT MODALS
