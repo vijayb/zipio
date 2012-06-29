@@ -16,7 +16,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_info = get_album_info($album_to_display);
     $album_owner_info = get_user_info($album_info["user_id"]);
     print("<!-- GET: " . print_r($_GET, true) . "-->");
-    print("<!-- album_id: $album_to_display -->\n");
+    print("<!-- album_to_display: $album_to_display -->\n");
     print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
     print("<!-- album_info: " . print_r($album_info, true) . "-->");
 
@@ -74,7 +74,6 @@ if ($album_info["permissions"] == 1) {
         $page_subtitle = "Add photos by emailing them to the above address (" . $album_owner_info['username'] . " will have to approve you first)";
     }
 }
-
 
 
 
@@ -183,21 +182,21 @@ if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
     $permissions_string = "";
 
     if ($album_info["permissions"] == 1) {
-        $permissions_title = "Private album.";
+        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
         $permissions_string = <<<HTML
 Only you can see or add photos to this album.
 HTML;
 
     } else if ($album_info["permissions"] == 2) {
-        $permissions_title = "Friends album.";
+        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
         $permissions_string = <<<HTML
-Only you and your friends can see and add photos to this album.
+Only you and your <a href="/{$_SESSION["user_info"]["username"]}/_friends">friends</a> can see and add photos to this album.
 HTML;
 
     } else if ($album_info["permissions"] == 3) {
-        $permissions_title = "Public album.";
+        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
         $permissions_string = <<<HTML
-Anyone on the web can see this album, but only you and your friends can add photos (anyone else can try to add photos, too, but we'll ask you first).
+Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
 HTML;
 
 }
@@ -249,6 +248,9 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
 
     <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
+        <!--
+        <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$www_root}/proxy.php?url={$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
+        -->
         <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
     </a>
 
@@ -257,11 +259,11 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     photo_id: {$albumphotos_array[$i]["photo_id"]}<br>
     album_id: {$album_to_display}<br>
     cover_albumphoto_id: {$album_info["cover_albumphoto_id"]}<br>
-    albumphoto_token: {$albumphotos_array[$i]["albumphoto_token"]}<br>
+    albumphoto_token: {$albumphotos_array[$i]["token"]}<br>
     s3_url: {$albumphotos_array[$i]["s3_url"]}<br>
     -->
 
-    <div class="tile-options">
+    <div class="tile-options" style="display:none">
         <div class="btn-group">
             <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
                 <i class="icon-sort-down icon-white"></i>
@@ -269,24 +271,22 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
             <ul class="dropdown-menu">
                 <li>
                     <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]},
-                                                                                '{$albumphotos_array[$i]["albumphoto_token"]}');"><i class="icon-trash"></i> Delete this photo
+                                                                                '{$albumphotos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
                     </a>
                 </li>
             </ul>
         </div>
     </div>
-
-    <!--
+<!--
     <div class="filter-buttons">
         <div class="btn-group">
-            <button class="btn btn-inverse">1</button>
-            <button class="btn btn-inverse">2</button>
-            <button class="btn btn-inverse">3</button>
-            <button class="btn btn-inverse">4</button>
+            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 1);">.</button>
+            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 2);">.</button>
+            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 3);">.</button>
+            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 4);">.</button>
         </div>
     </div>
-    -->
-
+-->
 </div>
 
 HTML;
@@ -339,7 +339,7 @@ $(function() {
         }
     });
 
-    /*
+
     if (isLoggedIn() && gUser["id"] == gAlbum["user_id"]) {
         $(".tile").each(function(index) {
             $(this).mouseenter(function() {
@@ -350,7 +350,6 @@ $(function() {
             });
         });
     }
-    */
 
 <?php
 

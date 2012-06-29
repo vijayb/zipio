@@ -1,8 +1,8 @@
 var albumPrivacyContants = [];
 
-albumPrivacyContants[1] = "Private";
-albumPrivacyContants[2] = "Friends";
-albumPrivacyContants[3] = "Public";
+albumPrivacyContants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
+albumPrivacyContants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
+albumPrivacyContants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
 
 function changeFilter(photoID, albumphotoID, filter) {
     var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
@@ -421,6 +421,13 @@ function checkUsernameIsUnique(prefix) {
 
 
 
+function applyFilter(image, filter) {
+    EFFECTS['e' + filter](image);
+}
+
+
+
+
 
 
 function isLoggedIn() {
@@ -444,6 +451,7 @@ function preload(arrayOfImages) {
 }
 
 function deletePhotoFromAlbum(albumPhotoID, token) {
+    $("#albumphoto-" + albumPhotoID).fadeOut(100);
     var urlString = "/delete_photo_from_album.php?albumphoto_id=" + albumPhotoID +
                                                 "&token=" + token;
     jQuery.ajax({
@@ -453,16 +461,42 @@ function deletePhotoFromAlbum(albumPhotoID, token) {
             if (parseInt(data) == 1) {
                 $("#albumphoto-" + albumPhotoID).remove();
             } else if (parseInt(data) == 0) {
-                debug("Could not delete photo because the token's wrong");
+                debug("Could not delete photo because the token's wrong.");
+                $("#albumphoto-" + albumPhotoID).show();
                 return;
             } else {
-                debug("Could not delete photo (unknown error)");
+                debug("Could not delete photo (unknown error).");
+                $("#albumphoto-" + albumPhotoID).show();
             }
         },
         async: true
     });
 }
 
+
+function deleteAlbum(albumID, token) {
+    $("#album-" + albumID).fadeOut(100);
+    var urlString = "/delete_album.php?album_id=" + albumID +
+                                     "&token=" + token;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#album-" + albumPhotoID).remove();
+            } else if (parseInt(data) == 0) {
+                debug("Could not delete album because the token's wrong.");
+                $("#album-" + albumPhotoID).show();
+                return;
+            } else {
+                debug("Could not delete album (unknown error).");
+                $("#album-" + albumPhotoID).show();
+            }
+        },
+        async: true
+    });
+
+}
 
 
 function validateEmail(email) {

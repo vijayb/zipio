@@ -9,12 +9,18 @@
 
 <link href="/fancybox/helpers/jquery.fancybox-thumbs.css?v=2.0.6" rel="stylesheet" />
 <link href="/fancybox/jquery.fancybox.css?v=2.0.6" rel="stylesheet" media="screen" />
-<link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
-<link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
+
 <link href="/lib/styles.css" rel="stylesheet" />
 <link href="/lib/fonts.css" rel="stylesheet" />
-<script src="/lib/less-1.3.0.min.js"></script>
 
+<link href="/lib/bootstrap.css" rel="stylesheet" />
+<link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
+
+<!--
+<link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
+<link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
+<script src="/lib/less-1.3.0.min.js"></script>
+-->
 
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -38,7 +44,7 @@
 
 if (is_logged_in()) {
 
-    $brand_name = "<span style='color:red;'>zipio</span>";
+    $brand_name = "<span style='color:red;'>zipio</span> alpha (you may lose data)";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -60,12 +66,12 @@ HTML;
 
 } else {
 
-    $brand_name = "zipio";
+    $brand_name = "zipio alpha (you may lose data)";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Login</a></li>
-            <li><a href="javascript:void(0);" onclick="showSignupModal();">Sign up</a></li>
+            <!-- <li><a href="javascript:void(0);" onclick="showSignupModal();">Sign up</a></li> -->
         </ul>
 HTML;
 
@@ -308,7 +314,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
-            <b>Private album</b>
+            <b><?php print($album_privacy_contants[1]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Only you can see and add photos to this album.
@@ -318,7 +324,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
-            <b>Friends album</b>
+            <b><?php print($album_privacy_contants[2]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Only you and your friends can see and add photos to this album.
@@ -330,7 +336,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
-            <b>Public album</b>
+            <b><?php print($album_privacy_contants[3]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
@@ -374,6 +380,36 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
 </div>
+
+
+<!----------------------------------------------------------------------------->
+
+
+<div class="modal hide" id="confirmation-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Are you sure?</h2>
+        <h3></h3>
+    </div>
+
+    <div class="modal-body">
+        <p>
+            Are you sure you want to <span id="confirmation-modal-action"></span>?
+        </p>
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitAlbumSettings();"
+                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
+                Yes, <b><span id="confirmation-modal-button"></span></b>
+        </button>
+    </div>
+
+
+</div>
+
 
 
 <!----------------------------------------------------------------------------->

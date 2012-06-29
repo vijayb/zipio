@@ -10,9 +10,9 @@ $founders_email_address = "Zipio <founders@zipio.com>";
 
 define('CACHE_PATH', 'opticrop-cache/');
 
-$album_privacy_contants[1] = "Private";
-$album_privacy_contants[2] = "Friends";
-$album_privacy_contants[3] = "Public";
+$album_privacy_contants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
+$album_privacy_contants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
+$album_privacy_contants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
 
 function goto_homepage($args) {
     if (!isset($args)) $args = "";
@@ -195,6 +195,8 @@ function create_user($username, $password_hash, $email) {
 function create_album($user_id, $handle) {
 
     global $con;
+
+    $handle = strtolower($handle);
 
     $query = "INSERT INTO Albums (
                   user_id,
@@ -406,6 +408,7 @@ function is_following($logged_in_user_id, $album_id) {
 function album_exists($handle, $user_id_or_username) {
 
     global $con;
+    $handle = strtolower($handle);
 
     // Check if argument is a username
     $user_id = get_user_id_from_username($user_id_or_username);
@@ -615,7 +618,7 @@ function get_albumphoto_info($albumphoto_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
-        $row["albumphoto_token"] = calculate_token($row["id"], $row["created"]);
+        $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {
         return 0;

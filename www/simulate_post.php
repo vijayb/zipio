@@ -25,6 +25,8 @@
             <option value="sanjay@gmail.com"/>sanjay@gmail.com</option>
             <option value="vijayb@gmail.com"/>vijayb@gmail.com</option>
             <option value="sanjay@mavinkurve.com"/>sanjay@mavinkurve.com</option>
+            <option value="samvita.padukone@gmail.com"/>samvita.padukone@gmail.com</option>
+            <option value="shobitb@gmail.com"/>shobitb@gmail.com</option>
         </select>
     </td>
 </tr>
