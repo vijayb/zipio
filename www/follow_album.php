@@ -11,7 +11,6 @@ if (!isset($_GET["request"])) {
 }
 
 $request = decrypt_json($_GET["request"]);
-print("<!--" . print_r($request, true) . "-->");
 
 $query = "INSERT INTO Followers (
             follower_id,

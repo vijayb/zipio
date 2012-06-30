@@ -48,9 +48,9 @@ body {
 
 .album-title {
     color: white;
-    font-size: 42px;
+    font-size: 32px;
     position: absolute;
-    bottom: 20px;
+    bottom: 15px;
     left: 10px;
 }
 
@@ -68,4 +68,12 @@ body {
 
 .follow-button {
     width: 100%;
+}
+
+.width-fix {
+    width: 100%;
+
+    -moz-box-sizing:    border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing:        border-box;
 }

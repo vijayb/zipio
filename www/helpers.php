@@ -8,6 +8,8 @@ $s3_root = "http://s3.zipio.com/photos";
 $www_root = "http://zipio.com";
 $founders_email_address = "Zipio <founders@zipio.com>";
 
+$debug = 0;
+
 define('CACHE_PATH', 'opticrop-cache/');
 
 $album_privacy_contants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
@@ -105,6 +107,8 @@ function send_email($to, $from, $subject, $html) {
     if ($from == "") {
         $from = $founders_email_address;
     }
+
+    $html = "<span style='color:black;' id='" . time() . "'>" . $html . "</span><br><br><span style='font-size:10px; color:#aaaaaa;'>Email confirmation number: " . time() . "</span>";
 
     $request = new HttpRequest('https://api.mailgun.net/v2/zipio.com/messages', HttpRequest::METH_POST);
     $auth = base64_encode('api:key-68imhgvpoa-6uw3cl8728kcs9brvlmr9');
@@ -277,7 +281,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_url;
 
-    $sizes = array(800);
+    $sizes = array(1024);
 
     $failed = 0;
 
@@ -577,6 +581,30 @@ function get_following_albums_info($user_id) {
     return $albums_array;
 }
 
+
+function get_followers_user_info($album_id) {
+
+    global $con;
+
+    $query = "SELECT
+                Followers.follower_id,
+                Users.*
+              FROM Followers
+              LEFT JOIN Users
+              ON Followers.follower_id=Users.id
+              WHERE Followers.album_id='$album_id'";
+    $result = mysql_query($query, $con);
+
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $users_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $row["token"] = calculate_token_from_id($row["id"], "Users");
+        array_push($users_array, $row);
+    }
+
+    return $users_array;
+}
 
 
 function get_albumphotos_info($album_id) {

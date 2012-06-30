@@ -1,13 +1,7 @@
 <?php
-session_start();
-ini_set("display_errors", 1);
-error_reporting(E_ALL | E_STRICT);
-
-require("db.php");
-require("helpers.php");
-
-check_request_for_login($_GET);
-print("<!-- session: " . print_r($_SESSION, true) . "-->");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+require("static_supertop.php");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     exit();
@@ -15,11 +9,15 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
     $album_owner_info = get_user_info($album_info["user_id"]);
-    print("<!-- GET: " . print_r($_GET, true) . "-->");
-    print("<!-- album_to_display: $album_to_display -->\n");
-    print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
-    print("<!-- album_info: " . print_r($album_info, true) . "-->");
+    $followers_info = get_followers_user_info($album_to_display);
 
+    if ($debug) {
+        print("<!-- GET: " . print_r($_GET, true) . "-->");
+        print("<!-- album_to_display: $album_to_display -->\n");
+        print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
+        print("<!-- album_info: " . print_r($album_info, true) . "-->");
+        print("<!-- followers_info: " . print_r($followers_info, true) . "-->");
+    }
 }
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
@@ -31,6 +29,13 @@ $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
+
+
+
+
+// Determine if the viewer has permission to view this album. If so, set the
+// subtitle of the page.
+
 $has_permission_to_view_album = 0;
 
 if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
@@ -41,15 +46,14 @@ if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
     $viewer_relationship = "STRANGER";
 }
 
-
 if ($album_info["permissions"] == 1) {
     if ($viewer_relationship == "OWNER") {
         $has_permission_to_view_album = 1;
         $page_subtitle = "Add photos by emailing them to the above address";
     } else if ($viewer_relationship == "FRIEND") {
-        // NO PERMISSION TO VIEW
+        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
     } else if ($viewer_relationship == "STRANGER") {
-        // NO PERMISSION TO VIEW
+        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
     }
 
 } else if ($album_info["permissions"] == 2) {
@@ -60,7 +64,7 @@ if ($album_info["permissions"] == 1) {
         $has_permission_to_view_album = 1;
         $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
     } else if ($viewer_relationship == "STRANGER") {
-        // NO PERMISSION TO VIEW
+        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
     }
 
 } else if ($album_info["permissions"] == 3) {
@@ -71,23 +75,38 @@ if ($album_info["permissions"] == 1) {
     } else if ($viewer_relationship == "FRIEND") {
         $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
     } else if ($viewer_relationship == "STRANGER") {
-        $page_subtitle = "Add photos by emailing them to the above address (" . $album_owner_info['username'] . " will have to approve you first)";
+        $page_subtitle = "Add photos by emailing them to the above address (may require approval)";
     }
 }
-
-
-
-
 
 if (!$has_permission_to_view_album) {
     goto_homepage();
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+// Set the right side button
+
 if (!is_logged_in()) {
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     // User is not logged in, so show the follow button since we don't know
     // whether they are following the album or not. The follow button will open
     // the follow modal so the user can enter his email address.
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
     $page_title_right = <<<HTML
         <button class="btn btn-large btn-success follow-button"
                 onclick="showFollowModal();"
@@ -98,7 +117,12 @@ if (!is_logged_in()) {
 HTML;
 
 } else {
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     // User is logged in
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
     $user_id = is_logged_in();
     $logged_in_username = get_username_from_user_id($user_id);
 
@@ -119,7 +143,9 @@ HTML;
     $follow_album_link = $www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
 
     if ($logged_in_username == $album_owner_info["username"]) {
+        // =====================================================================
         // Logged in user is the album owner
+        // =====================================================================
 
         if ($album_info["permissions"] == 3) {
         $page_title_right = <<<HTML
@@ -135,11 +161,15 @@ HTML;
         }
 
     } else {
+        // =====================================================================
         // Logged in user is viewing someone else's album
+        // =====================================================================
 
         if (isset($album_info) && is_following($user_id, $album_info["id"]) == 1) {
+            // -----------------------------------------------------------------
             // Logged in user is already following this album, so show the
             // unfollow button.
+            // -----------------------------------------------------------------
             $page_title_right = <<<HTML
                 <button class="btn btn-large follow-button"
                         onclick="unfollowAlbum({$_SESSION["user_id"]},
@@ -151,9 +181,11 @@ HTML;
                 </button>
 HTML;
         } else {
+            // -----------------------------------------------------------------
             // Logged in user is NOT following this album, so show the follow
             // button, but the onclick will immediately cause the user to be
             // following the album rather than asking for an email address.
+            // -----------------------------------------------------------------
             $page_title_right = <<<HTML
                 <button class="btn btn-large btn-success follow-button"
                         onclick="$(this).button('loading'); window.location.replace('{$follow_album_link}');"
@@ -166,62 +198,40 @@ HTML;
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+// Set the "third row" string
+
+if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+    $permissions_html = $album_privacy_contants[$album_info["permissions"]] . " album - <a href='javascript:void(0);' onclick='showAlbumSettingsModal();'>Change</a>";
+} else {
+    $permissions_html = $album_privacy_contants[$album_info["permissions"]] . " album";
+}
+
+$following_html = count($followers_info) . " followers";
+
+$third_row = $permissions_html . "&#160;&#160;   &#183;   &#160;&#160;" . $following_html;
+
 ?>
+
+
+
 
 
 
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
-
-<?php
-
-if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-
-    $permissions_title = "";
-    $permissions_string = "";
-
-    if ($album_info["permissions"] == 1) {
-        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
-        $permissions_string = <<<HTML
-Only you can see or add photos to this album.
-HTML;
-
-    } else if ($album_info["permissions"] == 2) {
-        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
-        $permissions_string = <<<HTML
-Only you and your <a href="/{$_SESSION["user_info"]["username"]}/_friends">friends</a> can see and add photos to this album.
-HTML;
-
-    } else if ($album_info["permissions"] == 3) {
-        $permissions_title = $album_privacy_contants[$album_info["permissions"]] . " album.";
-        $permissions_string = <<<HTML
-Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
-HTML;
-
-}
-
-    $html = <<<HTML
-
-<div class="row" style="margin-bottom:20px">
-    <div class="span12">
-        <div class="well well-small">
-            <strong>$permissions_title</strong>
-            {$permissions_string}
-            <a href="javascript:void(0);" onclick="showAlbumSettingsModal();">
-                Change
-            </a>
-        </div>
-    </div>
-</div>
-
-HTML;
-
-print($html);
-
-}
-
-?>
 
 
 
@@ -245,49 +255,48 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
     $html = <<<HTML
 
-<div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
+        <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
 
-    <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
-        <!--
-        <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$www_root}/proxy.php?url={$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
-        -->
-        <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
-    </a>
+            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
+                <!--
+                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$www_root}/proxy.php?url={$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
+                -->
+                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
+            </a>
+HTML;
 
-    <!--
-    albumphoto_id: {$albumphotos_array[$i]["id"]}<br>
-    photo_id: {$albumphotos_array[$i]["photo_id"]}<br>
-    album_id: {$album_to_display}<br>
-    cover_albumphoto_id: {$album_info["cover_albumphoto_id"]}<br>
-    albumphoto_token: {$albumphotos_array[$i]["token"]}<br>
-    s3_url: {$albumphotos_array[$i]["s3_url"]}<br>
-    -->
+    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
 
-    <div class="tile-options" style="display:none">
-        <div class="btn-group">
-            <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                <i class="icon-sort-down icon-white"></i>
-            </button>
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]},
-                                                                                '{$albumphotos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
-                    </a>
-                </li>
-            </ul>
+        $html .= <<<HTML
+            <div class="tile-options" style="display:none">
+                <div class="btn-group">
+                    <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
+                        <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]},
+                                                                                        '{$albumphotos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+HTML;
+    }
+
+    $html .= <<<HTML
+            <!--
+            <div class="filter-buttons">
+                <div class="btn-group">
+                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 1);">.</button>
+                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 2);">.</button>
+                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 3);">.</button>
+                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 4);">.</button>
+                </div>
+            </div>
+            -->
         </div>
-    </div>
-<!--
-    <div class="filter-buttons">
-        <div class="btn-group">
-            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 1);">.</button>
-            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 2);">.</button>
-            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 3);">.</button>
-            <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 4);">.</button>
-        </div>
-    </div>
--->
-</div>
 
 HTML;
     print($html);
@@ -314,7 +323,9 @@ $(function() {
 
     <?php
 
-    print("gAlbum = " . json_encode($album_info));
+    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+        print("gAlbum = " . json_encode($album_info));
+    }
 
     ?>
 
@@ -340,16 +351,14 @@ $(function() {
     });
 
 
-    if (isLoggedIn() && gUser["id"] == gAlbum["user_id"]) {
-        $(".tile").each(function(index) {
-            $(this).mouseenter(function() {
-                $(this).find(".tile-options").stop(true, true).show();
-            });
-            $(this).mouseleave(function() {
-                $(this).find(".tile-options").stop(true, true).fadeOut();
-            });
+    $(".tile").each(function(index) {
+        $(this).mouseenter(function() {
+            $(this).find(".tile-options").stop(true, true).show();
         });
-    }
+        $(this).mouseleave(function() {
+            $(this).find(".tile-options").stop(true, true).fadeOut();
+        });
+    });
 
 <?php
 

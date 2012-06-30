@@ -15,7 +15,6 @@ if (!isset($_GET["request"])) {
 }
 
 $request = decrypt_json($_GET["request"]);
-print("<!--" . print_r($request, true) . "-->");
 
 $user_id = $request["user_id"];
 $target_user_id = $request["target_user_id"];

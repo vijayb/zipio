@@ -17,11 +17,15 @@
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
 
 <!--
+lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
+lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
+-->
+
+<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
 -->
-
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -44,7 +48,7 @@
 
 if (is_logged_in()) {
 
-    $brand_name = "<span style='color:red;'>zipio</span> alpha (you may lose data)";
+    $brand_name = "<span style='color:red;'>zipio</span> alpha - may lose data";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -363,20 +367,26 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Invite people to follow this album</h2>
-        <h3></h3>
+        <h2>Followers get an email when photos are added to this album</h2>
+        <h3>There's <span style="color:red">no sign up</span> for them!</h3>
     </div>
 
     <div class="modal-body">
         <p>
-            When someone follows your album, they get an email any time photos are added (with the photos included).
+            Enter comma-separated email addresses, and we'll email them a link to follow this album.
         </p>
 
         <p>
-            To invite people to follow you, ask them to go to visit
-            <div id="invite-modal-album-url" class="well well-small" style="font-weight:bold; font-size:16px; text-align:center; margin-bottom:10px;"></div>
-            and click the green "Follow this album" button. There's no signup required of them!
+            <textarea id="invite-emails" class="width-fix" style="width:100%; max-width:100%;"></textarea>
         </p>
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitInvite();"
+                class="btn btn-primary" id="invite-submit" data-loading-text="Please wait...">
+                Invite
+        </button>
     </div>
 
 </div>
@@ -428,7 +438,7 @@ if (!isset($page_title_right)) $page_title_right = "";
                 <span class="icon-bar"></span>
             </a>
 
-            <a class="brand" href="/">
+            <a class="brand" href="/<? if (is_logged_in()) { print($_SESSION["user_info"]["username"]); } ?>">
                 <?php print($brand_name); ?>
             </a>
 
@@ -446,15 +456,18 @@ if (!isset($page_title_right)) $page_title_right = "";
             <div class="alert" style="display:none;" id="header-alert">
                 <button class="close">×</button>
                 <h3 class="alert-heading" id="header-alert-title" style="font-weight:bold;"></h3>
-                <span id="header-alert-text"></span>
+                <span style="font-size:16px" id="header-alert-text"></span>
             </div>
         </div>
     </div>
 
-    <div class="row" style="margin-bottom:20px;">
-        <div class="span9">
+    <div class="row">
+        <div class="span9" style="margin-bottom:10px">
             <h1><?php print($page_title); ?></h1>
-            <h3 style="color:#999999; margin-bottom:10px;"><?php print($page_subtitle); ?></h3>
+            <h2 style="color:#999999; margin: 5px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
+            <?php if (isset($third_row)) { print($third_row); } ?>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>
+
+    <div class="row" style="height:25px"></div>

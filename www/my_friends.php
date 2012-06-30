@@ -1,12 +1,7 @@
 <?php
-session_start();
-ini_set("display_errors", 1);
-error_reporting(E_ALL | E_STRICT);
-
-require("db.php");
-require("helpers.php");
-
-check_request_for_login($_GET);
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+require("static_supertop.php");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
 if (!isset($_GET["username"])) {
@@ -35,7 +30,7 @@ $table_rows = "";
 for ($i = 0; $i < count($friends_array); $i++) {
 
     $table_rows .= <<<HTML
-    
+
         <tr id="friend-listing-{friends_array[$i]["id"]}">
             <td><a href="/{$friends_array[$i]["username"]}">{$friends_array[$i]["username"]}</a></td>
             <td>{$friends_array[$i]["email"]}</td>

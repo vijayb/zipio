@@ -72,8 +72,9 @@ function showForgotPasswordModal() {
 
 function showInviteModal() {
     $(".modal").modal('hide');
-    $("#invite-modal-album-url").html(window.location.href);
+    $("#invite-submit").button("reset");
     $("#invite-modal").modal('show');
+    $("#invite-emails").val("").focus();
 }
 
 
@@ -98,6 +99,25 @@ function submitLogin() {
                 $("#login-submit").button("reset");
                 $("#login-submit").prop("disabled", true);
             }
+        },
+        async: true
+    });
+}
+
+function submitInvite() {
+    $("#invite-submit").button("loading");
+    var emails = $("#invite-emails").val();
+    var urlString = "/send_invite_emails.php?emails=" + emails +
+                                           "&handle=" + gAlbum["handle"] +
+                                           "&username=" + gUser["username"] +
+                                           "&user_email=" + gUser["email"];
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            window.location.replace(window.location.href.split('#')[0] + "#alert=6");
+            window.location.reload(true);
         },
         async: true
     });
@@ -531,6 +551,10 @@ function getAlert(alert) {
         returnArr["title"] = "The user '" + hashParams["username"] + "' doesn't exist.";
         returnArr["text"]  = "";
         returnArr["class"] = "alert-error";
+    } else if (alert == 6) {
+        returnArr["title"] = "Emails sent!";
+        returnArr["text"]  = "Now we play...the waiting game.";
+        returnArr["class"] = "alert-success";
     }
 
     return returnArr;

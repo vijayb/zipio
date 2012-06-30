@@ -1,12 +1,7 @@
 <?php
-session_start();
-ini_set("display_errors", 1);
-error_reporting(E_ALL | E_STRICT);
-
-require("db.php");
-require("helpers.php");
-
-check_request_for_login($_GET);
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+require("static_supertop.php");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 if (!isset($_GET["owner_username"]) && !isset($_GET["follower_username"])) {
     exit();
@@ -23,10 +18,13 @@ if (!isset($_GET["owner_username"]) && !isset($_GET["follower_username"])) {
     }
     $owner_username = get_username_from_user_id($owner_id);
     $owner_info = get_user_info($owner_id);
-    print("<!-- owner_id: $owner_id -->\n");
-    print("<!-- owner_username: $owner_username -->\n");
-    print("<!-- owner_info: " . print_r($owner_info, true) . "-->");
-    print("<!-- albums_array: " . print_r($albums_array, true) . "-->");
+
+    if ($debug) {
+        print("<!-- owner_id: $owner_id -->\n");
+        print("<!-- owner_username: $owner_username -->\n");
+        print("<!-- owner_info: " . print_r($owner_info, true) . "-->");
+        print("<!-- albums_array: " . print_r($albums_array, true) . "-->");
+    }
 }
 
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
@@ -38,6 +36,7 @@ if ($owner_id == 0) {
 }
 
 $note_to_user_who_is_looking_at_his_own_albums = "";
+$page_subtitle = "";
 
 if (!isset($_GET["following"])) {
 
@@ -45,56 +44,34 @@ if (!isset($_GET["following"])) {
     // Displaying a user's albums (his own, a friend's, OR a stranger's) =======
     // =========================================================================
 
-    $note_to_user_who_is_looking_at_his_own_albums = "";
-
     if (is_logged_in() && $_SESSION["user_id"] == $owner_id) {
+        // ---------------------------------------------------------------------
         // Viewer is looking at his own albums
-        $page_title = <<<HTML
-        {$owner_username} (this is you)
-HTML;
-        $page_subtitle = <<<HTML
-        To create a new album, send photos to <b>new_album_name@zipio.com</b>
-HTML;
-
-
-        $note_to_user_who_is_looking_at_his_own_albums = <<<HTML
-
-<div class="row" style="margin-bottom:20px">
-    <div class="span12">
-        <div class="well well-small">
-            <strong>Certain albums below are visible only to you.</strong>
-            Your Private albums can never be seen by anyone other than you. Your Friends albums are visible only to you and <a href="/{$_SESSION["user_info"]["username"]}/_friends">your friends</a>.
-        </div>
-    </div>
-</div>
-
-HTML;
-
+        // ---------------------------------------------------------------------
+        $page_title = "$owner_username's albums (this is you)";
+        $page_subtitle = "To create a new album, send photos to <b>new_album_name@zipio.com</b>";
+        $which_showing = "Showing $album_privacy_contants[1], $album_privacy_contants[2], and $album_privacy_contants[3] albums";
 
 
     } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
+        // ---------------------------------------------------------------------
         // Viewer is looking at a friend's albums
-        $page_title = <<<HTML
-        {$owner_username} (one of your friends)
-HTML;
-        $page_subtitle = <<<HTML
-        You're seeing {$owner_username}'s public and friends albums
-HTML;
+        // ---------------------------------------------------------------------
+        $page_title = "$owner_username's albums (one of your friends)";
+        //$page_subtitle = "You're seeing $owner_username's public and friends albums";
+        $which_showing = "Showing $album_privacy_contants[2] and $album_privacy_contants[3] albums only";
 
     } else {
+        // ---------------------------------------------------------------------
         // Viewer is looking at a stranger's albums
-        $page_title = <<<HTML
-        {$owner_username}
-HTML;
-        $page_subtitle = <<<HTML
-        You're seeing {$owner_username}'s public albums only
-HTML;
+        // ---------------------------------------------------------------------
+        $page_title = "$owner_username's albums";
+        //$page_subtitle = "You're seeing $owner_username's public albums only";
+        $which_showing = "Showing $album_privacy_contants[3] albums only";
+
     }
 
-
-
-
-
+    $third_row = $which_showing;
 
 } else {
 
@@ -102,13 +79,13 @@ HTML;
     // Displaying albums a user is FOLLOWING ===================================
     // =========================================================================
 
-    $page_title = <<<HTML
-    Albums I'm Following
-HTML;
-    $page_subtitle = <<<HTML
-    You'll get an email when photos are added to these albums
-HTML;
+    $page_title = "Albums I'm Following";
+    $page_subtitle = "You'll get an email when photos are added to these albums";
+
 }
+
+
+
 
 ?>
 
@@ -119,12 +96,6 @@ HTML;
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
-
-<?php
-
-print($note_to_user_who_is_looking_at_his_own_albums);
-
-?>
 
 <div class="row">
 <?php
@@ -159,8 +130,11 @@ for ($i = 0; $i < count($albums_array); $i++) {
         }
     }
 
+
+
+
     $html = <<<HTML
-    <div class="tile span4" id="album-{$albums_array[$i]["id"]}">
+    <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
         <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
             <img src='{$s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
             <div class="album-details"></div>
@@ -169,29 +143,33 @@ for ($i = 0; $i < count($albums_array); $i++) {
                 {$upper_left}
             </div>
         </a>
+HTML;
 
-        <div class="tile-options" style="display:none; padding:15px">
-            <div class="btn-group">
-                <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
-                    <i class="icon-sort-down icon-white"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="javascript:void(0);" onclick="if (confirm('Are you sure?')) { deleteAlbum({$albums_array[$i]["id"]}, '{$albums_array[$i]["token"]}'); }">
-                            <i class="icon-trash"></i>Delete this album
-                        </a>
-                    </li>
-                </ul>
+    if (!isset($_GET["following"]) && is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
+        $html .= <<<HTML
+            <div class="tile-options" style="display:none; padding:10px">
+                <div class="btn-group">
+                    <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
+                        <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:void(0);" onclick="if (confirm('Are you sure?')) { deleteAlbum({$albums_array[$i]["id"]}, '{$albums_array[$i]["token"]}'); }">
+                                <i class="icon-trash"></i>Delete this album
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
+HTML;
+    }
 
+    $html .= <<<HTML
     </div>
-
-
-
 HTML;
 
     print($html);
+
 }
 
 ?>
@@ -224,6 +202,7 @@ $(function() {
             $(this).find(".tile-options").stop(true, true).fadeOut();
         });
     });
+
 });
 
 </script>

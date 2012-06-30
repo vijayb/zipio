@@ -47,7 +47,6 @@ if (!defined('awsSecretKey')) define('awsSecretKey', 'xlT7rnKZPbFr1VayGtPu3zU6Tl
 $s3 = new S3(awsAccessKey, awsSecretKey);
 
 
-
 // First, check if this user exists
 
 $brand_new_user = 0;
@@ -267,10 +266,11 @@ EMAIL;
                 $add_friend_link = $www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
 
                 $target_user_email_body = <<<EMAIL
-                    {$user_info["email"]} tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
+                    <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
                     Add as a friend?
-                    <a href='{$add_friend_link}'>Yes</a>
-                    <a href='#'>No</a>
+                    <a href='{$add_friend_link}'>Yes (allows <b>{$user_info["username"]}</b> to post to any of your <i>non-Private</i> albums) </a>
+                    <br><br>
+                    If you don't want to allow <b>{$user_info["username"]}</b> to post photos to your albums, ignore this email.
 EMAIL;
 
             }

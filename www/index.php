@@ -1,15 +1,18 @@
 <?php
-session_start();
-ini_set("display_errors", 1);
-error_reporting(E_ALL | E_STRICT);
-
-require("db.php");
-require("helpers.php");
-
-check_request_for_login($_GET);
-print("<!--" . print_r($_SESSION, true) . "-->");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+require("static_supertop.php");
+// |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
+
+// Page-specific PHP goes here
+
+
+
+
+// The following variables should be set
+$page_title = "";
+$page_subtitle = "";
 
 
 ?>
@@ -23,7 +26,28 @@ print("<!--" . print_r($_SESSION, true) . "-->");
 
 
 
+<!-- Main body of the page goes here -->
 
+<div class="row">
+
+    <div class="span12" style="text-align:center">
+        <h1 style="font-size:60px; font-weight:700;">
+            Photo-sharing over email.
+        </h1>
+        <br><br>
+        <h2>
+            Share photos and collaborate on albums, all over email.
+            <br>
+            There's no app to download and no sign-up.
+        </h2>
+        <br><br><br>
+        <h1>
+            <span style="background-color:#ffff77; font-weight:700">To begin, send a photo to myphotos@zipio.com</span>
+        </h1>
+
+    </div>
+
+</div>
 
 
 
@@ -36,6 +60,8 @@ print("<!--" . print_r($_SESSION, true) . "-->");
 
 
 <script>
+
+// Page-specific JS goes here
 
 </script>
 

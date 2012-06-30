@@ -186,6 +186,14 @@ $(function() {
     });
 
     // -------------------------------------------------------------------------
+    // INVITE
+
+    $("#invite-modal textarea").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#password-submit").attr("disabled")) {
+            $("#invite-submit").click();
+        }
+    });
+    // -------------------------------------------------------------------------
     // LOGIN
 
     $("#login-email").typeWatch({
@@ -207,7 +215,7 @@ $(function() {
 
     // Clear the hash if there was one
     window.location.hash = "";
-    removeHash();
+    //removeHash();
 
 });
 
