@@ -281,7 +281,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_url;
 
-    $sizes = array(1024);
+    $sizes = array(800);
 
     $failed = 0;
 
