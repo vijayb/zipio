@@ -11,8 +11,11 @@
 
 */
 
+register_shutdown_function('handle_shutdown');
+set_error_handler("on_error");
+
 ini_set("display_errors", 1);
-error_reporting(E_ALL | E_STRICT);
+error_reporting(-1);
 
 require("db.php");
 require("helpers.php");
@@ -22,17 +25,17 @@ require("helpers.php");
 $sender = strtolower($_POST["sender"]);
 $recipient = strtolower($_POST["recipient"]);
 
-$date = date("Y-m-d_H-i-s");
+$date = gmdate("d-M-Y H:i:s");
 $handle = fopen("/log/" . $date . "_" . $sender, 'a') or die('Cannot open file.');
 
 
-fwrite($handle, "POST REQUEST:\n");
+output("POST REQUEST:\n");
 
-fwrite($handle, print_r($_POST, true) . "\n");
+output(print_r($_POST, true) . "\n");
 
 
 $start_time = time();
-fwrite($handle, "TIME 1: " . (time() - $start_time) . "\n");
+output("TIME 1: " . (time() - $start_time) . "\n");
 
 if (!filter_var($sender, FILTER_VALIDATE_EMAIL) || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
     exit();
@@ -55,15 +58,15 @@ $query = "SELECT id FROM Users WHERE email='$sender' LIMIT 1";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-fwrite($handle, "TIME 2: " . (time() - $start_time) . "\n");
+output("TIME 2: " . (time() - $start_time) . "\n");
 
 if (mysql_num_rows($result) == 1) {
     // A user with this email already exists, so get the user's ID
     while ($row = mysql_fetch_assoc($result)) {
         $user_id = $row["id"];
     }
-    fwrite($handle, "user_id: $user_id\n");
-    fwrite($handle, "User with id $user_id already exists prior to this post.\n");
+    output("user_id: $user_id\n");
+    output("User with id $user_id already exists prior to this post.\n");
 } else {
     // New user! Create a new row in the Users table and get the ID of the newly
     // created row.
@@ -83,11 +86,11 @@ if (mysql_num_rows($result) == 1) {
 
     $user_id = mysql_insert_id();
 
-    fwrite($handle, "New user added with id $user_id\n");
+    output("New user added with id $user_id\n");
 
 }
 
-fwrite($handle, "TIME 3: " . (time() - $start_time) . "\n");
+output("TIME 3: " . (time() - $start_time) . "\n");
 
 
 
@@ -98,7 +101,7 @@ $parts = explode('@', $recipient);
 $target_album_handle = strtolower(preg_replace("/[^A-Za-z0-9]/", "", $parts[0]));
 $recipient_domain = $parts[1];
 
-fwrite($handle, "target_album_handle: $target_album_handle\n");
+output("target_album_handle: $target_album_handle\n");
 
 // Get the attached photos
 $paths_to_photos = array();
@@ -106,7 +109,7 @@ for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
     array_push($paths_to_photos, $_FILES["attachment-" . ($i + 1)]["tmp_name"]);
 }
 
-fwrite($handle, "TIME 4: " . (time() - $start_time) . "\n");
+output("TIME 4: " . (time() - $start_time) . "\n");
 
 // Stores the S3 URLs of the photos afters they are added to S3
 $s3_urls = array();
@@ -114,22 +117,22 @@ $s3_urls = array();
 // Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
 if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
     $target_username = $matches[1];
-    fwrite($handle, "target_username: $target_username\n");
+    output("target_username: $target_username\n");
     $target_user_id = get_user_id_from_username($target_username);
 } else {
     $target_user_id = $user_id;
 }
 
-fwrite($handle, "TIME 5: " . (time() - $start_time) . "\n");
+output("TIME 5: " . (time() - $start_time) . "\n");
 
 $target_album_id = album_exists($target_album_handle, $target_user_id);
 $target_user_info = get_user_info($target_user_id);
 $user_info = get_user_info($user_id);
 
 
-fwrite($handle, "target_album_id: $target_album_id\n");
+output("target_album_id: $target_album_id\n");
 
-fwrite($handle, "TIME 6: " . (time() - $start_time) . "\n");
+output("TIME 6: " . (time() - $start_time) . "\n");
 
 // At this point, we have:
 //  $user_info
@@ -153,22 +156,22 @@ if ($target_album_id > 0) {
     // The target album exists (and so does the target user)...
     $target_album_info = get_album_info($target_album_id);
 
-    fwrite($handle, "Target user ($target_user_id, " . $target_user_info["username"] . ") exists.\n");
-    fwrite($handle, "Target album ($target_album_handle, owned by " . $target_user_info["username"] . ") exists.\n");
-    fwrite($handle, "Target album has ID $target_album_id\n");
+    output("Target user ($target_user_id, " . $target_user_info["username"] . ") exists.\n");
+    output("Target album ($target_album_handle, owned by " . $target_user_info["username"] . ") exists.\n");
+    output("Target album has ID $target_album_id\n");
 
     if ($target_user_id == $user_id) {
         // User is adding a photo to own existing album
-        fwrite($handle, "User is adding to his own album.\n");
-        fwrite($handle, "TIME 6.1: " . (time() - $start_time) . "\n");
+        output("User is adding to his own album.\n");
+        output("TIME 6.1: " . (time() - $start_time) . "\n");
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
             add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
             array_push($s3_urls, $s3_url);
         }
-        fwrite($handle, "TIME 6.2: " . (time() - $start_time) . "\n");
+        output("TIME 6.2: " . (time() - $start_time) . "\n");
         email_followers($target_album_info, $s3_urls);
-        fwrite($handle, "TIME 6.3: " . (time() - $start_time) . "\n");
+        output("TIME 6.3: " . (time() - $start_time) . "\n");
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
@@ -183,7 +186,7 @@ if ($target_album_id > 0) {
 
 EMAIL;
 
-        fwrite($handle, "TIME 7: " . (time() - $start_time) . "\n");
+        output("TIME 7: " . (time() - $start_time) . "\n");
 
     } else {
         // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
@@ -202,7 +205,7 @@ EMAIL;
         } else {
 
             if ($is_friend == 1) {
-                fwrite($handle, "User " . $user_info["username"] . " is a friend of " . $target_user_info["username"] . "\n");
+                output("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"] . "\n");
                 // Add the photo to the friend's album
                 for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                     $s3_url = "";
@@ -231,12 +234,12 @@ EMAIL;
                      <a href='{$owner_display_album_link}'>See the album!</a>
 EMAIL;
 
-                fwrite($handle, "TIME 8: " . (time() - $start_time) . "\n");
+                output("TIME 8: " . (time() - $start_time) . "\n");
 
 
             } else if ($is_friend == 0) {
 
-                fwrite($handle, "User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"] . "\n");
+                output("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"] . "\n");
                 // Add photo as invisible and send an email to the owner
                 for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                     $s3_url = "";
@@ -280,12 +283,12 @@ EMAIL;
 } else if ($target_album_id == 0) {
     // The album doesn't exist but the user does...
 
-    fwrite($handle, "Target user ($target_user_id, " . $target_user_info["username"] . ") exists.\n");
-    fwrite($handle, "Target album ($target_album_handle) does not exist.\n");
+    output("Target user ($target_user_id, " . $target_user_info["username"] . ") exists.\n");
+    output("Target album ($target_album_handle) does not exist.\n");
 
     if ($target_user_id == $user_id) {
         // User is creating a new album and adding a photo to it
-        fwrite($handle, "User is attempting to create own album.");
+        output("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
 
@@ -295,13 +298,13 @@ EMAIL;
             array_push($s3_urls, $s3_url);
             if ($i == 0) {
                 // Set the first photo as the cover photo
-                fwrite($handle, "current_albumphoto_id: $current_albumphoto_id\n");
+                output("current_albumphoto_id: $current_albumphoto_id\n");
                 update_data("Albums", $target_album_id, array("cover_albumphoto_id" => $current_albumphoto_id));
-                fwrite($handle, "Adding albumphoto $current_albumphoto_id added to album $target_album_id\n");
+                output("Adding albumphoto $current_albumphoto_id added to album $target_album_id\n");
             }
         }
         email_followers($target_album_info, $s3_urls);
-        fwrite($handle, "TIME 9: " . (time() - $start_time) . "\n");
+        output("TIME 9: " . (time() - $start_time) . "\n");
 
 
         $display_album_ra = array();
@@ -318,16 +321,16 @@ EMAIL;
 
     } else {
         // A user cannot create an album for another user, so disallow
-        fwrite($handle, "User is attempting to create album for another user.\n");
+        output("User is attempting to create album for another user.\n");
 
         $user_email_body = <<<EMAIL
             You tried to add a photo to {$target_user_info["username"]}'s {$target_album_info["handle"]} album, but {$target_user_info["username"]} doesn't have an album by that name!
 EMAIL;
-        fwrite($handle, "TIME 10: " . (time() - $start_time));
+        output("TIME 10: " . (time() - $start_time));
 
     }
 } else if ($target_album_id == -1) {
-    fwrite($handle, "Target user ($target_user_id) does not exist.\n");
+    output("Target user ($target_user_id) does not exist.\n");
 }
 
 
@@ -339,17 +342,52 @@ if (!preg_match("/zipio.com$/", $sender)) {
     send_email($user_info["email"], $founders_email_address, "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
         send_email($target_user_info["email"], $founders_email_address, "Zipio activity notification", $target_user_email_body);
-        fwrite($handle, "$target_user_email_body\n\n");
+        output("$target_user_email_body\n\n");
     }
 }
 
-fwrite($handle, "$user_email_body\n");
-fwrite($handle, "TIME 11: " . (time() - $start_time) . "\n");
+output("$user_email_body\n");
+output("TIME 11: " . (time() - $start_time) . "\n");
 
 fclose($handle);
 
-//if (!preg_match("/zipio.com$/", $sender)) {
-//    send_email("sanjay@gmail.com", $founders_email_address, $confirmation_number . " - process_email", $contents);
-//}
+
+function output($string) {
+    global $handle;
+    $date = gmdate("d-M-Y H:i:s");
+    $date = "[" . $date . " UTC]";
+    fwrite($handle, $date . " " . $string);
+}
+
+
+function handle_shutdown() {
+    $error = error_get_last();
+    output(print_r($error, true));
+
+
+    global $target_album_handle;
+    global $target_username;
+    global $target_user_id;
+    global $target_album_id;
+    global $target_user_info;
+    global $user_info;
+    global $display_album_ra;
+    global $display_album_link;
+    global $user_email_body;
+    global $is_friend;
+    global $owner_display_album_ra;
+    global $target_user_email_body;
+    global $add_friend_ra;
+    global $brand_new_user;
+    global $sender;
+    global $recipient;
+    
+    output(print_r(get_defined_vars(), true));
+}
+
+function on_error($num, $str, $file, $line) {
+    output("Encountered error $num in $file, line $line: $str\n");
+}
+
 
 ?>
