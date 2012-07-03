@@ -15,6 +15,7 @@ $page_title = "";
 $page_subtitle = "";
 
 
+
 ?>
 
 
@@ -42,7 +43,7 @@ $page_subtitle = "";
         </h2>
         <br><br><br>
         <h1>
-            <span style="background-color:#ffff77; font-weight:700">To begin, send a photo to myphotos@zipio.com</span>
+            <span class="highlight" style="font-weight:700">To begin, send a photo to myphotos@zipio.com</span>
         </h1>
 
     </div>

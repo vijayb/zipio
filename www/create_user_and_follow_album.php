@@ -25,19 +25,19 @@ $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
 if (mysql_num_rows($result) == 0) { // follower is not present
-    
-    $follower_id = create_user("","","",$email);
+
+    $follower_id = create_user("", "", "", "", $email);
     login_user($follower_id);
-    create_follower($album_owner_id, $follower_id, $album_id); 
+    create_follower($album_owner_id, $follower_id, $album_id);
     print("0");
     return;
 }
 
 //if follower is present
-    $row = mysql_fetch_array($result);    
+    $row = mysql_fetch_array($result);
     $follower_id = $row["id"];
     login_user($follower_id);
-    create_follower($album_owner_id, $follower_id, $album_id);    
+    create_follower($album_owner_id, $follower_id, $album_id);
     print($row["id"]);
     return;
 

@@ -31,11 +31,8 @@ if (mysql_num_rows($result) == 1) {
     $follower_id = $row["id"];
     $follower_username = $row["username"];
 } else {
-    // CASE 3: Email doesn't exist, so create user
     $follower_username = generate_username($email);
-    $follower_id = create_user($follower_username,
-                               "",
-                               $email);
+    $follower_id = create_user("", $follower_username, "", $email);
 }
 
 

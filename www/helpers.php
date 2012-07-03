@@ -5,7 +5,7 @@ error_reporting(E_ALL | E_STRICT);
 
 $s3_bucket_name = "s3.zipio.com";
 $s3_root = "http://s3.zipio.com/photos";
-$www_root = "http://zipio.com";
+$www_root = "http://localhost.com";
 $founders_email_address = "Zipio <founders@zipio.com>";
 
 $debug = 0;
@@ -174,15 +174,17 @@ function is_friend($user_id, $potential_friend_id) {
     return 0;
 }
 
-function create_user($username, $password_hash, $email) {
+function create_user($name, $username, $password_hash, $email) {
 
     global $con;
 
     $query = "INSERT INTO Users (
+                name,
                 email,
                 username,
                 password_hash
               ) VALUES (
+                '$name',
                 '$email',
                 '$username',
                 '$password_hash'
@@ -281,7 +283,8 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_url;
 
-    $sizes = array(800);
+    $sizes = array(1024);
+    $max_size = max($sizes);
 
     $failed = 0;
 
@@ -328,10 +331,12 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     if (!$failed) {
         $query = "INSERT INTO Photos (
                     user_id,
-                    s3_url
+                    s3_url,
+                    max_size
                   ) VALUES (
                     '$owner_user_id',
-                    '$s3_url'
+                    '$s3_url',
+                    $max_size
                   ) ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
@@ -636,6 +641,7 @@ function get_albumphoto_info($albumphoto_id) {
                 visible,
                 filter_code,
                 s3_url,
+                max_size,
                 AlbumPhotos.created
               FROM AlbumPhotos
               LEFT JOIN Photos

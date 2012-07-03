@@ -3,6 +3,7 @@
 /*
 
     TRUNCATE TABLE AlbumPhotos;
+    TRUNCATE TABLE AlbumAccessors;
     TRUNCATE TABLE Albums;
     TRUNCATE TABLE Friends;
     TRUNCATE TABLE Photos;
@@ -24,6 +25,13 @@ require("helpers.php");
 
 $sender = strtolower($_POST["sender"]);
 $recipient = strtolower($_POST["recipient"]);
+
+$name = $_POST["from"];
+$name = str_replace('"', "", $name);
+$name = str_replace("'", "", $name);
+preg_match('~(?:([^<]*?)\s*)?<(.*)>~', $name, $var);
+$name = $var[1];
+
 
 $date = gmdate("d-M-Y H:i:s");
 $handle = fopen("/log/" . $date . "_" . $sender, 'a') or die('Cannot open file.');
@@ -75,9 +83,11 @@ if (mysql_num_rows($result) == 1) {
 
     $username = generate_username($sender);
     $query = "INSERT INTO Users (
+                name,
                 email,
                 username
               ) VALUES (
+                '$name',
                 '$sender',
                 '$username'
               ) ON DUPLICATE KEY UPDATE last_seen=UTC_TIMESTAMP()";
@@ -381,7 +391,7 @@ function handle_shutdown() {
     global $brand_new_user;
     global $sender;
     global $recipient;
-    
+
     output(print_r(get_defined_vars(), true));
 }
 

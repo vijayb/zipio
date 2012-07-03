@@ -251,13 +251,13 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $opacity = "1.0";
     }
 
-    $albumphotos_array_js .= "'" . $s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_800_" . $albumphotos_array[$i]["filter_code"] . "',";
+    $albumphotos_array_js .= "'" . $s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_" . $albumphotos_array[$i]["max_size"] . "_" . $albumphotos_array[$i]["filter_code"] . "',";
 
     $html = <<<HTML
 
         <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
 
-            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
+            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}">
                 <!--
                 <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$www_root}/proxy.php?url={$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
                 -->

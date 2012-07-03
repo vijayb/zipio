@@ -5,6 +5,7 @@ $password="daewoo";
 $database="Zipio";
 
 $con = mysql_connect ("zipio.com", $username, $password, true);
+//$con = mysql_connect ("ec2-23-22-14-153.compute-1.amazonaws.com", $username, $password, true);
 
 
 if (!$con) {
