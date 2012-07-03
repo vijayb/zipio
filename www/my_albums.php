@@ -19,7 +19,7 @@ if (!isset($_GET["owner_username"]) && !isset($_GET["follower_username"])) {
     $owner_username = get_username_from_user_id($owner_id);
     $owner_info = get_user_info($owner_id);
 
-    if ($debug) {
+    if ($g_debug) {
         print("<!-- owner_id: $owner_id -->\n");
         print("<!-- owner_username: $owner_username -->\n");
         print("<!-- owner_info: " . print_r($owner_info, true) . "-->");
@@ -50,7 +50,7 @@ if (!isset($_GET["following"])) {
         // ---------------------------------------------------------------------
         $page_title = "$owner_username's albums (this is you)";
         $page_subtitle = "To create a new album, send photos to <b>new_album_name@zipio.com</b>";
-        $which_showing = "Showing $album_privacy_contants[1], $album_privacy_contants[2], and $album_privacy_contants[3] albums";
+        $which_showing = "Showing $g_album_privacy_contants[1], $g_album_privacy_contants[2], and $g_album_privacy_contants[3] albums";
 
 
     } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
@@ -59,7 +59,7 @@ if (!isset($_GET["following"])) {
         // ---------------------------------------------------------------------
         $page_title = "$owner_username's albums (one of your friends)";
         //$page_subtitle = "You're seeing $owner_username's public and friends albums";
-        $which_showing = "Showing $album_privacy_contants[2] and $album_privacy_contants[3] albums only";
+        $which_showing = "Showing $g_album_privacy_contants[2] and $g_album_privacy_contants[3] albums only";
 
     } else {
         // ---------------------------------------------------------------------
@@ -67,7 +67,7 @@ if (!isset($_GET["following"])) {
         // ---------------------------------------------------------------------
         $page_title = "$owner_username's albums";
         //$page_subtitle = "You're seeing $owner_username's public albums only";
-        $which_showing = "Showing $album_privacy_contants[3] albums only";
+        $which_showing = "Showing $g_album_privacy_contants[3] albums only";
 
     }
 
@@ -109,14 +109,14 @@ for ($i = 0; $i < count($albums_array); $i++) {
     if ($albums_array[$i]["permissions"] == 1) {
         if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
             // Viewer is the owner of the gallery
-            $upper_left = $album_privacy_contants[$albums_array[$i]["permissions"]];
+            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
         } else {
             continue;
         }
     } else if ($albums_array[$i]["permissions"] == 2) {
         if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
             // Viewer is the owner of the albums
-            $upper_left = $album_privacy_contants[$albums_array[$i]["permissions"]];
+            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
         } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
             // View is a friend of the owner of the albums
         } else {
@@ -126,7 +126,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
         // Anyone can see this album...
         if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
             // Viewer is the owner of the albums
-            $upper_left = $album_privacy_contants[$albums_array[$i]["permissions"]];
+            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
         }
     }
 
@@ -136,7 +136,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $html = <<<HTML
     <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
         <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
-            <img src='{$s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
+            <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
             <div class="album-details"></div>
             <div class="album-title">{$albums_array[$i]["handle"]}</div>
             <div class="album-privacy">

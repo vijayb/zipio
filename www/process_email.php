@@ -1,23 +1,12 @@
 <?php
 
-/*
-
-    TRUNCATE TABLE AlbumPhotos;
-    TRUNCATE TABLE AlbumAccessors;
-    TRUNCATE TABLE Albums;
-    TRUNCATE TABLE Friends;
-    TRUNCATE TABLE Photos;
-    TRUNCATE TABLE Users;
-    TRUNCATE TABLE Followers;
-
-*/
-
 register_shutdown_function('handle_shutdown');
 set_error_handler("on_error");
 
 ini_set("display_errors", 1);
 error_reporting(-1);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -186,7 +175,7 @@ if ($target_album_id > 0) {
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
         $display_album_ra["timestamp"] = time();
-        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+        $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -227,12 +216,12 @@ EMAIL;
                 $display_album_ra = array();
                 $display_album_ra["user_id"] = $user_info["id"];
                 $display_album_ra["timestamp"] = time();
-                $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+                $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
                 $owner_display_album_ra = array();
                 $owner_display_album_ra["user_id"] = $target_album_info["user_id"];
                 $owner_display_album_ra["timestamp"] = time();
-                $owner_display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
+                $owner_display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
 
                 $user_email_body = <<<EMAIL
                     You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
@@ -261,7 +250,7 @@ EMAIL;
                 $display_album_ra = array();
                 $display_album_ra["user_id"] = $user_info["id"];
                 $display_album_ra["timestamp"] = time();
-                $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
+                $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
 
                 $user_email_body = <<<EMAIL
                     You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
@@ -276,7 +265,7 @@ EMAIL;
                 $add_friend_ra["album_id"] = $target_album_id;
                 $add_friend_ra["action"] = "add_friend";
                 $add_friend_ra["timestamp"] = time();
-                $add_friend_link = $www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
+                $add_friend_link = $g_www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
 
                 $target_user_email_body = <<<EMAIL
                     <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
@@ -320,7 +309,7 @@ EMAIL;
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_info["id"];
         $display_album_ra["timestamp"] = time();
-        $display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+        $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
@@ -349,9 +338,9 @@ if ($brand_new_user) {
 }
 
 if (!preg_match("/zipio.com$/", $sender)) {
-    send_email($user_info["email"], $founders_email_address, "Zipio activity notification", $user_email_body);
+    send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
-        send_email($target_user_info["email"], $founders_email_address, "Zipio activity notification", $target_user_email_body);
+        send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);
         output("$target_user_email_body\n\n");
     }
 }

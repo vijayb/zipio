@@ -3,6 +3,7 @@ session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -30,10 +31,10 @@ $album_owner_email_body = <<<EMAIL
 EMAIL;
 
 $album_owner_email_subject = $request["follower_username"] . " is now following your " . $request["album_handle"] . " album";
-send_email($request["album_owner_email"], $founders_email_address, $album_owner_email_subject, $album_owner_email_body);
+send_email($request["album_owner_email"], $g_founders_email_address, $album_owner_email_subject, $album_owner_email_body);
 
 login_user($request["follower_id"]);
 
-header("Location: " . $www_root . "/" . $request["album_owner_username"] . "/" . $request["album_handle"] . "#alert=1");
+header("Location: " . $g_www_root . "/" . $request["album_owner_username"] . "/" . $request["album_handle"] . "#alert=1");
 
 ?>

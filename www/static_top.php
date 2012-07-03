@@ -14,9 +14,17 @@
 <link href="/lib/fonts.css" rel="stylesheet" />
 
 
+
+
+
+
+
+
+
+
+
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
-
 
 <!--
 rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
@@ -28,6 +36,15 @@ rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > 
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
 -->
+
+
+
+
+
+
+
+
+
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -187,7 +204,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
-            <b><?php print($album_privacy_contants[1]); ?> album</b>
+            <b><?php print($g_album_privacy_contants[1]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Only you can see and add photos to this album.
@@ -197,7 +214,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
-            <b><?php print($album_privacy_contants[2]); ?> album</b>
+            <b><?php print($g_album_privacy_contants[2]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Only you and your friends can see and add photos to this album.
@@ -209,7 +226,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         <label class="radio">
             <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
-            <b><?php print($album_privacy_contants[3]); ?> album</b>
+            <b><?php print($g_album_privacy_contants[3]); ?> album</b>
         </label>
         <p style="margin-left:20px">
             Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
@@ -476,7 +493,51 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 
+<div class="navbar navbar-fixed-bottom">
 
+
+<?php
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+if ($_SERVER["HTTP_HOST"] == "localhost") {
+    $html = <<<HTML
+    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+        {$_SERVER["HTTP_HOST"]}
+    </div>
+HTML;
+    print($html);
+
+} else if ($_SERVER["HTTP_HOST"] == "ec2-23-22-14-153.compute-1.amazonaws.com") {
+    $html = <<<HTML
+    <div style="background-color:orange; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+        {$_SERVER["HTTP_HOST"]}
+    </div>
+HTML;
+    print($html);
+}
+
+
+
+
+if ($g_database_to_use == "TEST") {
+    $html = <<<HTML
+    <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+        USING THE TEST DATABASE
+    </div>
+HTML;
+    print($html);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+?>
+
+</div>
 
 
 <div class="container">

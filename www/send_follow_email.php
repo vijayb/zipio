@@ -3,6 +3,7 @@ session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -48,9 +49,9 @@ $follow_album_ra["album_owner_id"] = $album_owner_info["id"];
 $follow_album_ra["album_owner_username"] = $album_owner_info["username"];
 $follow_album_ra["album_owner_email"] = $album_owner_info["email"];
 $follow_album_ra["timestamp"] = time();
-$follow_album_link = $www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
+$follow_album_link = $g_www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
 
-$follower_my_albums_page_link = $www_root . "/" . $follower_username;
+$follower_my_albums_page_link = $g_www_root . "/" . $follower_username;
 
 $follower_email_body = <<<EMAIL
     <a href="$follow_album_link">Click here</a> to confirm that you want to follow <b>{$album_owner_info["email"]}</b>'s <b>{$album_info["handle"]}</b> album.
@@ -59,7 +60,7 @@ $follower_email_body = <<<EMAIL
 EMAIL;
 
 
-send_email($email, $founders_email_address, "Confirm album following", $follower_email_body);
+send_email($email, $g_founders_email_address, "Confirm album following", $follower_email_body);
 
 
 

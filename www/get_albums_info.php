@@ -3,6 +3,7 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -22,7 +23,7 @@ if (count($_POST) == 2) {
         $password_hash = $_GET["password_hash"];
     }
 } else {
-    print("Incorrect number of arguments. You should be sending email and password_hash as GET or POST.");
+    print("ERROR: Incorrect number of arguments. You should be sending email and password_hash as GET or POST.");
     exit();
 }
 
@@ -35,7 +36,7 @@ $user_id = 0;
 if ($row = mysql_fetch_assoc($result)) {
     $user_id = $row["id"];
 } else {
-    print("Invalid username and password combo.");
+    print("ERROR: Invalid username and password combo.");
     exit();
 }
 

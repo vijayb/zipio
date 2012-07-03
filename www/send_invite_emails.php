@@ -3,6 +3,7 @@ session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -30,7 +31,7 @@ $email_body = <<<EMAIL
 
 I've posted some photos online at Zipio. Here they are:
 <br><br>
-{$www_root}/{$username}/{$handle}
+{$g_www_root}/{$username}/{$handle}
 <br><br>
 Click the green follow button on the page to get emailed when new photos are added (no signup required)!
 
