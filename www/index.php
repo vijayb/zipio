@@ -46,6 +46,11 @@ $page_subtitle = "";
             <span class="highlight" style="font-weight:700">To begin, send a photo to myphotos@zipio.com</span>
         </h1>
 
+        <br><br>
+        <span style="font-size:10px; color:#cccccc;">
+            <?php print($g_www_root); ?>
+        </span>
+
     </div>
 
 </div>

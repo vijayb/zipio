@@ -25,6 +25,11 @@ $g_founders_email_address = "Zipio <founders@zipio.com>";
 $g_debug = 0;
 $g_database_to_use = "PROD";
 
+if ($_SERVER["HTTP_HOST"] == "localhost") {
+    $g_debug = 1;
+    // $g_database_to_use = "TEST";
+}
+
 $g_album_privacy_contants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
 $g_album_privacy_contants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
 $g_album_privacy_contants[3] = "<i class='icon-globe' style='color:green;'></i> Public";

@@ -1,8 +1,5 @@
 <?php
 
-register_shutdown_function('handle_shutdown');
-set_error_handler("on_error");
-
 ini_set("display_errors", 1);
 error_reporting(-1);
 
@@ -10,7 +7,8 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
-
+register_shutdown_function('handle_shutdown');
+set_error_handler("on_error");
 
 $sender = strtolower($_POST["sender"]);
 $recipient = strtolower($_POST["recipient"]);

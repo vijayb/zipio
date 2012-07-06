@@ -504,31 +504,55 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 if ($_SERVER["HTTP_HOST"] == "localhost") {
     $html = <<<HTML
-    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
         {$_SERVER["HTTP_HOST"]}
     </div>
 HTML;
     print($html);
+
+        if ($g_database_to_use == "PROD") {
+            $html = <<<HTML
+            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE PRODUCTION DATABASE
+            </div>
+HTML;
+            print($html);
+        } else if ($g_database_to_use == "TEST") {
+            $html = <<<HTML
+            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE TEST DATABASE
+            </div>
+HTML;
+            print($html);
+        }
+
 
 } else if ($_SERVER["HTTP_HOST"] == "ec2-23-22-14-153.compute-1.amazonaws.com") {
     $html = <<<HTML
-    <div style="background-color:orange; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+    <div style="background-color:orange; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
         {$_SERVER["HTTP_HOST"]}
     </div>
 HTML;
     print($html);
-}
 
-
-
-
-if ($g_database_to_use == "TEST") {
-    $html = <<<HTML
-    <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-        USING THE TEST DATABASE
-    </div>
+        if ($g_database_to_use == "PROD") {
+            $html = <<<HTML
+            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE PRODUCTION DATABASE
+            </div>
 HTML;
-    print($html);
+            print($html);
+        } else if ($g_database_to_use == "TEST") {
+            $html = <<<HTML
+            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE TEST DATABASE
+            </div>
+HTML;
+            print($html);
+        }
+
+
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////
