@@ -1,7 +1,5 @@
 <?php
 
-// USER is the one who added the photos to TARGET USER's album
-// TARGET USER clicks on the link in his email to add USER as a friend
 session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);

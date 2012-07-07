@@ -27,8 +27,11 @@ function is_logged_in() {
 }
 
 function check_request_for_login($_GET) {
+    print("<!-- IN CHECK_REQUEST_FOR_LOGIN -->\n");
+    print("<!-- GET:" . print_r($_GET, true) . "-->\n");
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
+        print("<!-- REQUEST:" . print_r($_SESSION, true) . "-->");
         if (isset($request["user_id"])) {
             login_user($request["user_id"]);
             $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -164,6 +167,23 @@ function is_friend($user_id, $potential_friend_id) {
     return 0;
 }
 
+
+function is_accessor($user_id, $album_id) {
+
+    global $con;
+
+    $query = "SELECT * FROM AlbumAccessors WHERE accessor_id='$user_id' AND album_id=$album_id";
+    $result = mysql_query($query, $con);
+    if (!$result)
+        die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if (mysql_num_rows($result) == 1) {
+        return 1;
+    }
+
+    return 0;
+}
+
 function create_user($name, $username, $password_hash, $email) {
 
     global $con;
@@ -197,11 +217,11 @@ function create_album($user_id, $handle) {
     $query = "INSERT INTO Albums (
                   user_id,
                   handle,
-                  permissions
+                  read_permissions
               ) VALUES (
                   '$user_id',
                   '$handle',
-                  3
+                  2
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ .
@@ -482,16 +502,6 @@ function get_user_info($user_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
-
-        $inner_query = "SELECT friend_id FROM Friends WHERE user_id='$user_id'";
-        $inner_result = mysql_query($inner_query, $con);
-        if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-        $row["friends"] = array();
-
-        while ($inner_row = mysql_fetch_assoc($inner_result)) {
-            array_push($row["friends"], $inner_row["friend_id"]);
-        }
-
         $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {

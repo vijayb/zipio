@@ -22,20 +22,19 @@
 
 
 
-
+<!--
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
+-->
 
 <!--
 rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
 rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 -->
 
-<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
--->
 
 
 
@@ -513,14 +512,14 @@ HTML;
         if ($g_database_to_use == "PROD") {
             $html = <<<HTML
             <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE PRODUCTION DATABASE
+                USING THE PRODUCTION DATABASE - {$database}
             </div>
 HTML;
             print($html);
         } else if ($g_database_to_use == "TEST") {
             $html = <<<HTML
             <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE TEST DATABASE
+                USING THE TEST DATABASE - {$database}
             </div>
 HTML;
             print($html);
@@ -580,7 +579,7 @@ HTML;
         <div class="span9" style="margin-bottom:10px">
             <h1><?php print($page_title); ?></h1>
             <h2 style="color:#999999; margin: 5px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
-            <?php if (isset($third_row)) { print($third_row); } ?>
+            <?php // if (isset($third_row)) { print($third_row); } ?>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

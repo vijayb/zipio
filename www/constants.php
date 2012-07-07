@@ -9,7 +9,6 @@
     TRUNCATE TABLE AlbumPhotos;
     TRUNCATE TABLE AlbumAccessors;
     TRUNCATE TABLE Albums;
-    TRUNCATE TABLE Friends;
     TRUNCATE TABLE Photos;
     TRUNCATE TABLE Users;
     TRUNCATE TABLE Followers;
@@ -22,12 +21,24 @@ $g_s3_root = "http://s3.zipio.com/photos";
 $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
 
+
+// When set to 1, certain debug statements are turned ON. This must be set to
+// 0 before pushing to production because the debug statements might reveal
+// information that is sensitive.
+
 $g_debug = 0;
-$g_database_to_use = "PROD";
+
+
+
+// When set to "PROD", the system uses the database at zipio.com. When set to
+// "TEST", the system uses the database at ec2-23-22-14-153.compute-1.amazonaws.com
+
+$g_database_to_use = "TEST";
+
+
 
 if ($_SERVER["HTTP_HOST"] == "localhost") {
     $g_debug = 1;
-    // $g_database_to_use = "TEST";
 }
 
 $g_album_privacy_contants[1] = "<i class='icon-lock' style='color:red;'></i> Private";

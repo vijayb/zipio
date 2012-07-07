@@ -1,5 +1,6 @@
 <?php
 
+
 ini_set("display_errors", 1);
 error_reporting(-1);
 
@@ -7,21 +8,30 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
-register_shutdown_function('handle_shutdown');
-set_error_handler("on_error");
+if (isset($_POST["sender"]) && isset($_POST["recipient"])) {
+    $sender = strtolower($_POST["sender"]);
+    $recipient = strtolower($_POST["recipient"]);
+} else {
+    $sender = "";
+    $recipient = "";
+}
 
-$sender = strtolower($_POST["sender"]);
-$recipient = strtolower($_POST["recipient"]);
+$date = gmdate("d-M-Y H:i:s");
+$output_handle = fopen("/log/" . $date . "_" . $sender, 'a+') or die('Cannot open file.');
+
+
+register_shutdown_function('handle_shutdown');
+set_error_handler("on_error", -1);
+
 
 $name = $_POST["from"];
 $name = str_replace('"', "", $name);
 $name = str_replace("'", "", $name);
-preg_match('~(?:([^<]*?)\s*)?<(.*)>~', $name, $var);
-$name = $var[1];
 
+$pattern = "/<.*>/";
+$name = preg_replace($pattern, "", $name);
+print($name);
 
-$date = gmdate("d-M-Y H:i:s");
-$handle = fopen("/log/" . $date . "_" . $sender, 'a') or die('Cannot open file.');
 
 
 output("POST REQUEST:\n");
@@ -45,7 +55,7 @@ if (!defined('awsSecretKey')) define('awsSecretKey', 'xlT7rnKZPbFr1VayGtPu3zU6Tl
 $s3 = new S3(awsAccessKey, awsSecretKey);
 
 
-// First, check if this user exists
+// First, check if the user who SENT the email is an existing Zipio user
 
 $brand_new_user = 0;
 
@@ -88,7 +98,6 @@ if (mysql_num_rows($result) == 1) {
 }
 
 output("TIME 3: " . (time() - $start_time) . "\n");
-
 
 
 
@@ -143,17 +152,10 @@ output("TIME 6: " . (time() - $start_time) . "\n");
 //      exist AND the user doesn't exist, this variable is -1.
 
 
-// The different ways to add a photo:
-//  Add to own existing album
-//  Create a new album and add a photo to it
-//  Add to friend's album
-//  Add to not-yet-friend's album
-
 if ($target_album_id > 0) {
     // The target album exists (and so does the target user)...
     $target_album_info = get_album_info($target_album_id);
 
-    output("Target user ($target_user_id, " . $target_user_info["username"] . ") exists.\n");
     output("Target album ($target_album_handle, owned by " . $target_user_info["username"] . ") exists.\n");
     output("Target album has ID $target_album_id\n");
 
@@ -167,7 +169,7 @@ if ($target_album_id > 0) {
             array_push($s3_urls, $s3_url);
         }
         output("TIME 6.2: " . (time() - $start_time) . "\n");
-        email_followers($target_album_info, $s3_urls);
+        // email_followers($target_album_info, $s3_urls);
         output("TIME 6.3: " . (time() - $start_time) . "\n");
 
         $display_album_ra = array();
@@ -186,95 +188,85 @@ EMAIL;
         output("TIME 7: " . (time() - $start_time) . "\n");
 
     } else {
-        // User is adding to another user's album, so check if the submitter of the photo is a friend of the target user
+        // User is adding to another user's album, so check if the submitter
+        // of the photo is an accessor of the album
 
-        $is_friend = is_friend($target_user_id, $user_id);
+        $is_accessor = is_accessor($user_id, $target_album_id);
 
-        if (($target_album_info["permissions"] == 1)
-            ||
-            ($target_album_info["permissions"] == 2 && $is_friend == 0)) {
+        if ($is_accessor == 1) {
+            // The user who SENT the photos is already an accessor of the target album, so add the photos
+            output("User " . $user_info["username"] . " is an access of album with ID $target_album_id.\n");
+            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                $s3_url = "";
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
+                array_push($s3_urls, $s3_url);
+            }
+            // email_followers($target_album_info, $s3_urls);
+
+            $display_album_ra = array();
+            $display_album_ra["user_id"] = $user_info["id"];
+            $display_album_ra["timestamp"] = time();
+            $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+
+            $owner_display_album_ra = array();
+            $owner_display_album_ra["user_id"] = $target_album_info["user_id"];
+            $owner_display_album_ra["timestamp"] = time();
+            $owner_display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
 
             $user_email_body = <<<EMAIL
-                You tried to add a photo to <b>{$target_user_info["username"]}</b>'s <b>{$target_album_info["handle"]}</b> album.
-                That album either doesn't exist or you don't have permission to add photos to it.
+                You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
+                <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
-        } else {
-
-            if ($is_friend == 1) {
-                output("User " . $user_info["username"] . " is a friend of " . $target_user_info["username"] . "\n");
-                // Add the photo to the friend's album
-                for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                    $s3_url = "";
-                    add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
-                    array_push($s3_urls, $s3_url);
-                }
-                email_followers($target_album_info, $s3_urls);
-
-                $display_album_ra = array();
-                $display_album_ra["user_id"] = $user_info["id"];
-                $display_album_ra["timestamp"] = time();
-                $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
-
-                $owner_display_album_ra = array();
-                $owner_display_album_ra["user_id"] = $target_album_info["user_id"];
-                $owner_display_album_ra["timestamp"] = time();
-                $owner_display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
-
-                $user_email_body = <<<EMAIL
-                    You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                    <a href='{$display_album_link}'>See the album!</a>
+            $target_user_email_body = <<<EMAIL
+                {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
+                 <a href='{$owner_display_album_link}'>See the album!</a>
 EMAIL;
 
-                $target_user_email_body = <<<EMAIL
-                    {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                     <a href='{$owner_display_album_link}'>See the album!</a>
-EMAIL;
-
-                output("TIME 8: " . (time() - $start_time) . "\n");
+            output("TIME 8: " . (time() - $start_time) . "\n");
 
 
-            } else if ($is_friend == 0) {
+        } else if ($is_friend == 0) {
 
-                output("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"] . "\n");
-                // Add photo as invisible and send an email to the owner
-                for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
-                    $s3_url = "";
-                    add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
-                    array_push($s3_urls, $s3_url);
-                }
-                // email_followers($target_album_info, $s3_urls);
-
-                $display_album_ra = array();
-                $display_album_ra["user_id"] = $user_info["id"];
-                $display_album_ra["timestamp"] = time();
-                $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
-
-                $user_email_body = <<<EMAIL
-                    You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
-                    <br><br>
-                    Your photo will appear in the album once <b>{$target_user_info["username"]}</b> approves you as a friend.
-                    <a href='{$display_album_link}'>See the album!</a>
-EMAIL;
-
-                $add_friend_ra = array();
-                $add_friend_ra["user_id"] = $user_info["id"];
-                $add_friend_ra["target_user_id"] = $target_user_info["id"];
-                $add_friend_ra["album_id"] = $target_album_id;
-                $add_friend_ra["action"] = "add_friend";
-                $add_friend_ra["timestamp"] = time();
-                $add_friend_link = $g_www_root . "/add_friend.php?request=" . urlencode(encrypt_json($add_friend_ra));
-
-                $target_user_email_body = <<<EMAIL
-                    <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
-                    Add as a friend?
-                    <a href='{$add_friend_link}'>Yes (allows <b>{$user_info["username"]}</b> to post to any of your <i>non-Private</i> albums) </a>
-                    <br><br>
-                    If you don't want to allow <b>{$user_info["username"]}</b> to post photos to your albums, ignore this email.
-EMAIL;
-
+            output("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"] . "\n");
+            // Add photo as invisible and send an email to the owner
+            for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
+                $s3_url = "";
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
+                array_push($s3_urls, $s3_url);
             }
+            // email_followers($target_album_info, $s3_urls);
+
+            $display_album_ra = array();
+            $display_album_ra["user_id"] = $user_info["id"];
+            $display_album_ra["timestamp"] = time();
+            $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra))  . "#register=true";
+
+            $user_email_body = <<<EMAIL
+                You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
+                <br><br>
+                Your photo will appear in the album once <b>{$target_user_info["username"]}</b> says you're allowed to post to this album.
+                <a href='{$display_album_link}'>See the album!</a>
+EMAIL;
+
+            $add_accessor_ra = array();
+            $add_accessor_ra["user_id"] = $user_info["id"];
+            $add_accessor_ra["album_id"] = $target_album_id;
+            $add_accessor_ra["action"] = "add_accessor";
+            $add_accessor_ra["timestamp"] = time();
+            $add_accessor_link = $g_www_root . "/add_accessor.php?request=" . urlencode(encrypt_json($add_accessor_ra));
+
+            $target_user_email_body = <<<EMAIL
+                <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
+                <br><br>
+                <b>Want to allow photos from {$user_info["username"]} to this album?</b>
+                <a href='{$add_accessor_link}'>Yes (allows <b>{$user_info["username"]}</b> to post to any of your <i>non-Private</i> albums) </a>
+                <br><br>
+                If you don't want to allow <b>{$user_info["username"]}</b> to post photos to your <b>{$target_album_info["handle"]}</b> album, ignore this email.
+EMAIL;
+
         }
+
     }
 
 } else if ($target_album_id == 0) {
@@ -300,7 +292,7 @@ EMAIL;
                 output("Adding albumphoto $current_albumphoto_id added to album $target_album_id\n");
             }
         }
-        email_followers($target_album_info, $s3_urls);
+        // email_followers($target_album_info, $s3_urls);
         output("TIME 9: " . (time() - $start_time) . "\n");
 
 
@@ -346,14 +338,13 @@ if (!preg_match("/zipio.com$/", $sender)) {
 output("$user_email_body\n");
 output("TIME 11: " . (time() - $start_time) . "\n");
 
-fclose($handle);
-
 
 function output($string) {
-    global $handle;
+    global $output_handle;
+    print($string);
     $date = gmdate("d-M-Y H:i:s");
     $date = "[" . $date . " UTC]";
-    fwrite($handle, $date . " " . $string);
+    fwrite($output_handle, $date . " " . $string);
 }
 
 
@@ -374,7 +365,7 @@ function handle_shutdown() {
     global $is_friend;
     global $owner_display_album_ra;
     global $target_user_email_body;
-    global $add_friend_ra;
+    global $add_accessor_ra;
     global $brand_new_user;
     global $sender;
     global $recipient;

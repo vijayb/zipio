@@ -3,6 +3,7 @@
 require("static_supertop.php");
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+
 if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     exit();
 } else {
@@ -29,62 +30,7 @@ $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
-
-
-
-
-// Determine if the viewer has permission to view this album. If so, set the
-// subtitle of the page.
-
-$has_permission_to_view_album = 0;
-
-if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-    $viewer_relationship = "OWNER";
-} else if (is_logged_in() && isset($album_owner_info["friends"]) && in_array($_SESSION["user_id"], $album_owner_info["friends"])) {
-    $viewer_relationship = "FRIEND";
-} else {
-    $viewer_relationship = "STRANGER";
-}
-
-if ($album_info["permissions"] == 1) {
-    if ($viewer_relationship == "OWNER") {
-        $has_permission_to_view_album = 1;
-        $page_subtitle = "Add photos by emailing them to the above address";
-    } else if ($viewer_relationship == "FRIEND") {
-        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
-    } else if ($viewer_relationship == "STRANGER") {
-        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
-    }
-
-} else if ($album_info["permissions"] == 2) {
-    if ($viewer_relationship == "OWNER") {
-        $has_permission_to_view_album = 1;
-        $page_subtitle = "Add photos by emailing them to the above address";
-    } else if ($viewer_relationship == "FRIEND") {
-        $has_permission_to_view_album = 1;
-        $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
-    } else if ($viewer_relationship == "STRANGER") {
-        // NO PERMISSION TO VIEW, so we do NOT set $has_permission_to_view_album to 1
-    }
-
-} else if ($album_info["permissions"] == 3) {
-    $has_permission_to_view_album = 1;
-
-    if ($viewer_relationship == "OWNER") {
-        $page_subtitle = "Add photos by emailing them to the above address";
-    } else if ($viewer_relationship == "FRIEND") {
-        $page_subtitle = "Since you're " . $album_owner_info['username'] . "'s friend, you can add photos by emailing the above address";
-    } else if ($viewer_relationship == "STRANGER") {
-        $page_subtitle = "Add photos by emailing them to the above address (may require approval)";
-    }
-}
-
-if (!$has_permission_to_view_album) {
-    goto_homepage();
-}
-
-
-
+$page_subtitle = "";
 
 
 
@@ -212,15 +158,12 @@ HTML;
 
 // Set the "third row" string
 
-if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-    $permissions_html = $g_album_privacy_contants[$album_info["permissions"]] . " album - <a href='javascript:void(0);' onclick='showAlbumSettingsModal();'>Change</a>";
-} else {
-    $permissions_html = $g_album_privacy_contants[$album_info["permissions"]] . " album";
-}
 
 $following_html = count($followers_info) . " followers";
 
-$third_row = $permissions_html . "&#160;&#160;   &#183;   &#160;&#160;" . $following_html;
+// $third_row = $permissions_html . "&#160;&#160;   &#183;   &#160;&#160;" . $following_html;
+$third_row = $following_html;
+
 
 ?>
 
@@ -239,6 +182,9 @@ $third_row = $permissions_html . "&#160;&#160;   &#183;   &#160;&#160;" . $follo
 
 <div class="row">
 
+    <div class="span9">
+        <div class="row">
+
 <?php
 
 $albumphotos_array = get_albumphotos_info($album_to_display);
@@ -256,11 +202,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     $html = <<<HTML
 
         <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
-
             <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}">
-                <!--
-                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
-                -->
                 <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
             </a>
 HTML;
@@ -285,31 +227,53 @@ HTML;
 HTML;
     }
 
+
     $html .= <<<HTML
-            <!--
-            <div class="filter-buttons">
-                <div class="btn-group">
-                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 1);">.</button>
-                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 2);">.</button>
-                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 3);">.</button>
-                    <button class="btn btn-inverse" onclick="applyFilter('image-{$albumphotos_array[$i]["id"]}', 4);">.</button>
-                </div>
-            </div>
-            -->
+
         </div>
 
 HTML;
+
     print($html);
 }
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 ?>
+
+        </div>
+    </div>
+
+    <div class="span3">
+        <div>
+            <h2>Album Collaborators</h2>
+            <h4>Collaborators can <b style="color:#666666">add</b> photos and get an email when photos are added</h4>
+        </div>
+
+        <div style="height:30px"></div>
+
+        <div>
+            <h2>Album Privacy</h2>
+            <h4>Who is allowed to <b style="color:#666666">view</b> this album?</h4>
+        </div>
+    </div>
+
+
 </div>
+
+
+
 
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_scripts.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
+
+
+
+
+
+
+
 
 
 

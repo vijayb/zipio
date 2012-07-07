@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `Albums` (
   `handle_hash` binary(20) NOT NULL,
   `title` varchar(500) DEFAULT NULL,
   `caption` varchar(2000) DEFAULT NULL,
-  `permissions` int(11) unsigned NOT NULL DEFAULT 3,
+  `read_permissions` int(11) unsigned NOT NULL DEFAULT 3,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `num_views` int(11) NOT NULL,
   PRIMARY KEY (`id`),

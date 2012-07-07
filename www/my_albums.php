@@ -106,32 +106,6 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
     $upper_left = $album_owner_info["username"];
 
-    if ($albums_array[$i]["permissions"] == 1) {
-        if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
-            // Viewer is the owner of the gallery
-            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
-        } else {
-            continue;
-        }
-    } else if ($albums_array[$i]["permissions"] == 2) {
-        if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
-            // Viewer is the owner of the albums
-            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
-        } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
-            // View is a friend of the owner of the albums
-        } else {
-            continue;
-        }
-    } else if ($albums_array[$i]["permissions"] == 3) {
-        // Anyone can see this album...
-        if (is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
-            // Viewer is the owner of the albums
-            $upper_left = $g_album_privacy_contants[$albums_array[$i]["permissions"]];
-        }
-    }
-
-
-
 
     $html = <<<HTML
     <div class="tile span3" id="album-{$albums_array[$i]["id"]}">

@@ -9,6 +9,7 @@ require("db.php");
 require("helpers.php");
 
 check_request_for_login($_GET);
-print("<!--" . print_r($_SESSION, true) . "-->");
+
+print("<!-- SESSION: " . print_r($_SESSION, true) . "-->");
 
 ?>
