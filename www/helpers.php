@@ -27,6 +27,8 @@ function is_logged_in() {
 }
 
 function check_request_for_login($_GET) {
+    print("<!--" . print_r($_GET, true) . "-->\n");
+    exit();
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
         if (isset($request["user_id"])) {

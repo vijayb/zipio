@@ -23,7 +23,7 @@ $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
 
 $g_debug = 0;
-$g_database_to_use = "PROD";
+$g_database_to_use = "TEST";
 
 if ($_SERVER["HTTP_HOST"] == "localhost") {
     $g_debug = 1;
