@@ -34,7 +34,7 @@ $query = "DELETE FROM Followers WHERE album_id='$album_id'";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-$query = "DELETE FROM AlbumAccessors WHERE album_id='$album_id'";
+$query = "DELETE FROM Collaborators WHERE album_id='$album_id'";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 

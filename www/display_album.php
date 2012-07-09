@@ -39,7 +39,7 @@ $page_subtitle = "";
 
 
 
-
+/*
 
 
 // Set the right side button
@@ -93,18 +93,9 @@ HTML;
         // Logged in user is the album owner
         // =====================================================================
 
-        if ($album_info["permissions"] == 3) {
         $page_title_right = <<<HTML
-            <button class="btn btn-large btn-primary follow-button"
-                    onclick="showInviteModal();"
-                    id="invite-submit"
-                    data-loading-text="Please wait...">
-                Invite people to follow this public album!<br><span style="font-size:12px;">They'll get an email when photos are added</a>
-            </button>
 HTML;
-        } else {
-            $page_title_right = "";
-        }
+
 
     } else {
         // =====================================================================
@@ -143,6 +134,8 @@ HTML;
         }
     }
 }
+
+*/
 
 
 
@@ -247,13 +240,45 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
     <div class="span3">
         <div>
             <h2>Album Collaborators</h2>
-            <h4>Collaborators can <b style="color:#666666">add</b> photos and get an email when photos are added</h4>
+            <h4>Collaborators can <b style="color:#666666">add</b> photos</h4>
+
+            <div id="collaborators-list" style="margin:10px 0px;">
+<?php
+
+$collaborators_info = get_collaborators_info($album_to_display);
+
+$html = "";
+
+foreach ($collaborators_info as $collaborator) {
+    $html .= <<<HTML
+<li id="collaborator-{$collaborator["id"]}">
+    {$collaborator["email"]}
+    <a href="javascript:void(0);"
+       onclick="if (confirm('Sure you want to remove this collaborator?')) {
+                        deleteCollaborator({$collaborator["id"]},
+                                           '{$collaborator["collaborator_token"]}',
+                                           {$album_info["id"]},
+                                           '{$album_info["token"]}');
+                    }">
+        <i class="icon-remove"></i>
+    </a>
+</li>
+HTML;
+}
+
+print($html);
+
+?>
+
+            </div>
+
+            <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite collaborators</button>
         </div>
 
         <div style="height:30px"></div>
 
         <div>
-            <h2>Album Privacy</h2>
+            <h2>Privacy</h2>
             <h4>Who is allowed to <b style="color:#666666">view</b> this album?</h4>
         </div>
     </div>

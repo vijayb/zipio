@@ -149,7 +149,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Hi, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
+        <h2>Hi, <?php print($_SESSION["user_info"]["name"]); ?>!</h2>
         <h3>Set a password and change your username (if you want)</h3>
     </div>
 
@@ -411,13 +411,18 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Followers get an email when photos are added to this album</h2>
-        <h3>There's <span style="color:red">no sign up</span> for them!</h3>
+        <h2>Invite people to see and add photos</h2>
+        <h3>Photos can be added by email &mdash; <span style="color:red">they need not sign up!</span></h3>
     </div>
 
     <div class="modal-body">
+
         <p>
-            Enter comma-separated email addresses, and we'll email them a link to follow this album.
+            People you invite can add photos by email. Plus, we'll update them when photos are added to this album.
+        </p>
+
+        <p>
+            <b>Enter email addresses below</b> (either comma-separated or any way you like; we'll figure it out).
         </p>
 
         <p>

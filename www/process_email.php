@@ -121,7 +121,7 @@ output("TIME 4: " . (time() - $start_time) . "\n");
 $s3_urls = array();
 
 // Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
-if (preg_match("/(.+)\.zipio\.com/", $recipient_domain, $matches)) {
+if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
     $target_username = $matches[1];
     output("target_username: $target_username\n");
     $target_user_id = get_user_id_from_username($target_username);
@@ -189,12 +189,12 @@ EMAIL;
 
     } else {
         // User is adding to another user's album, so check if the submitter
-        // of the photo is an accessor of the album
+        // of the photo is a collaborator of the album
 
-        $is_accessor = is_accessor($user_id, $target_album_id);
+        $is_collaborator = is_collaborator($user_id, $target_album_id);
 
-        if ($is_accessor == 1) {
-            // The user who SENT the photos is already an accessor of the target album, so add the photos
+        if ($is_collaborator == 1) {
+            // The user who SENT the photos is already a collaborator of the target album, so add the photos
             output("User " . $user_info["username"] . " is an access of album with ID $target_album_id.\n");
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
@@ -226,9 +226,9 @@ EMAIL;
             output("TIME 8: " . (time() - $start_time) . "\n");
 
 
-        } else if ($is_friend == 0) {
+        } else if ($is_collaborator == 0) {
 
-            output("User " . $user_info["username"] . " is not a friend of " . $target_user_info["username"] . "\n");
+            output("User " . $user_info["username"] . " is not a collaborator of the album " . $target_album_info["handle"] . "\n");
             // Add photo as invisible and send an email to the owner
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
@@ -249,18 +249,18 @@ EMAIL;
                 <a href='{$display_album_link}'>See the album!</a>
 EMAIL;
 
-            $add_accessor_ra = array();
-            $add_accessor_ra["user_id"] = $user_info["id"];
-            $add_accessor_ra["album_id"] = $target_album_id;
-            $add_accessor_ra["action"] = "add_accessor";
-            $add_accessor_ra["timestamp"] = time();
-            $add_accessor_link = $g_www_root . "/add_accessor.php?request=" . urlencode(encrypt_json($add_accessor_ra));
+            $add_collaborator_ra = array();
+            $add_collaborator_ra["user_id"] = $user_info["id"];
+            $add_collaborator_ra["album_id"] = $target_album_id;
+            $add_collaborator_ra["action"] = "add_collaborator";
+            $add_collaborator_ra["timestamp"] = time();
+            $add_collaborator_link = $g_www_root . "/add_collaborator.php?request=" . urlencode(encrypt_json($add_collaborator_ra));
 
             $target_user_email_body = <<<EMAIL
                 <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) tried to post a photo to your <b>{$target_album_info["handle"]}</b> album.
                 <br><br>
-                <b>Want to allow photos from {$user_info["username"]} to this album?</b>
-                <a href='{$add_accessor_link}'>Yes (allows <b>{$user_info["username"]}</b> to post to any of your <i>non-Private</i> albums) </a>
+                <b>Want to allow photos from {$user_info["username"]} in this album?</b>
+                <a href='{$add_collaborator_link}'>Yes, allow <b>{$user_info["username"]}</b> to post to my <b>{$target_album_info["handle"]}</b> album </a>
                 <br><br>
                 If you don't want to allow <b>{$user_info["username"]}</b> to post photos to your <b>{$target_album_info["handle"]}</b> album, ignore this email.
 EMAIL;
@@ -327,7 +327,7 @@ if ($brand_new_user) {
     $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
 }
 
-if (!preg_match("/zipio.com$/", $sender)) {
+if (!preg_match("/zipiyo.com$/", $sender)) {
     send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
         send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);
@@ -362,10 +362,10 @@ function handle_shutdown() {
     global $display_album_ra;
     global $display_album_link;
     global $user_email_body;
-    global $is_friend;
+    global $is_collaborator;
     global $owner_display_album_ra;
     global $target_user_email_body;
-    global $add_accessor_ra;
+    global $add_collaborator_ra;
     global $brand_new_user;
     global $sender;
     global $recipient;

@@ -12,7 +12,7 @@ $user_id = $_GET["user_id"];
 $query = "delete from Users where id=$user_id LIMIT 1";
 mysql_query($query, $con);
 
-$query = "delete from AlbumAccessors where album_owner_id=$user_id or accessor_id=$user_id";
+$query = "delete from Collaborators where album_owner_id=$user_id or collaborator_id=$user_id";
 mysql_query($query, $con);
 
 $query = "delete from AlbumPhotos where album_owner_id=$user_id or photo_owner_id=$user_id";

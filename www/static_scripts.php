@@ -68,19 +68,6 @@ $(function() {
 
     ?>
 
-    /*
-
-    // Used to vertically center all modals, but it interferes with Bootstrap's
-    // native handling of screens lower than 480px in width.
-
-    $('.modal').on('shown', function(e) {
-        var modal = $(this);
-        modal.css('margin-top', (modal.outerHeight() / 2) * -1)
-             .css('margin-left', (modal.outerWidth() / 2) * -1);
-        return this;
-    });
-    */
-
     // If there is an alert URL parameter, show the alert
     var alert = getURLHashParameter("alert");
     if (alert != "null") {

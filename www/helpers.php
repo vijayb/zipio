@@ -31,7 +31,7 @@ function check_request_for_login($_GET) {
     print("<!-- GET:" . print_r($_GET, true) . "-->\n");
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
-        print("<!-- REQUEST:" . print_r($_SESSION, true) . "-->");
+        print("<!-- REQUEST:" . print_r($request, true) . "-->");
         if (isset($request["user_id"])) {
             login_user($request["user_id"]);
             $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -88,6 +88,27 @@ function create_follower($album_owner_id, $follower_id, $album_id) {
     $id = mysql_insert_id();
     return $id;
 }
+
+
+function create_collaborator($album_owner_id, $collaborator_id, $album_id) {
+
+    global $con;
+
+    $query ="INSERT INTO Collaborators (
+                collaborator_id,
+                album_owner_id,
+                album_id
+              ) VALUES (
+                '$collaborator_id',
+                '$album_owner_id',
+                '$album_id'
+              ) ON DUPLICATE KEY UPDATE id=id";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    $id = mysql_insert_id();
+    return $id;
+}
+
 
 function debug($string, $color = "black") {
     print("<span style='color:$color;'>$string</span>" . "\n<br>");
@@ -151,28 +172,11 @@ function check_token($id, $token, $table) {
     return 0;
 }
 
-function is_friend($user_id, $potential_friend_id) {
+function is_collaborator($user_id, $album_id) {
 
     global $con;
 
-    $query = "SELECT * FROM Friends WHERE user_id='$user_id' AND friend_id=$potential_friend_id";
-    $result = mysql_query($query, $con);
-    if (!$result)
-        die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    if (mysql_num_rows($result) == 1) {
-        return 1;
-    }
-
-    return 0;
-}
-
-
-function is_accessor($user_id, $album_id) {
-
-    global $con;
-
-    $query = "SELECT * FROM AlbumAccessors WHERE accessor_id='$user_id' AND album_id=$album_id";
+    $query = "SELECT * FROM Collaborators WHERE collaborator_id='$user_id' AND album_id=$album_id";
     $result = mysql_query($query, $con);
     if (!$result)
         die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -234,6 +238,7 @@ function create_album($user_id, $handle) {
 function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     global $s3;
     global $g_s3_bucket_name;
+    global $g_s3_folder_name;
 
     $tmp_image_path = $image_path . "_tmp";
 
@@ -263,7 +268,7 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     }
 
     if (!$s3->putObjectFile($tmp_image_path, $g_s3_bucket_name,
-                            "photos/" . $s3_name, S3::ACL_PUBLIC_READ)) {
+                            "$g_s3_folder_name/" . $s3_name, S3::ACL_PUBLIC_READ)) {
         return 1;
     }
 
@@ -608,6 +613,31 @@ function get_followers_user_info($album_id) {
 }
 
 
+function get_collaborators_user_info($album_id) {
+
+    global $con;
+
+    $query = "SELECT
+                Collaborators.follower_id,
+                Users.*
+              FROM Collaborators
+              LEFT JOIN Users
+              ON Collaborators.collaborator_id=Users.id
+              WHERE Collaborators.album_id='$album_id'";
+    $result = mysql_query($query, $con);
+
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $users_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $row["token"] = calculate_token_from_id($row["id"], "Users");
+        array_push($users_array, $row);
+    }
+
+    return $users_array;
+}
+
+
 function get_albumphotos_info($album_id) {
     global $con;
 
@@ -655,22 +685,23 @@ function get_albumphoto_info($albumphoto_id) {
     }
 }
 
-function get_friends_info($user_id) {
+function get_collaborators_info($album_id) {
 
    global $con;
 
-   $query = "SELECT friend_id
-             FROM Friends
-             WHERE user_id='$user_id'";
+   $query = "SELECT *
+             FROM Collaborators
+             WHERE album_id='$album_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
-    $friends_array = array();
+    $collaborators_array = array();
     while ($row = mysql_fetch_assoc($result)) {
-        $friend = get_user_info($row["friend_id"]);
-        array_push($friends_array, $friend);
+        $collaborator = get_user_info($row["collaborator_id"]);
+        $collaborator["collaborator_token"] = calculate_token($row["id"], $row["created"]);
+        array_push($collaborators_array, $collaborator);
     }
-    return $friends_array;
+    return $collaborators_array;
 
 }
 

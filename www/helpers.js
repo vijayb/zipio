@@ -115,11 +115,12 @@ function submitLogin() {
 
 function submitInvite() {
     $("#invite-submit").button("loading");
-    var emails = $("#invite-emails").val();
-    var urlString = "/send_invite_emails.php?emails=" + emails +
-                                           "&handle=" + gAlbum["handle"] +
-                                           "&username=" + gUser["username"] +
-                                           "&user_email=" + gUser["email"];
+    var emails = encodeURIComponent($("#invite-emails").val());
+    var urlString = "/add_collaborators_and_send_emails.php?emails=" + emails +
+                                                          "&inviter_id=" + gUser["id"] +
+                                                          "&album_id=" + gAlbum["id"] +
+                                                          "&inviter_token=" + gUser["token"] +
+                                                          "&album_token=" + gAlbum["token"];
 
     jQuery.ajax({
         type: "GET",
@@ -151,10 +152,10 @@ function submitForgotPassword() {
     });
 }
 
-function submitEmailToFollow(album_id) {
+function submitEmailToFollow(albumID) {
     $("#follow-submit").button("loading");
     var email = $("#follow-email").val();
-    var urlString = "/send_follow_email.php?email=" + email + "&album_id=" + album_id;
+    var urlString = "/send_follow_email.php?email=" + email + "&album_id=" + albumID;
 
     jQuery.ajax({
         type: "GET",
@@ -297,13 +298,33 @@ function setPasswordSubmitButton() {
 
 
 
+function deleteCollaborator(collaboratorID, collaboratorToken, albumID, albumToken) {
+    var urlString = "/delete_collaborator.php?collaborator_id=" + collaboratorID +
+                                            "&collaborator_token=" + collaboratorToken +
+                                            "&album_id=" + albumID +
+                                            "&album_token=" + albumToken;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#collaborator-" + collaboratorID).remove();
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+
+}
 
 
 
-function unfollowAlbum(user_id, album_id, token) {
+function unfollowAlbum(userID, albumID, token) {
     $("#unfollow-submit").button("loading");
 
-    var urlString = "/unfollow_album.php?user_id=" + user_id + "&album_id=" + album_id + "&token=" + token;
+    var urlString = "/unfollow_album.php?user_id=" + userID + "&album_id=" + albumID + "&token=" + token;
 
     jQuery.ajax({
         type: "GET",
@@ -321,20 +342,6 @@ function unfollowAlbum(user_id, album_id, token) {
 
 }
 
-function unfriend(user_id, friend_id) {
-    $("#unfriend-" + friend_id).button("loading");
-    var urlString = "/unfriend.php?friend_id=" + friend_id +"&user_id=" + user_id;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            $("#friend-listing-" + friend_id).remove();
-            $("#friends-table").load("_friends #friends-table")
-        },
-        async: true
-    });
-}
 
 function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
@@ -558,8 +565,8 @@ function getAlert(alert) {
         returnArr["text"]  = "";
         returnArr["class"] = "alert-error";
     } else if (alert == 6) {
-        returnArr["title"] = "Emails sent!";
-        returnArr["text"]  = "Now we play...the waiting game.";
+        returnArr["title"] = "Emails sent and collaborators added.";
+        returnArr["text"]  = "The people you just invited can now add photos to this album (they're now listed in the Album Collaborators list).";
         returnArr["class"] = "alert-success";
     }
 

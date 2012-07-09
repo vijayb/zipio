@@ -5,9 +5,11 @@
 1. Compile LESS and use static CSS in static_top.php
 2. Change $g_debug from 1 to 0 in constants.php
 3. Change $g_database from TEST to PROD in constants.php
+4. Change zipiyo to zipio in process_email.php (used in preg_match at least twice)
+5. Change the $g_s3_folder_name variable in constants.php from photos_test to photos
 
     TRUNCATE TABLE AlbumPhotos;
-    TRUNCATE TABLE AlbumAccessors;
+    TRUNCATE TABLE Collaborators;
     TRUNCATE TABLE Albums;
     TRUNCATE TABLE Photos;
     TRUNCATE TABLE Users;
@@ -17,7 +19,8 @@
 
 
 $g_s3_bucket_name = "s3.zipio.com";
-$g_s3_root = "http://s3.zipio.com/photos";
+$g_s3_folder_name = "photos_test";
+$g_s3_root = "http://s3.zipio.com/$g_s3_folder_name";
 $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
 
