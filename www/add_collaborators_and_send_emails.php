@@ -54,7 +54,7 @@ foreach ($emails as $email) {
             $user_id_corresponding_to_this_email = $user_info_corresponding_to_this_email["id"];
         }
 
-        create_collaborator($album_owner_info["id"], $user_id_corresponding_to_this_email, $album_id);
+        create_collaborator($user_id_corresponding_to_this_email, $album_id);
 
     }
 }

@@ -15,7 +15,7 @@ if (!isset($_GET["request"])) {
 
 $request = decrypt_json($_GET["request"]);
 
-$user_id = $request["user_id"];
+$user_id = $request["user_id"]; // The owner of the album who clicked the link that triggers this file
 $target_user_id = $request["target_user_id"];
 
 $album_info = get_album_info($request["album_id"]);

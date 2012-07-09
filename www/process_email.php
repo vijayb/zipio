@@ -250,7 +250,8 @@ EMAIL;
 EMAIL;
 
             $add_collaborator_ra = array();
-            $add_collaborator_ra["user_id"] = $user_info["id"];
+            $add_collaborator_ra["user_id"] = $target_user_info["id"];
+            $add_collaborator_ra["collaborator_id"] = $user_info["id"];
             $add_collaborator_ra["album_id"] = $target_album_id;
             $add_collaborator_ra["action"] = "add_collaborator";
             $add_collaborator_ra["timestamp"] = time();

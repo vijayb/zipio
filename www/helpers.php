@@ -90,17 +90,15 @@ function create_follower($album_owner_id, $follower_id, $album_id) {
 }
 
 
-function create_collaborator($album_owner_id, $collaborator_id, $album_id) {
+function create_collaborator($collaborator_id, $album_id) {
 
     global $con;
 
     $query ="INSERT INTO Collaborators (
                 collaborator_id,
-                album_owner_id,
                 album_id
               ) VALUES (
                 '$collaborator_id',
-                '$album_owner_id',
                 '$album_id'
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
