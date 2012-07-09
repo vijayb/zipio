@@ -217,6 +217,27 @@ HTML;
                     </ul>
                 </div>
             </div>
+
+
+     <div class="filter-buttons">
+        <div class="btn-group">
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 1);">1</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 2);">2</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 3);">3</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 4);">4</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 5);">5</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 6);">6</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 7);">7</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 8);">8</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 9);">9</button>
+            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 10);">10</button>
+
+            <button class="btn btn-inverse" onclick="saveFiltered({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg','{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg');">Save</button>
+            <button class="btn btn-inverse" onclick="undoFilter('{$albumphotos_array[$i]["id"]}');">Undo</button>
+        </div>
+    </div>
+
+
 HTML;
     }
 

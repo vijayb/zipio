@@ -809,35 +809,73 @@
      * @callback The callback function to be executed once the image
      *           has be loaded.
      **/
-    this.img = function(elemOrId, callback)
+    this.filter_and_cover_img = function(imgId, imgSrc, callback)
     {
-	//blah
-        var imgElem = (isString(elemOrId))? document.getElementById(elemOrId) : elemOrId;
+        var imgElem = document.getElementById(imgId);
         if (imgElem) {
+
             var img = new Image();
             img.onload = function()
             {
+		$("#"+imgId).parent().parent().find("canvas").remove();
+
                 var canvas = document.createElement("canvas");
                 canvas.width = img.width;
                 canvas.height = img.height;
+
+		var w = $("#"+imgId).width();
+		var h = $("#"+imgId).height();
+
+		canvas.getContext("2d").scale(w/canvas.width,h/canvas.height);
                 canvas.getContext("2d").drawImage(img, 0, 0);
                 var pos = findPos(imgElem);
                 var posP = findPos(imgElem.offsetParent);
                 canvas.style.top = Math.abs(pos.top - posP.top) + "px";
                 canvas.style.left = Math.abs(pos.left - posP.left) + "px";
                 canvas.style.position = "absolute";
+
+
                 if (imgElem.offsetParent) {
-                    imgElem.offsetParent.appendChild(canvas);
-                    //imgElem.style.display = "none";
+		    imgElem.offsetParent.insertBefore(canvas, imgElem.offsetParent.firstChild);
                 }
-                //img = null;
-                //imgElem = null;
                 callback(new filtr(canvas));
             };
-            img.src = imgElem.getAttribute("src");
+            img.src = imgSrc;
         } else {
             throw "Could not find image element with id: " + id;
         }
+    };
+
+
+
+    this.filter_and_save = function(imgID, imgSrc, callback)
+    {
+        var img = new Image();
+        img.onload = function()
+        {
+	    var canvas = document.createElement("canvas");
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+	    //alert(imgID);
+   
+            canvas.getContext("2d").drawImage(img, 0, 0);
+            callback(new filtr(canvas));
+
+	    var image = canvas.toDataURL("image/png");
+	    image = image.replace('data:image/png;base64,', '');
+
+	    $.ajax({
+		type: 'POST',
+		url: '/save_filtered.php',
+		sync: true, 
+		data: { 'imageData': image, 'imageSrc': imgSrc },
+		cache: false,
+		success: function (msg) {
+		}
+	    });
+        };
+        img.src = imgSrc;
     };
 
     /**
@@ -867,9 +905,9 @@
 
 
 /* Predefine our effects as functions for easy calling. */
-var EFFECTS = {
+var RUN_EFFECT = {
 
-    e1 : function(imageID) {
+    e1 : function(imageID, imageSrc) {
 
         /* This is the starting point to apply filtrr on your images.
          * Using the img() function you can pass in an id or the img element,
@@ -877,7 +915,7 @@ var EFFECTS = {
          * The callback function is given a filtr parameter which is a wrapper around
          * the canvas element, and contains all the filter and blending methods.
          */
-        filtrr.img(imageID, function(filtr) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
 
             /* filtr.duplicate() can be used to get a duplicate of the filtr object
              * so you can blend many together.*/
@@ -903,75 +941,61 @@ var EFFECTS = {
              */
             //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
 
-            /* Here I'm just removing the 'Working..' loader. */
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e2 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e2 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.saturation(0.3).posterize(70).tint([50, 35, 10], [190, 190, 230]);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e3 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e3 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.tint([60, 35, 10], [170, 170, 230]).contrast(0.8);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e4 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e4 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
+	    filtr.canvas().getContext("2d").scale(0.5,0.5);
         });
     },
 
-    e5 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e5 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.tint([30, 40, 30], [120, 170, 210])
                       .contrast(0.75)
                       .bias(1)
                       .saturation(0.6)
                       .brightness(20);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e6 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e6 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.saturation(0.4).contrast(0.75).tint([20, 35, 10], [150, 160, 230]);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e7 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e7 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             topFiltr.core.tint([20, 35, 10], [150, 160, 230]).saturation(0.6);
             filtr.core.adjust(0.1,0.7,0.4).saturation(0.6).contrast(0.8);
             filtr.blend.multiply(topFiltr);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e8 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
-            var startTime = (new Date).getTime();
+    e8 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             /* In this example we are creating 3 different duplicate layers. Each one is filtered
              * and then blended on the filtr object. Note that you could say blend topFiltr1 and
              * topFiltr2 together and then blend the resuln on filtr.
@@ -987,14 +1011,11 @@ var EFFECTS = {
             filtr.blend.softLight(topFiltr2);
             filtr.core.saturation(0.5).contrast(0.86);
             filtr.put();
-            console.log((new Date).getTime() - startTime);
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e9 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e9 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             var topFiltr1 = filtr.duplicate();
             topFiltr1.core.fill(226, 217, 113).saturation(0.2);
@@ -1004,28 +1025,151 @@ var EFFECTS = {
             filtr.blend.multiply(topFiltr);
             filtr.core.brightness(20).sharpen().contrast(1.1);
             filtr.put();
-            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
-            //$("#loader").fadeOut(100);
         });
     },
 
-    e10 : function(imageID) {
-        filtrr.img(imageID, function(filtr) {
+    e10 : function(imageID, imageSrc) {
+        filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.sepia().bias(0.6);
             filtr.put();
-            // filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
+        });
+    }
+};
 
-            var image = filtr.canvas().toDataURL("image/png");
-            image = image.replace('data:image/png;base64,', '');
 
-            $.ajax({
-                type: 'POST',
-                url: 'save.php',
-                data: { 'imageData': image },
-                cache: false,
-                success: function (msg) {
-                }
-            });
+
+
+
+
+
+/* Run effect and then run ajax call to send filtered image to backend */
+var SAVE_EFFECT = {
+
+    e1 : function(imageID, imageSrc) {
+
+        /* This is the starting point to apply filtrr on your images.
+         * Using the img() function you can pass in an id or the img element,
+         * and a callback function, to be called when the image has been loaded.
+         * The callback function is given a filtr parameter which is a wrapper around
+         * the canvas element, and contains all the filter and blending methods.
+         */
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+
+            /* filtr.duplicate() can be used to get a duplicate of the filtr object
+             * so you can blend many together.*/
+            var topFiltr = filtr.duplicate();
+
+            /* filtr.core contains all the core filters. Filter calls can be chained.
+             * filtr.blend contains all the blending modes. */
+            topFiltr.core.saturation(0).blur();
+
+            /* Here we are blending the topFiltr on top of the filtr object. */
+            filtr.blend.multiply(topFiltr);
+
+            /* All filters after a blending, will apply on the blended filtr object */
+            filtr.core.tint([60, 35, 10], [170, 140, 160]).contrast(0.8).brightness(10);
+
+            /* You need to call put() on a filtr object to see your filter applied on
+             * the image. This is explained in the commented version of filtrr.js */
+            filtr.put();
+
+            /* filtr also gives a reference to the underlying canvas object using filtr.canvas().
+             * This is very useful in drawing frames or other images on top - so for example you
+             * can draw the white frame as in my example, or a wrinkly pattern.
+             */
+            //filtr.canvas().getContext("2d").drawImage(whiteFrame, 0, 0);
+
+        });
+    },
+
+    e2 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.saturation(0.3).posterize(70).tint([50, 35, 10], [190, 190, 230]);
+            filtr.put();
+        });
+    },
+
+    e3 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.tint([60, 35, 10], [170, 170, 230]).contrast(0.8);
+            filtr.put();
+        });
+    },
+
+    e4 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
+            filtr.put();
+	    filtr.canvas().getContext("2d").scale(0.5,0.5);
+        });
+    },
+
+    e5 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.tint([30, 40, 30], [120, 170, 210])
+                      .contrast(0.75)
+                      .bias(1)
+                      .saturation(0.6)
+                      .brightness(20);
+            filtr.put();
+        });
+    },
+
+    e6 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.saturation(0.4).contrast(0.75).tint([20, 35, 10], [150, 160, 230]);
+            filtr.put();
+        });
+    },
+
+    e7 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            var topFiltr = filtr.duplicate();
+            topFiltr.core.tint([20, 35, 10], [150, 160, 230]).saturation(0.6);
+            filtr.core.adjust(0.1,0.7,0.4).saturation(0.6).contrast(0.8);
+            filtr.blend.multiply(topFiltr);
+            filtr.put();
+        });
+    },
+
+    e8 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            /* In this example we are creating 3 different duplicate layers. Each one is filtered
+             * and then blended on the filtr object. Note that you could say blend topFiltr1 and
+             * topFiltr2 together and then blend the resuln on filtr.
+             */
+            var topFiltr = filtr.duplicate();
+            var topFiltr1 = filtr.duplicate();
+            var topFiltr2 = filtr.duplicate();
+            topFiltr2.core.fill(167, 118, 12);
+            topFiltr1.core.gaussianBlur();
+            topFiltr.core.saturation(0);
+            filtr.blend.overlay(topFiltr);
+            filtr.blend.softLight(topFiltr1);
+            filtr.blend.softLight(topFiltr2);
+            filtr.core.saturation(0.5).contrast(0.86);
+            filtr.put();
+        });
+    },
+
+    e9 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            var topFiltr = filtr.duplicate();
+            var topFiltr1 = filtr.duplicate();
+            topFiltr1.core.fill(226, 217, 113).saturation(0.2);
+            topFiltr.core.gaussianBlur().saturation(0.2);
+            topFiltr.blend.multiply(topFiltr1);
+            filtr.core.saturation(0.2).tint([30, 45, 40], [110, 190, 110]);
+            filtr.blend.multiply(topFiltr);
+            filtr.core.brightness(20).sharpen().contrast(1.1);
+            filtr.put();
+        });
+    },
+
+    e10 : function(imageID, imageSrc) {
+        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+            filtr.core.sepia().bias(0.6);
+            filtr.put();
         });
     }
 };

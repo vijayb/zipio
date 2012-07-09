@@ -1,4 +1,5 @@
 var albumPrivacyContants = [];
+var imageFilters = {};
 
 albumPrivacyContants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
 albumPrivacyContants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
@@ -452,12 +453,27 @@ function checkUsernameIsUnique(prefix) {
 
 
 
+function applyFilter(imageID, imageSrc, filter) {
+    var imgID = "image-" + imageID;
+    RUN_EFFECT['e' + filter](imgID, imageSrc);
 
-
-function applyFilter(image, filter) {
-    EFFECTS['e' + filter](image);
+    imageFilters[imageID.toString()] = filter;
 }
 
+function undoFilter(imageID) {
+    delete imageFilters[imageID.toString()];
+    $("#image-"+imageID).parent().parent().find("canvas").remove();
+}
+
+
+function saveFiltered(imageID, croppedImageSrc, largeImageSrc) {
+    if (imageFilters.hasOwnProperty(imageID)) {
+	SAVE_EFFECT['e' + imageFilters[imageID]](imageID, croppedImageSrc);
+	SAVE_EFFECT['e' + imageFilters[imageID]](imageID, largeImageSrc);
+    } else {
+	alert("No filter selected");
+    }
+}
 
 
 

@@ -5,7 +5,6 @@ error_reporting(E_ALL | E_STRICT);
 
 define('CACHE_PATH', 'opticrop-cache/');
 
-
 function goto_homepage($args) {
     if (!isset($args)) $args = "";
     header("Location: $g_www_root/index.php$args");
