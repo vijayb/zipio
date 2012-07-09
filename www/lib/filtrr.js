@@ -811,6 +811,7 @@
      **/
     this.img = function(elemOrId, callback)
     {
+	//blah
         var imgElem = (isString(elemOrId))? document.getElementById(elemOrId) : elemOrId;
         if (imgElem) {
             var img = new Image();
