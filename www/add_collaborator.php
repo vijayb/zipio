@@ -15,69 +15,46 @@ if (!isset($_GET["request"])) {
 
 $request = decrypt_json($_GET["request"]);
 
-$user_id = $request["user_id"]; // The owner of the album who clicked the link that triggers this file
-$target_user_id = $request["target_user_id"];
+
+// The owner of the album who clicked the link that triggers this file
+$user_id = $request["user_id"];
+
+// The user to be added as a collaborator and the album for collaboration
+$collaborator_id = $request["collaborator_id"];
+$album_id = $request["album_id"];
+
 
 $album_info = get_album_info($request["album_id"]);
 
-$query = "INSERT INTO Friends (
-            user_id,
-            friend_id
-          ) VALUES (
-            '$target_user_id',
-            '$user_id'
-          ), (
-            '$user_id',
-            '$target_user_id'
-          ) ON DUPLICATE KEY UPDATE id=id";
-$result = mysql_query($query, $con);
-if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
+create_collaborator($collaborator_id, $album_id);
 
+// Now, all of collabortor_id's photos that live in target_user_id's albums need to be made visible
 
-// Now, all of user_id's photos that live in target_user_id's albums need to be made visible
-
-$query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_owner_id=$user_id AND album_owner_id=$target_user_id";
+$query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_owner_id=$collaborator_id AND album_id=$user_id";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 
 $user_info = get_user_info($user_id);
-$target_user_info = get_user_info($target_user_id);
-
-$output = <<<EMAIL
-    You've added {$user_info["username"]} (that's {$user_info["email"]}) as a friend. You can now add to each other's albums.
-EMAIL;
-
-print($output);
+$collaborator_info = get_user_info($collaborator_id);
 
 $display_album_ra = array();
-$display_album_ra["user_id"] = $user_info["id"];
-$display_album_ra["token"] = $user_info["token"];
+$display_album_ra["user_id"] = $collaborator_id;
+$display_album_ra["token"] = $collaborator_info["token"];
 $display_album_ra["timestamp"] = time();
-$display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+$display_album_link = $g_www_root . "/" . $user_info["username"] . "/" . $album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
 
-$target_user_email_body = <<<EMAIL
-    A reminder that you added <b>{$user_info["username"]}</b> (that's {$user_info["email"]}) as a friend.
+$collaborator_email_body = <<<EMAIL
+    Good news, you can now add photos to <b>{$user_info["username"]}</b>'s (that's {$user_info["email"]}) <b>{$album_info["handle"]}</b> album.
     <br><br>
-    You can now add photos to each other's albums.
+    Any photos you've already tried to add to the album are now in the album. <a href='{$display_album_link}'>See the album</a>.
 EMAIL;
 
+send_email($collaborator_info["email"], $g_founders_email_address, "Zipio activity notification", $collaborator_email_body);
 
-$user_email_body = <<<EMAIL
-    <b>{$target_user_info["username"]}</b> (that's {$target_user_info["email"]}) added you as a friend.
-    <br><br>
-    Your photos now appear in <b>{$target_user_info["username"]}</b>'s {$album_info["handle"]} album.
-    <a href='{$display_album_link}'>See album</a>
-EMAIL;
+$url =  $g_www_root . "/" . $user_info["username"] . "/" . $album_info["handle"] . "#alert=3&email=" . $collaborator_info["email"];
 
-send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);
-send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
-
-$url =  $g_www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
-
-login_user($target_user_id);
-
-create_follower($target_user_id, $user_id, $album_info["id"]);
+login_user($user_id);
 
 header("Location: $url");
 

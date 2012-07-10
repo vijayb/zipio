@@ -8,21 +8,18 @@ require("db.php");
 require("helpers.php");
 
 if (!isset($_GET["collaborator_id"]) ||
-    !isset($_GET["collaborator_token"]) ||
     !isset($_GET["album_id"]) ||
     !isset($_GET["album_token"])
     ) {
     exit();
 } else {
     $collaborator_id = $_GET["collaborator_id"];
-    $collaborator_token = $_GET["collaborator_token"];
     $album_id = $_GET["album_id"];
     $album_token = $_GET["album_token"];
 }
 
-if (!check_token($collaborator_id, $collaborator_token, "Collaborators") ||
-    !check_token($album_id, $album_token, "Albums")
-    ) {
+
+if (!check_token($album_id, $album_token, "Albums")) {
     print("0");
     exit();
 }

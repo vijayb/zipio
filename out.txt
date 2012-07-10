@@ -1,0 +1,130 @@
+CREATE TABLE IF NOT EXISTS `AlbumPhotos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `photo_id` int(11) unsigned NOT NULL,
+  `photo_owner_id` int(11) unsigned NOT NULL,
+  `album_id` int(11) unsigned NOT NULL,
+  `album_owner_id` int(11) unsigned NOT NULL,
+  `visible` int(11) NOT NULL DEFAULT '1',
+  `filter_code` int(11) NOT NULL DEFAULT '0',
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY (`photo_id`),
+  KEY (`album_id`),
+  UNIQUE KEY `photo_album_key` (`photo_id`, `album_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `Albums` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL,
+  `cover_albumphoto_id` int(11) unsigned NOT NULL,
+  `handle` varchar(100) DEFAULT NULL,
+  `handle_hash` binary(20) NOT NULL,
+  `title` varchar(500) DEFAULT NULL,
+  `caption` varchar(2000) DEFAULT NULL,
+  `read_permissions` int(11) unsigned NOT NULL DEFAULT 3,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `num_views` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY (`user_id`),
+  KEY (`handle_hash`),
+  UNIQUE KEY `handle_user_key` (`handle_hash`, `user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+DROP TRIGGER IF EXISTS `albumstrigger`;
+
+DELIMITER //
+CREATE TRIGGER `albumstrigger` BEFORE INSERT ON `Albums`
+ FOR EACH ROW SET
+    NEW.handle_hash = UNHEX(SHA1(NEW.handle))
+//
+DELIMITER ;CREATE TABLE IF NOT EXISTS `Collaborators` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `album_id` int(11) unsigned NOT NULL,
+  `collaborator_id` int(11) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY (`album_id`),
+  KEY (`collaborator_id`),
+  UNIQUE KEY `collaborator_key` (`collaborator_id`, `album_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;CREATE TABLE IF NOT EXISTS `Followers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `follower_id` int(11) unsigned NOT NULL,
+  `album_owner_id` int(11) unsigned NOT NULL,
+  `album_id` int(11) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY (`follower_id`),
+  KEY (`album_id`),
+  KEY (`album_owner_id`),
+  UNIQUE KEY `follower_key` (`follower_id`, `album_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `Photos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) unsigned NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `s3_url` varchar(1000) DEFAULT NULL,
+  `s3_url_hash` binary(20) NOT NULL,
+  `num_views` int(11) NOT NULL,
+  `caption` varchar(1000) DEFAULT NULL,
+  `width` int(11) NOT NULL,
+  `height` int(11) NOT NULL,
+  `mime_type` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `s3_url_hash` (`s3_url_hash`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+DROP TRIGGER IF EXISTS `photostrigger`;
+
+DELIMITER //
+CREATE TRIGGER `photostrigger` BEFORE INSERT ON `Photos`
+ FOR EACH ROW SET
+    NEW.s3_url_hash = UNHEX(SHA1(NEW.s3_url))
+//
+DELIMITER ;
+CREATE TABLE IF NOT EXISTS `Users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) NOT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
+  `zipcode` varchar(20) DEFAULT NULL,
+  `last_seen` datetime NOT NULL,
+  `visits` int(11) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `utm` varchar(255) NOT NULL,
+  `session_id` varchar(255) NOT NULL,
+  `session_created` datetime NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `subscribed` tinyint(1) NOT NULL DEFAULT '0',
+  `last_emailed` datetime DEFAULT NULL,
+  `email_frequency` int(11) NOT NULL DEFAULT '86400',
+  `referrer` int(11) DEFAULT NULL,
+  `username_hash` binary(20) NOT NULL,
+  `email_hash` binary(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_hash` (`email_hash`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+DROP TRIGGER IF EXISTS `userstrigger`;
+
+DELIMITER //
+CREATE TRIGGER `userstrigger` BEFORE INSERT ON `Users`
+    FOR EACH ROW BEGIN
+        SET NEW.email_hash = UNHEX(SHA1(NEW.email));
+        SET NEW.username_hash = UNHEX(SHA1(NEW.username));
+    END;
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER `userstrigger2` BEFORE UPDATE ON `Users`
+    FOR EACH ROW BEGIN
+        SET NEW.email_hash = UNHEX(SHA1(NEW.email));
+        SET NEW.username_hash = UNHEX(SHA1(NEW.username));
+    END;
+//
+DELIMITER ;

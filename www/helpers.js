@@ -1,9 +1,9 @@
-var albumPrivacyContants = [];
+var albumPrivacyConstants = [];
 var imageFilters = {};
 
-albumPrivacyContants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
-albumPrivacyContants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
-albumPrivacyContants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
+albumPrivacyConstants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
+albumPrivacyConstants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
+albumPrivacyConstants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
 
 function changeFilter(photoID, albumphotoID, filter) {
     var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
@@ -299,9 +299,8 @@ function setPasswordSubmitButton() {
 
 
 
-function deleteCollaborator(collaboratorID, collaboratorToken, albumID, albumToken) {
+function deleteCollaborator(collaboratorID, albumID, albumToken) {
     var urlString = "/delete_collaborator.php?collaborator_id=" + collaboratorID +
-                                            "&collaborator_token=" + collaboratorToken +
                                             "&album_id=" + albumID +
                                             "&album_token=" + albumToken;
 
@@ -466,12 +465,11 @@ function undoFilter(imageID) {
 }
 
 
-function saveFiltered(imageID, croppedImageSrc, largeImageSrc) {
+function saveFiltered(imageID, croppedImageSrc, bigImageSrc) {
     if (imageFilters.hasOwnProperty(imageID)) {
-	SAVE_EFFECT['e' + imageFilters[imageID]](imageID, croppedImageSrc);
-	SAVE_EFFECT['e' + imageFilters[imageID]](imageID, largeImageSrc);
+        SAVE_EFFECT['e' + imageFilters[imageID]](imageID, croppedImageSrc, bigImageSrc);
     } else {
-	alert("No filter selected");
+        alert("No filter selected");
     }
 }
 
@@ -569,12 +567,12 @@ function getAlert(alert) {
         returnArr["text"]  = "";
         returnArr["class"] = "alert-success";
     } else if (alert == 3) {
-        returnArr["title"] = "You've successfully added a friend.";
-        returnArr["text"]  = "Your friend can now add photos to this album.";
+        returnArr["title"] = hashParams["email"] + " can now add photos to this album.";
+        returnArr["text"]  = "We'll email " + hashParams["email"] + " when this album is updated.";
         returnArr["class"] = "alert-success";
     } else if (alert == 4) {
         returnArr["title"] = "Album settings have been saved.";
-        returnArr["text"]  = "This is now a " + albumPrivacyContants[hashParams["setting"]] + " album.";
+        returnArr["text"]  = "This is now a " + albumPrivacyConstants[hashParams["setting"]] + " album.";
         returnArr["class"] = "alert-success";
     } else if (alert == 5) {
         returnArr["title"] = "The user '" + hashParams["username"] + "' doesn't exist.";

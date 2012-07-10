@@ -1,10 +1,3 @@
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-
 CREATE TABLE IF NOT EXISTS `AlbumPhotos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `photo_id` int(11) unsigned NOT NULL,
@@ -12,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `AlbumPhotos` (
   `album_id` int(11) unsigned NOT NULL,
   `album_owner_id` int(11) unsigned NOT NULL,
   `visible` int(11) NOT NULL DEFAULT '1',
-  `filter_code` int(11) NOT NULL DEFAULT '0',
+  `filtered` int(11) NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY (`photo_id`),

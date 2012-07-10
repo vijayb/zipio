@@ -149,7 +149,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Hi, <?php print($_SESSION["user_info"]["name"]); ?>!</h2>
+        <h2>Hi, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
         <h3>Set a password and change your username (if you want)</h3>
     </div>
 
@@ -496,7 +496,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 
-
+<!--
 <div class="navbar navbar-fixed-bottom">
 
 
@@ -508,7 +508,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 if ($_SERVER["HTTP_HOST"] == "localhost") {
     $html = <<<HTML
-    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
+    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
         {$_SERVER["HTTP_HOST"]}
     </div>
 HTML;
@@ -566,7 +566,7 @@ HTML;
 ?>
 
 </div>
-
+-->
 
 <div class="container">
 

@@ -51,7 +51,6 @@ $confirmation_number = rand_string(5);
 if (!class_exists('S3')) require_once 'S3.php';
 if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
 if (!defined('awsSecretKey')) define('awsSecretKey', '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');
-
 $s3 = new S3(awsAccessKey, awsSecretKey);
 
 
@@ -169,7 +168,7 @@ if ($target_album_id > 0) {
             array_push($s3_urls, $s3_url);
         }
         output("TIME 6.2: " . (time() - $start_time) . "\n");
-        // email_followers($target_album_info, $s3_urls);
+        email_newly_added_photos_to_collaborators($target_album_info, $s3_urls);
         output("TIME 6.3: " . (time() - $start_time) . "\n");
 
         $display_album_ra = array();
@@ -179,7 +178,7 @@ if ($target_album_id > 0) {
 
         $user_email_body = <<<EMAIL
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
-            <a href='{$display_album_link}'>See the album!</a>
+            <a href='{$display_album_link}'>See the album</a>!
             <br><br>
             To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 
@@ -201,7 +200,7 @@ EMAIL;
                 add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            // email_followers($target_album_info, $s3_urls);
+            email_newly_added_photos_to_collaborators($target_album_info, $s3_urls);
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
@@ -215,12 +214,12 @@ EMAIL;
 
             $user_email_body = <<<EMAIL
                 You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                <a href='{$display_album_link}'>See the album!</a>
+                <a href='{$display_album_link}'>See the album</a>!
 EMAIL;
 
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
-                 <a href='{$owner_display_album_link}'>See the album!</a>
+                 <a href='{$owner_display_album_link}'>See the album</a>!
 EMAIL;
 
             output("TIME 8: " . (time() - $start_time) . "\n");
@@ -235,7 +234,9 @@ EMAIL;
                 add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            // email_followers($target_album_info, $s3_urls);
+            // We don't email collaborators about these photos because the
+            // sender of the photos has not been approved (yet) by the owner of
+            // the album.
 
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
@@ -246,7 +247,7 @@ EMAIL;
                 You tried to add a photo to <b>{$target_user_info["username"]}</b>'s (that's {$target_user_info["email"]}) <b>{$target_album_info["handle"]}</b> album.
                 <br><br>
                 Your photo will appear in the album once <b>{$target_user_info["username"]}</b> says you're allowed to post to this album.
-                <a href='{$display_album_link}'>See the album!</a>
+                <a href='{$display_album_link}'>See the album</a>!
 EMAIL;
 
             $add_collaborator_ra = array();
@@ -293,7 +294,7 @@ EMAIL;
                 output("Adding albumphoto $current_albumphoto_id added to album $target_album_id\n");
             }
         }
-        // email_followers($target_album_info, $s3_urls);
+        email_newly_added_photos_to_collaborators($target_album_info, $s3_urls);
         output("TIME 9: " . (time() - $start_time) . "\n");
 
 
@@ -304,7 +305,7 @@ EMAIL;
 
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
-            <a href='{$display_album_link}'>See the album!</a>
+            <a href='{$display_album_link}'>See the album</a>!
             <br><br>
             To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 EMAIL;

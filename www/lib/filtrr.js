@@ -817,16 +817,16 @@
             var img = new Image();
             img.onload = function()
             {
-		$("#"+imgId).parent().parent().find("canvas").remove();
+        $("#"+imgId).parent().parent().find("canvas").remove();
 
                 var canvas = document.createElement("canvas");
                 canvas.width = img.width;
                 canvas.height = img.height;
 
-		var w = $("#"+imgId).width();
-		var h = $("#"+imgId).height();
+        var w = $("#"+imgId).width();
+        var h = $("#"+imgId).height();
 
-		canvas.getContext("2d").scale(w/canvas.width,h/canvas.height);
+        canvas.getContext("2d").scale(w/canvas.width,h/canvas.height);
                 canvas.getContext("2d").drawImage(img, 0, 0);
                 var pos = findPos(imgElem);
                 var posP = findPos(imgElem.offsetParent);
@@ -836,7 +836,7 @@
 
 
                 if (imgElem.offsetParent) {
-		    imgElem.offsetParent.insertBefore(canvas, imgElem.offsetParent.firstChild);
+            imgElem.offsetParent.insertBefore(canvas, imgElem.offsetParent.firstChild);
                 }
                 callback(new filtr(canvas));
             };
@@ -848,34 +848,67 @@
 
 
 
-    this.filter_and_save = function(imgID, imgSrc, callback)
-    {
-        var img = new Image();
-        img.onload = function()
-        {
-	    var canvas = document.createElement("canvas");
+    this.filter_and_save = function(albumphotoID, croppedImgSrc, bigImgSrc, callback) {
+        var croppedImg = new Image();
+        var bigImg = new Image();
 
-            canvas.width = img.width;
-            canvas.height = img.height;
-	    //alert(imgID);
-   
-            canvas.getContext("2d").drawImage(img, 0, 0);
-            callback(new filtr(canvas));
+        croppedImg.src = croppedImgSrc;
+        bigImg.src = bigImgSrc;
 
-	    var image = canvas.toDataURL("image/png");
-	    image = image.replace('data:image/png;base64,', '');
+        var function2 = function(croppedImg, bigImg, albumphotoID) {
+            // Once for the small image...
+            var croppedCanvas = document.createElement("canvas");
 
-	    $.ajax({
-		type: 'POST',
-		url: '/save_filtered.php',
-		sync: true, 
-		data: { 'imageData': image, 'imageSrc': imgSrc },
-		cache: false,
-		success: function (msg) {
-		}
-	    });
+            croppedCanvas.width = croppedImg.width;
+            croppedCanvas.height = croppedImg.height;
+
+            croppedCanvas.getContext("2d").drawImage(croppedImg, 0, 0);
+            callback(new filtr(croppedCanvas));
+
+            var croppedImgData = croppedCanvas.toDataURL("image/jpeg");
+            croppedImgData = croppedImgData.replace('data:image/jpeg;base64,', '');
+
+            // And now for the big image...
+            var bigCanvas = document.createElement("canvas");
+
+            bigCanvas.width = bigImg.width;
+            bigCanvas.height = bigImg.height;
+
+            bigCanvas.getContext("2d").drawImage(bigImg, 0, 0);
+            callback(new filtr(bigCanvas));
+
+            var bigImgData = bigCanvas.toDataURL("image/jpeg");
+            bigImgData = bigImgData.replace('data:image/jpeg;base64,', '');
+
+            // Save the images on S3
+            $.ajax({
+                type: 'POST',
+                url: '/save_filtered.php',
+                sync: true,
+                data: {
+                    'albumphoto_id': albumphotoID,
+                    'cropped_image_data': croppedImgData,
+                    'cropped_image_src': croppedImgSrc,
+                    'big_image_data': bigImgData,
+                    'big_image_src': bigImgSrc
+                },
+                cache: false,
+                success: function(data) {
+                    console.log(data);
+                }
+            });
         };
-        img.src = imgSrc;
+
+        var function1 = function(croppedImg, bigImg, albumphotoID) {
+            $(bigImg).on("load", function() {
+                function2(croppedImg, bigImg, albumphotoID);
+            });
+        };
+
+        $(croppedImg).on("load", function() {
+            function1(croppedImg, bigImg, albumphotoID);
+        });
+
     };
 
     /**
@@ -962,7 +995,7 @@ var RUN_EFFECT = {
         filtrr.filter_and_cover_img(imageID, imageSrc, function(filtr) {
             filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
             filtr.put();
-	    filtr.canvas().getContext("2d").scale(0.5,0.5);
+        filtr.canvas().getContext("2d").scale(0.5,0.5);
         });
     },
 
@@ -1045,7 +1078,7 @@ var RUN_EFFECT = {
 /* Run effect and then run ajax call to send filtered image to backend */
 var SAVE_EFFECT = {
 
-    e1 : function(imageID, imageSrc) {
+    e1 : function(imageID, croppedImgSrc, bigImageSrc) {
 
         /* This is the starting point to apply filtrr on your images.
          * Using the img() function you can pass in an id or the img element,
@@ -1053,7 +1086,7 @@ var SAVE_EFFECT = {
          * The callback function is given a filtr parameter which is a wrapper around
          * the canvas element, and contains all the filter and blending methods.
          */
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
 
             /* filtr.duplicate() can be used to get a duplicate of the filtr object
              * so you can blend many together.*/
@@ -1082,30 +1115,30 @@ var SAVE_EFFECT = {
         });
     },
 
-    e2 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e2 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.saturation(0.3).posterize(70).tint([50, 35, 10], [190, 190, 230]);
             filtr.put();
         });
     },
 
-    e3 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e3 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.tint([60, 35, 10], [170, 170, 230]).contrast(0.8);
             filtr.put();
         });
     },
 
-    e4 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e4 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
             filtr.put();
-	    filtr.canvas().getContext("2d").scale(0.5,0.5);
+        filtr.canvas().getContext("2d").scale(0.5,0.5);
         });
     },
 
-    e5 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e5 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.tint([30, 40, 30], [120, 170, 210])
                       .contrast(0.75)
                       .bias(1)
@@ -1115,15 +1148,15 @@ var SAVE_EFFECT = {
         });
     },
 
-    e6 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e6 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.saturation(0.4).contrast(0.75).tint([20, 35, 10], [150, 160, 230]);
             filtr.put();
         });
     },
 
-    e7 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e7 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             topFiltr.core.tint([20, 35, 10], [150, 160, 230]).saturation(0.6);
             filtr.core.adjust(0.1,0.7,0.4).saturation(0.6).contrast(0.8);
@@ -1132,8 +1165,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e8 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e8 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             /* In this example we are creating 3 different duplicate layers. Each one is filtered
              * and then blended on the filtr object. Note that you could say blend topFiltr1 and
              * topFiltr2 together and then blend the resuln on filtr.
@@ -1152,8 +1185,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e9 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e9 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             var topFiltr1 = filtr.duplicate();
             topFiltr1.core.fill(226, 217, 113).saturation(0.2);
@@ -1166,8 +1199,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e10 : function(imageID, imageSrc) {
-        filtrr.filter_and_save(imageID, imageSrc, function(filtr) {
+    e10 : function(imageID, croppedImgSrc, bigImageSrc) {
+        filtrr.filter_and_save(imageID, croppedImgSrc, bigImageSrc, function(filtr) {
             filtr.core.sepia().bias(0.6);
             filtr.put();
         });

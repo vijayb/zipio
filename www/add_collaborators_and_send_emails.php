@@ -56,25 +56,29 @@ foreach ($emails as $email) {
 
         create_collaborator($user_id_corresponding_to_this_email, $album_id);
 
-    }
-}
+        $display_album_ra = array();
+        $display_album_ra["user_id"] = $user_id_corresponding_to_this_email;
+        $display_album_ra["timestamp"] = time();
+        $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"];
+        $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
 
-$email_body = <<<EMAIL
+        $email_body = <<<EMAIL
 
-I've posted some photos online and want you to add more photos to the album. Here's the album:
-<br><br>
-{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}
-<br><br>
-To add photos, email them to:
-<br><br>
-{$album_info["handle"]}@{$album_owner_info["username"]}.zipio.com
+            I've posted some photos online and want you to add more photos to the album. Here's the album:
+            <br><br>
+            <a href="{$display_album_link}">{$display_album_pretty_link}</a>
+            <br><br>
+            To add photos, email them to:
+            <br><br>
+            {$album_info["handle"]}@{$album_owner_info["username"]}.zipio.com
 
 EMAIL;
 
 
-foreach ($valid_emails as $email) {
-    send_email($email, $album_owner_info["email"], "Check out my photos (and add your own)", $email_body);
+        send_email($email, $album_owner_info["email"], "Check out my photos (and add your own)", $email_body);
+
+    }
 }
 
 print(json_encode($valid_emails));

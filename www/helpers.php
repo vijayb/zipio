@@ -232,47 +232,6 @@ function create_album($user_id, $handle) {
     return $album_id;
 }
 
-function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
-    global $s3;
-    global $g_s3_bucket_name;
-    global $g_s3_folder_name;
-
-    $tmp_image_path = $image_path . "_tmp";
-
-    $image->writeImage($tmp_image_path);
-    if ($filter == 1) { // tilt shift
-        exec("/usr/bin/convert \( $tmp_image_path -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite $tmp_image_path");
-    } else if ($filter == 2) { // gotham
-        $cmd = "/usr/bin/convert $tmp_image_path -modulate 120,10,100 -fill '#222b6d' -colorize 20 -gamma 0.5 -contrast -contrast $tmp_image_path";
-        exec($cmd);
-        echo "[$cmd]<BR>\n";
-        $cmd = "/usr/bin/convert $tmp_image_path -bordercolor 'black' -border {20}x{20} $tmp_image_path";
-        echo "[$cmd]<BR>\n";
-        exec($cmd);
-    } else if ($filter == 3) { // kelvin
-        $cmd = "/usr/bin/convert \( $tmp_image_path -auto-gamma -modulate 120,50,100 \) \( -size ".$image->getImageWidth()."x".$image->getImageHeight()." -fill rgba\(255,153,0,0.5\) -draw 'rectangle 0,0 ".$image->getImageWidth().",".$image->getImageHeight()."' \) -compose multiply $tmp_image_path";
-        echo "[$cmd]<BR>\n";
-        exec($cmd);
-        // also need to add border for kelvin...
-    } else if ($filter == 4) { // lomo-fi
-        exec("/usr/bin/convert $tmp_image_path -channel R -level 33% -channel G -level 33% $tmp_image_path");
-    } else if ($filter == 5) { // toaster
-        exec("/usr/bin/convert $tmp_image_path -modulate 150,80,100 -gamma 1.2 -contrast -contrast $tmp_image_path");
-    } else if ($filter == 6) { // nashville
-        exec("/usr/bin/convert $tmp_image_path -contrast -modulate 100,150,100 -auto-gamma $tmp_image_path");
-    } else { // No filter
-
-    }
-
-    if (!$s3->putObjectFile($tmp_image_path, $g_s3_bucket_name,
-                            "$g_s3_folder_name/" . $s3_name, S3::ACL_PUBLIC_READ)) {
-        return 1;
-    }
-
-    unlink($tmp_image_path);
-    return 0;
-}
-
 //$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
 
 function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
@@ -283,68 +242,90 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
     global $con;
     global $s3;
+    global $g_s3_bucket_name;
+    global $g_s3_folder_name;
 
     $visible_string = "";
     if (!$visible) $visible_string = "<b>invisible</b>";
 
-    $s3_url =
-        $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
-    $s3_url_parameter = $s3_url;
+    // 1_1_pu423oriu34pour234pu_cropped
+    // 1_1_pu423oriu34pour234pu_big
+    // 1_1_pu423oriu34pour234pu_cropped_filtered
+    // 1_1_pu423oriu34pour234pu_big_filtered
 
-    $sizes = array(1024);
-    $max_size = max($sizes);
+    $s3_base_image_url =
+        $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
+    $s3_url_parameter = $s3_base_image_url;
+
+    $big_size = 1024;
+    $cropped_size = 300;
 
     $failed = 0;
 
     $image = new imagick($path_to_photo);
+    $image->setImageFormat('jpeg');
     $image->setImageCompression(Imagick::COMPRESSION_JPEG);
-    $image->setImageCompressionQuality(65);
+    $image->setImageCompressionQuality(85);
     $image->stripImage();
 
-    for ($ii = 0; $ii < count($sizes); $ii++) {
-        // Scale the image, indeud
-        $tmpimage = clone $image;
-        $tmpimage->scaleImage($sizes[$ii], $sizes[$ii], true);
+    $big_image = clone $image;
+    $big_image->scaleImage($big_size, $big_size, true);
 
-        for ($filter = 0; $filter <= 0; $filter++) {
-            $s3_name = $s3_url . "_" . $sizes[$ii] . "_" . $filter;
-            $failed = $failed || filterImageAndWriteToS3($tmpimage,
-                                                         $path_to_photo,
-                                                         $s3_name,
-                                                         $filter);
-        }
+    $s3_big_image_name = $s3_base_image_url . "_big";
+    $big_image_path = $path_to_photo . "_big";
+    $big_image->writeImage($big_image_path);
+
+    if (!$s3->putObjectFile($big_image_path,
+                            $g_s3_bucket_name,
+                            "$g_s3_folder_name/" . $s3_big_image_name,
+                            S3::ACL_PUBLIC_READ)) {
+        $failed = 1;
     }
+
+
+
+
+
 
     $cropped_image = clone $image;
+
     if ($image->getImageWidth() > $image->getImageHeight()) {
-        $cropped_image->scaleImage(0, 300);
+        $cropped_image->scaleImage(0, $cropped_size);
     } else {
-        $cropped_image->scaleImage(300, 0);
-    }
-    $cropped_path = $path_to_photo."_cropped";
-    opticrop($cropped_image, 300, 300, $cropped_path);
-
-    $cropped_image = new imagick($cropped_path);
-
-    for ($filter = 0; $filter <= 0; $filter++) {
-        $s3_name = $s3_url."_cropped_" . $filter;
-        $failed = $failed || filterImageAndWriteToS3($cropped_image,
-                                                     $path_to_photo,
-                                                     $s3_name,
-                                                     $filter);
+        $cropped_image->scaleImage($cropped_size, 0);
     }
 
-    unlink($cropped_path);
+    $s3_cropped_image_name = $s3_base_image_url . "_cropped";
+    $cropped_image_path = $path_to_photo."_cropped";
+    opticrop($cropped_image, $cropped_size, $cropped_size, $cropped_image_path);
+
+    if (!$s3->putObjectFile($cropped_image_path,
+                            $g_s3_bucket_name,
+                            "$g_s3_folder_name/" . $s3_cropped_image_name,
+                            S3::ACL_PUBLIC_READ)) {
+        $failed = 1;
+    }
+
+
+    unlink($big_image_path);
+    unlink($cropped_image_path);
+
+    $image_properties = $big_image->identifyImage();
+
 
     if (!$failed) {
         $query = "INSERT INTO Photos (
                     user_id,
                     s3_url,
-                    max_size
+                    width,
+                    height,
+                    mime_type
                   ) VALUES (
                     '$owner_user_id',
-                    '$s3_url',
-                    $max_size
+                    '$s3_base_image_url',
+                    " . $big_image->getImageWidth() . ",
+                    " . $big_image->getImageHeight() . ",
+                    'image/jpeg'
                   ) ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
@@ -403,6 +384,59 @@ EMAIL;
     }
 
 }
+
+
+
+
+
+
+
+function email_newly_added_photos_to_collaborators($album_info, $s3_urls) {
+
+    global $con;
+    global $g_www_root;
+    global $g_s3_root;
+
+    $query = "SELECT
+                Collaborators.collaborator_id,
+                Users.email
+              FROM Collaborators
+              LEFT JOIN Users
+              ON collaborator_id=Users.id
+              WHERE Collaborators.album_id=" . $album_info["id"];
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+
+    $album_owner_info = get_user_info($album_info["user_id"]);
+
+    $pictures_html = "";
+    for ($i = 0; $i < count($s3_urls); $i++) {
+        $pictures_html .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
+    }
+
+    while ($row = mysql_fetch_assoc($result)) {
+
+        $display_album_ra = array();
+        $display_album_ra["user_id"] = $row["collaborator_id"];
+        $display_album_ra["timestamp"] = time();
+        $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"];
+        $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+
+        $collaborator_email_body = <<<EMAIL
+            Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
+            <br><br>
+EMAIL;
+        $collaborator_email_body .= $pictures_html;
+
+        send_email($row["email"], $g_founders_email_address, "New photos!", $collaborator_email_body);
+    }
+
+}
+
+
+
+
+
 
 
 /** return 1 if user is following album
@@ -610,31 +644,6 @@ function get_followers_user_info($album_id) {
 }
 
 
-function get_collaborators_user_info($album_id) {
-
-    global $con;
-
-    $query = "SELECT
-                Collaborators.follower_id,
-                Users.*
-              FROM Collaborators
-              LEFT JOIN Users
-              ON Collaborators.collaborator_id=Users.id
-              WHERE Collaborators.album_id='$album_id'";
-    $result = mysql_query($query, $con);
-
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $users_array = array();
-    while ($row = mysql_fetch_assoc($result)) {
-        $row["token"] = calculate_token_from_id($row["id"], "Users");
-        array_push($users_array, $row);
-    }
-
-    return $users_array;
-}
-
-
 function get_albumphotos_info($album_id) {
     global $con;
 
@@ -662,9 +671,8 @@ function get_albumphoto_info($albumphoto_id) {
                 album_id,
                 album_owner_id,
                 visible,
-                filter_code,
+                filtered,
                 s3_url,
-                max_size,
                 AlbumPhotos.created
               FROM AlbumPhotos
               LEFT JOIN Photos
@@ -695,7 +703,6 @@ function get_collaborators_info($album_id) {
     $collaborators_array = array();
     while ($row = mysql_fetch_assoc($result)) {
         $collaborator = get_user_info($row["collaborator_id"]);
-        $collaborator["collaborator_token"] = calculate_token($row["id"], $row["created"]);
         array_push($collaborators_array, $collaborator);
     }
     return $collaborators_array;

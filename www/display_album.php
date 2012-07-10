@@ -183,6 +183,8 @@ $third_row = $following_html;
 $albumphotos_array = get_albumphotos_info($album_to_display);
 $albumphotos_array_js = "";
 
+$photo_owners = array();
+
 for ($i = 0; $i < count($albumphotos_array); $i++) {
     if ($albumphotos_array[$i]["visible"] == 0) {
         $opacity = "0.4";
@@ -190,13 +192,29 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $opacity = "1.0";
     }
 
-    $albumphotos_array_js .= "'" . $g_s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_" . $albumphotos_array[$i]["max_size"] . "_" . $albumphotos_array[$i]["filter_code"] . "',";
+    $albumphotos_array_js .= "'" . $g_s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_big',";
+
+    if ($albumphotos_array[$i]["filtered"] > 0) {
+        $is_filtered = "_filtered";
+    } else {
+        $is_filtered = "";
+    }
+
+    if (isset($photo_owners[$albumphotos_array[$i]["photo_owner_id"]])) {
+        $photo_owner = $photo_owners[$albumphotos_array[$i]["photo_owner_id"]];
+    } else {
+        $photo_owner = get_user_info($albumphotos_array[$i]["photo_owner_id"]);
+        $photo_owners[$albumphotos_array[$i]["photo_owner_id"]] = $photo_owner;
+    }
 
     $html = <<<HTML
 
         <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
-            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}">
-                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
+            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big">
+                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
+            <div class="album-privacy">
+                {$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}
+            </div>
             </a>
 HTML;
 
@@ -209,33 +227,21 @@ HTML;
                         <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]},
-                                                                                        '{$albumphotos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo
-                            </a>
-                        </li>
+                        <li><a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}');"><i class="icon-trash"></i> Delete this photo</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 1);">1</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 2);">2</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 3);">3</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 4);">4</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 5);">5</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 6);">6</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 7);">7</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 8);">8</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 10);">10</a></li>
+                        <li><a href="javascript:void(0);" onclick="saveFiltered({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg','{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mimeType=image/jpeg');">Save</a></li>
+                        <li><a href="javascript:void(0);" onclick="undoFilter('{$albumphotos_array[$i]["id"]}');">Undo</a></li>
                     </ul>
                 </div>
             </div>
-
-
-     <div class="filter-buttons">
-        <div class="btn-group">
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 1);">1</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 2);">2</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 3);">3</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 4);">4</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 5);">5</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 6);">6</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 7);">7</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 8);">8</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 9);">9</button>
-            <button class="btn btn-inverse" onclick="applyFilter({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg', 10);">10</button>
-
-            <button class="btn btn-inverse" onclick="saveFiltered({$albumphotos_array[$i]["id"]},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg','{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}&mimeType=image/jpeg');">Save</button>
-            <button class="btn btn-inverse" onclick="undoFilter('{$albumphotos_array[$i]["id"]}');">Undo</button>
-        </div>
-    </div>
 
 
 HTML;
@@ -258,10 +264,14 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
         </div>
     </div>
 
+
+
+
+
     <div class="span3">
         <div>
             <h2>Album Collaborators</h2>
-            <h4>Collaborators can <b style="color:#666666">add</b> photos</h4>
+            <h4>Collaborators can <b style="color:#444444">add</b> photos</h4>
 
             <div id="collaborators-list" style="margin:10px 0px;">
 <?php
@@ -272,18 +282,27 @@ $html = "";
 
 foreach ($collaborators_info as $collaborator) {
     $html .= <<<HTML
-<li id="collaborator-{$collaborator["id"]}">
-    {$collaborator["email"]}
-    <a href="javascript:void(0);"
-       onclick="if (confirm('Sure you want to remove this collaborator?')) {
-                        deleteCollaborator({$collaborator["id"]},
-                                           '{$collaborator["collaborator_token"]}',
-                                           {$album_info["id"]},
-                                           '{$album_info["token"]}');
-                    }">
-        <i class="icon-remove"></i>
-    </a>
-</li>
+<div id="collaborator-{$collaborator["id"]}" style="padding:3px;">
+
+    <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
+        <a href="javascript:void(0);"
+           onclick="if (confirm('Sure you want to remove this collaborator?')) {
+                            deleteCollaborator({$collaborator["id"]},
+                                               {$album_info["id"]},
+                                               '{$album_info["token"]}');
+                        }">
+            <i class="icon-remove"></i>
+        </a>
+    </div>
+
+    <div style="overflow:hidden;">
+        <b>{$collaborator["username"]}</b>
+        <br>
+        <span style="color:#aaaaaa">{$collaborator["email"]}</span>
+    </div>
+
+
+</div>
 HTML;
 }
 
@@ -296,11 +315,11 @@ print($html);
             <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite collaborators</button>
         </div>
 
-        <div style="height:30px"></div>
+        <div style="height:40px"></div>
 
         <div>
             <h2>Privacy</h2>
-            <h4>Who is allowed to <b style="color:#666666">view</b> this album?</h4>
+            <h4>Who is allowed to <b style="color:#444444">view</b> this album?</h4>
         </div>
     </div>
 
