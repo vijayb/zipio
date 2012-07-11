@@ -23,12 +23,11 @@ $g_s3_root = "http://s3.zipio.com/$g_s3_folder_name";
 $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
 
-
 // When set to 1, certain debug statements are turned ON. This must be set to
 // 0 before pushing to production because the debug statements might reveal
 // information that is sensitive.
 
-$g_debug = 0;
+$g_debug = 1;
 
 
 

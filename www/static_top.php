@@ -86,7 +86,7 @@ HTML;
 
 } else {
 
-    $brand_name = "zipio alpha (you may lose data)";
+    $brand_name = "zipio alpha - may lose data";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -437,7 +437,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 
-<div class="navbar navbar-fixed-bottom">
+<div class="navbar navbar-fixed-bottom" style="z-index:-1000">
 
 
 <?php
@@ -446,58 +446,33 @@ if (!isset($page_title_right)) $page_title_right = "";
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-if ($_SERVER["HTTP_HOST"] == "localhost") {
+if ($g_debug) {
+
     $html = <<<HTML
-    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
         {$_SERVER["HTTP_HOST"]}
     </div>
 HTML;
     print($html);
 
-        if ($g_database_to_use == "PROD") {
-            $html = <<<HTML
-            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE PRODUCTION DATABASE - {$database}
-            </div>
+    if ($g_database_to_use == "PROD") {
+        $html = <<<HTML
+        <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
+            USING THE PRODUCTION DATABASE - {$database}
+        </div>
 HTML;
-            print($html);
-        } else if ($g_database_to_use == "TEST") {
-            $html = <<<HTML
-            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE TEST DATABASE - {$database}
-            </div>
+        print($html);
+    } else if ($g_database_to_use == "TEST") {
+        $html = <<<HTML
+        <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
+            USING THE TEST DATABASE - {$database}
+        </div>
 HTML;
-            print($html);
-        }
-
-
-} else if ($_SERVER["HTTP_HOST"] == "ec2-23-22-14-153.compute-1.amazonaws.com") {
-    $html = <<<HTML
-    <div style="background-color:orange; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
-        {$_SERVER["HTTP_HOST"]}
-    </div>
-HTML;
-    print($html);
-
-        if ($g_database_to_use == "PROD") {
-            $html = <<<HTML
-            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE PRODUCTION DATABASE
-            </div>
-HTML;
-            print($html);
-        } else if ($g_database_to_use == "TEST") {
-            $html = <<<HTML
-            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
-                USING THE TEST DATABASE
-            </div>
-HTML;
-            print($html);
-        }
-
-
-
+        print($html);
+    }
 }
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

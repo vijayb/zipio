@@ -32,6 +32,10 @@ if (is_logged_in() && is_collaborator($_SESSION["user_id"], $album_to_display)) 
     $is_owner = 1;
 }
 
+if ($album_info["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
+    goto_homepage();
+}
+
 print("<!-- is_collaborator: $is_collaborator -->\n");
 print("<!-- is_owner: $is_owner -->\n");
 
@@ -214,29 +218,60 @@ HTML;
             </div>
 
             <div style="height:70px"></div>
+HTML;
 
+
+    if ($is_owner) {
+
+        $html .= <<<HTML
             <div>
                 <h2>Privacy</h2>
-                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
+                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album? Only the album owner can change this.</h4>
 
-                <label class="radio">
+                <label class="radio" style="margin:0px;">
                     <input type="radio" name="album-privacy" id="album-privacy-1" value="1" checked="" onclick="changeAlbumPrivacy();">
-                    <b>Album collaborators only</b> <span id="album-privacy-saved-1" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                    <i class="icon-lock"></i> <b>Album collaborators only</b> <span id="album-privacy-saved-1" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                 </label>
                 <p style="margin-left:20px; color:#999999;">
                     Just the folks listed above
                 </p>
 
 
-                <label class="radio">
+                <label class="radio" style="margin:0px;">
                     <input type="radio" name="album-privacy" id="album-privacy-2" value="2" checked="" onclick="changeAlbumPrivacy();">
-                    <b>Anyone on the web</b> <span id="album-privacy-saved-2" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                    <i class="icon-globe"></i> <b>Anyone on the web</b> <span id="album-privacy-saved-2" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                 </label>
                 <p style="margin-left:20px; color:#999999;">
-                     Album visible to all at {$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}
+                     Album visible to all at {$_SERVER["HTTP_HOST"]}/{$album_owner_info["username"]}/{$album_info["handle"]}
                 </p>
 
             </div>
+HTML;
+
+
+    } else if ($is_collaborator) {
+
+        if ($album_info["read_permissions"] == 1) {
+            $read_permissions_html = "Only album collaborators (listed above) can see this album.";
+        } else if ($album_info["read_permissions"] == 2) {
+            $read_permissions_html = <<<HTML
+                Anyone on the web can see this album at {$_SERVER["HTTP_HOST"]}/{$album_owner_info["username"]}/{$album_info["handle"]}
+HTML;
+        }
+
+        $html .= <<<HTML
+            <div>
+                <h2>Privacy</h2>
+                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
+                <p>
+                    <b>{$read_permissions_html}</b>
+                </p>
+            </div>
+HTML;
+
+    }
+
+    $html .= <<<HTML
         </div>
 HTML;
 

@@ -3,19 +3,11 @@
 require("static_supertop.php");
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-if (!isset($_GET["owner_username"]) && !isset($_GET["follower_username"])) {
+if (!isset($_GET["owner_username"])) {
     exit();
 } else {
-    if (isset($_GET["following"])) {
-        $owner_id = get_user_id_from_username($_GET["follower_username"]);
-        $albums_array = get_following_albums_info($owner_id);
-        if ($_SESSION["user_id"] != $owner_id) {
-            goto_homepage();
-        }
-    } else {
-        $owner_id = get_user_id_from_username($_GET["owner_username"]);
-        $albums_array = get_albums_info($owner_id);
-    }
+    $owner_id = get_user_id_from_username($_GET["owner_username"]);
+    $albums_array = get_albums_info($owner_id);
     $owner_username = get_username_from_user_id($owner_id);
     $owner_info = get_user_info($owner_id);
 
@@ -35,56 +27,8 @@ if ($owner_id == 0) {
     goto_homepage("#alert=5&username=" . $_GET["owner_username"]);
 }
 
-$note_to_user_who_is_looking_at_his_own_albums = "";
+$page_title = "$owner_username";
 $page_subtitle = "";
-
-if (!isset($_GET["following"])) {
-
-    // =========================================================================
-    // Displaying a user's albums (his own, a friend's, OR a stranger's) =======
-    // =========================================================================
-
-    if (is_logged_in() && $_SESSION["user_id"] == $owner_id) {
-        // ---------------------------------------------------------------------
-        // Viewer is looking at his own albums
-        // ---------------------------------------------------------------------
-        $page_title = "$owner_username's albums (this is you)";
-        $page_subtitle = "To create a new album, send photos to <b>new_album_name@zipio.com</b>";
-        $which_showing = "Showing $g_album_privacy_contants[1], $g_album_privacy_contants[2], and $g_album_privacy_contants[3] albums";
-
-
-    } else if (is_logged_in() && in_array($_SESSION["user_id"], $owner_info["friends"])) {
-        // ---------------------------------------------------------------------
-        // Viewer is looking at a friend's albums
-        // ---------------------------------------------------------------------
-        $page_title = "$owner_username's albums (one of your friends)";
-        //$page_subtitle = "You're seeing $owner_username's public and friends albums";
-        $which_showing = "Showing $g_album_privacy_contants[2] and $g_album_privacy_contants[3] albums only";
-
-    } else {
-        // ---------------------------------------------------------------------
-        // Viewer is looking at a stranger's albums
-        // ---------------------------------------------------------------------
-        $page_title = "$owner_username's albums";
-        //$page_subtitle = "You're seeing $owner_username's public albums only";
-        $which_showing = "Showing $g_album_privacy_contants[3] albums only";
-
-    }
-
-    $third_row = $which_showing;
-
-} else {
-
-    // =========================================================================
-    // Displaying albums a user is FOLLOWING ===================================
-    // =========================================================================
-
-    $page_title = "Albums I'm Following";
-    $page_subtitle = "You'll get an email when photos are added to these albums";
-
-}
-
-
 
 
 ?>
@@ -110,7 +54,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
     $html = <<<HTML
     <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
         <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
-            <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped_0'>
+            <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped'>
             <div class="album-details"></div>
             <div class="album-title">{$albums_array[$i]["handle"]}</div>
             <div class="album-privacy">
