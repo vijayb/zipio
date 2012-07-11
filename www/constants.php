@@ -13,7 +13,6 @@
     TRUNCATE TABLE Albums;
     TRUNCATE TABLE Photos;
     TRUNCATE TABLE Users;
-    TRUNCATE TABLE Followers;
 
 */
 

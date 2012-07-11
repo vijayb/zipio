@@ -21,9 +21,6 @@ mysql_query($query, $con);
 $query = "delete from Albums where user_id=$user_id";
 mysql_query($query, $con);
 
-$query = "delete from Followers where follower_id=$user_id or album_owner_id=$user_id";
-mysql_query($query, $con);
-
 $query = "delete from Friends where user_id=$user_id or friend_id=$user_id";
 mysql_query($query, $con);
 

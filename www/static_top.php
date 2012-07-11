@@ -76,8 +76,6 @@ if (is_logged_in()) {
                 </a>
                 <ul class="dropdown-menu">
                     <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
-                    <li><a href="/{$_SESSION["user_info"]["username"]}/_following"><i class="icon-eye-open"></i> Albums I'm Following</a></li>
-                    <li><a href="/{$_SESSION["user_info"]["username"]}/_friends"><i class="icon-group"></i> My Friends</a></li>
                     <li class="divider"></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
                 </ul>
@@ -372,38 +370,6 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 </div>
 
-<!----------------------------------------------------------------------------->
-
-<div class="modal hide" id="follow-modal">
-
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
-        <h2>Follow this album&#8212;no signup needed!</h2>
-        <h3>Enter your email and we'll let you know when photos are added</h3>
-    </div>
-
-    <div class="modal-body">
-        <div class="form-horizontal">
-            <div class="control-group">
-                <label class="control-label" for="input01">Your email</label>
-                <div class="controls">
-                    <input type="text" class="input-xlarge" id="follow-email">
-                    <p class="help-block" id="follow-email-check"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="submitEmailToFollow(<?php if (isset($album_info)) { print($album_info['id']); } ?>);"
-                disabled
-                class="btn btn-primary" id="follow-submit" data-loading-text="Please wait...">
-                Follow
-        </button>
-    </div>
-
-</div>
 
 <!----------------------------------------------------------------------------->
 
@@ -442,32 +408,6 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <!----------------------------------------------------------------------------->
 
-<div class="modal hide" id="confirmation-modal">
-
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
-        <h2>Are you sure?</h2>
-        <h3></h3>
-    </div>
-
-    <div class="modal-body">
-        <p>
-            Are you sure you want to <span id="confirmation-modal-action"></span>?
-        </p>
-    </div>
-
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="submitAlbumSettings();"
-                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
-                Yes, <b><span id="confirmation-modal-button"></span></b>
-        </button>
-    </div>
-
-
-</div>
-
-
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
@@ -496,7 +436,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 
-<!--
+
 <div class="navbar navbar-fixed-bottom">
 
 
@@ -566,7 +506,7 @@ HTML;
 ?>
 
 </div>
--->
+
 
 <div class="container">
 
@@ -583,7 +523,7 @@ HTML;
     <div class="row">
         <div class="span9" style="margin-bottom:10px">
             <h1><?php print($page_title); ?></h1>
-            <h2 style="color:#999999; margin: 5px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
+            <h2 style="color:#999999; margin: 10px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
             <?php // if (isset($third_row)) { print($third_row); } ?>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>

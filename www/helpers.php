@@ -3,6 +3,8 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
+
 define('CACHE_PATH', 'opticrop-cache/');
 
 function goto_homepage($args) {
@@ -68,25 +70,6 @@ function rand_number_string($length) {
     return rand(pow(10, $length - 1), pow(10, $length) - 1);
 }
 
-
-function create_follower($album_owner_id, $follower_id, $album_id) {
-
-    global $con;
-
-    $query ="INSERT INTO Followers (
-                follower_id,
-                album_owner_id,
-                album_id
-              ) VALUES (
-                '$follower_id',
-                '$album_owner_id',
-                '$album_id'
-              )";
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-    $id = mysql_insert_id();
-    return $id;
-}
 
 
 function create_collaborator($collaborator_id, $album_id) {
@@ -358,34 +341,6 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
 }
 
-function email_followers($album_info, $s3_urls) {
-
-    global $con;
-    global $g_www_root;
-    global $g_s3_root;
-
-    $query = "SELECT follower_id, email FROM Followers LEFT JOIN Users ON follower_id=Users.id WHERE album_id=" . $album_info["id"];
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-
-    $album_owner_info = get_user_info($album_info["user_id"]);
-
-    $follower_email_body = <<<EMAIL
-        Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
-        <br><br>
-EMAIL;
-
-    for ($i = 0; $i < count($s3_urls); $i++) {
-        $follower_email_body .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped_0'><br><br>";
-    }
-
-    while ($row = mysql_fetch_assoc($result)) {
-        send_email($row["email"], $g_founders_email_address, "New photos!", $follower_email_body);
-    }
-
-}
-
-
 
 
 
@@ -396,6 +351,7 @@ function email_newly_added_photos_to_collaborators($album_info, $s3_urls) {
     global $con;
     global $g_www_root;
     global $g_s3_root;
+    global $g_founders_email_address;
 
     $query = "SELECT
                 Collaborators.collaborator_id,
@@ -423,7 +379,7 @@ function email_newly_added_photos_to_collaborators($album_info, $s3_urls) {
         $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $collaborator_email_body = <<<EMAIL
-            Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
+            These photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$display_album_link}"><b>{$album_info["handle"]}</b> album</a>.
             <br><br>
 EMAIL;
         $collaborator_email_body .= $pictures_html;
@@ -432,27 +388,6 @@ EMAIL;
     }
 
 }
-
-
-
-
-
-
-
-/** return 1 if user is following album
- *  else returns 0
- **/
-function is_following($logged_in_user_id, $album_id) {
-
-    global $con;
-
-    $query = "SELECT id FROM Followers WHERE follower_id='$logged_in_user_id' AND album_id='$album_id'";
-    $result = mysql_query($query);
-    if(mysql_num_rows($result) == 1) { // user is following the album
-        return 1;
-    } else return 0;
-}
-
 
 
 
@@ -596,52 +531,7 @@ function get_albums_info($user_id) {
 
 }
 
-function get_following_albums_info($user_id) {
 
-    global $con;
-
-    $query = "SELECT *
-              FROM Followers
-              LEFT JOIN Albums
-              ON Followers.album_id = Albums.id
-              WHERE Followers.follower_id = '$user_id'";
-    $result = mysql_query($query, $con);
-
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $albums_array = array();
-    while ($row = mysql_fetch_assoc($result)) {
-        $album = get_album_info($row["id"]);
-        array_push($albums_array, $album);
-    }
-
-    return $albums_array;
-}
-
-
-function get_followers_user_info($album_id) {
-
-    global $con;
-
-    $query = "SELECT
-                Followers.follower_id,
-                Users.*
-              FROM Followers
-              LEFT JOIN Users
-              ON Followers.follower_id=Users.id
-              WHERE Followers.album_id='$album_id'";
-    $result = mysql_query($query, $con);
-
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-    $users_array = array();
-    while ($row = mysql_fetch_assoc($result)) {
-        $row["token"] = calculate_token_from_id($row["id"], "Users");
-        array_push($users_array, $row);
-    }
-
-    return $users_array;
-}
 
 
 function get_albumphotos_info($album_id) {
@@ -649,7 +539,9 @@ function get_albumphotos_info($album_id) {
 
     $query = "SELECT id
               FROM AlbumPhotos
-              WHERE album_id='$album_id'";
+              WHERE album_id='$album_id'
+              ORDER BY AlbumPhotos.created DESC
+              ";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 

@@ -143,21 +143,6 @@ $(function() {
     });
 
     // -------------------------------------------------------------------------
-    // FOLLOW
-
-    $("#follow-email").typeWatch({
-        callback: function(e) { checkEmailIsOkay("follow");  setFollowSubmitButton(); },
-        wait: 0,
-        captureLength: 0
-    });
-
-    $("#follow-modal input").keyup(function(e) {
-        if (e.keyCode == 13 && !$("#follow-submit").attr("disabled")) {
-            $("#follow-submit").click();
-        }
-    });
-
-    // -------------------------------------------------------------------------
     // PASSWORD
 
     $("#password-email").typeWatch({

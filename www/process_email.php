@@ -17,7 +17,7 @@ if (isset($_POST["sender"]) && isset($_POST["recipient"])) {
 }
 
 $date = gmdate("d-M-Y H:i:s");
-$output_handle = fopen("/log/" . $date . "_" . $sender, 'a+') or die('Cannot open file.');
+$output_handle = fopen("/log/" . rand_string(5) . $date . "_" . $sender, 'a+') or die('Cannot open file.');
 
 
 register_shutdown_function('handle_shutdown');

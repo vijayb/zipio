@@ -10,14 +10,12 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
     $album_owner_info = get_user_info($album_info["user_id"]);
-    $followers_info = get_followers_user_info($album_to_display);
 
     if ($g_debug) {
         print("<!-- GET: " . print_r($_GET, true) . "-->");
         print("<!-- album_to_display: $album_to_display -->\n");
         print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
         print("<!-- album_info: " . print_r($album_info, true) . "-->");
-        print("<!-- followers_info: " . print_r($followers_info, true) . "-->");
     }
 }
 
@@ -25,143 +23,31 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
+$is_owner = 0;
+$is_collaborator = 0;
+
+if (is_logged_in() && is_collaborator($_SESSION["user_id"], $album_to_display)) {
+    $is_collaborator = 1;
+} else if (is_logged_in() && $album_info["user_id"] == $_SESSION["user_id"]) {
+    $is_owner = 1;
+}
+
+print("<!-- is_collaborator: $is_collaborator -->\n");
+print("<!-- is_owner: $is_owner -->\n");
 
 $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.zipio.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
-$page_subtitle = "";
+$page_subtitle = "To add a photo, email the above address";
 
-
-
-
-
-
-
-
-/*
-
-
-// Set the right side button
-
-if (!is_logged_in()) {
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // User is not logged in, so show the follow button since we don't know
-    // whether they are following the album or not. The follow button will open
-    // the follow modal so the user can enter his email address.
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-    $page_title_right = <<<HTML
-        <button class="btn btn-large btn-success follow-button"
-                onclick="showFollowModal();"
-                id="follow-submit"
-                data-loading-text="Please wait...">
-            Follow this album<br><span style="font-size:12px;">No signup required!</a>
-        </button>
-HTML;
-
+if ($is_owner || $is_collaborator) {
+    $photos_area_width = "span9";
 } else {
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // User is logged in
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-    $user_id = is_logged_in();
-    $logged_in_username = get_username_from_user_id($user_id);
-
-
-    // Create a follow link to follow_album.php in case the user is logged in (which
-    // in tern means when he clicks the follow button, we need not ask him for his
-    // email address; we can immediately create the following relationship with
-    // follow_album.php).
-    $follow_album_ra = array();
-    $follow_album_ra["follower_id"] = $user_id;
-    $follow_album_ra["follower_username"] = $logged_in_username;
-    $follow_album_ra["album_id"] = $album_info["id"];
-    $follow_album_ra["album_handle"] = $album_info["handle"];
-    $follow_album_ra["album_owner_id"] = $album_owner_info["id"];
-    $follow_album_ra["album_owner_username"] = $album_owner_info["username"];
-    $follow_album_ra["album_owner_email"] = $album_owner_info["email"];
-    $follow_album_ra["timestamp"] = time();
-    $follow_album_link = $g_www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
-
-    if ($logged_in_username == $album_owner_info["username"]) {
-        // =====================================================================
-        // Logged in user is the album owner
-        // =====================================================================
-
-        $page_title_right = <<<HTML
-HTML;
-
-
-    } else {
-        // =====================================================================
-        // Logged in user is viewing someone else's album
-        // =====================================================================
-
-        if (isset($album_info) && is_following($user_id, $album_info["id"]) == 1) {
-            // -----------------------------------------------------------------
-            // Logged in user is already following this album, so show the
-            // unfollow button.
-            // -----------------------------------------------------------------
-            $page_title_right = <<<HTML
-                <button class="btn btn-large follow-button"
-                        onclick="unfollowAlbum({$_SESSION["user_id"]},
-                                               {$album_info["id"]},
-                                               '{$_SESSION["user_info"]["token"]}');"
-                        id="unfollow-submit"
-                        data-loading-text="Please wait...">
-                    Unfollow this album
-                </button>
-HTML;
-        } else {
-            // -----------------------------------------------------------------
-            // Logged in user is NOT following this album, so show the follow
-            // button, but the onclick will immediately cause the user to be
-            // following the album rather than asking for an email address.
-            // -----------------------------------------------------------------
-            $page_title_right = <<<HTML
-                <button class="btn btn-large btn-success follow-button"
-                        onclick="$(this).button('loading'); window.location.replace('{$follow_album_link}');"
-                        id="follow-submit"
-                        data-loading-text="Please wait...">
-                    Follow this album
-                </button>
-HTML;
-        }
-    }
+    $photos_area_width = "span12";
 }
 
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Set the "third row" string
-
-
-$following_html = count($followers_info) . " followers";
-
-// $third_row = $permissions_html . "&#160;&#160;   &#183;   &#160;&#160;" . $following_html;
-$third_row = $following_html;
-
-
 ?>
-
-
-
 
 
 
@@ -171,11 +57,9 @@ $third_row = $following_html;
 
 
 
-
-
 <div class="row">
 
-    <div class="span9">
+    <div class="<?php print($photos_area_width); ?>">
         <div class="row">
 
 <?php
@@ -200,6 +84,10 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $is_filtered = "";
     }
 
+    // Get the owner of the current photo. $photo_owners is a temporary store of
+    // user objects (who are various photo owners) so that we don't need to do
+    // a get_user_info each time for the same potential owner. We can make this
+    // simpler after memcache has been added to the entire system.
     if (isset($photo_owners[$albumphotos_array[$i]["photo_owner_id"]])) {
         $photo_owner = $photo_owners[$albumphotos_array[$i]["photo_owner_id"]];
     } else {
@@ -208,17 +96,16 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     }
 
     $html = <<<HTML
-
         <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
             <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big">
                 <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
             <div class="album-privacy">
-                {$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}
+                by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
             </div>
             </a>
 HTML;
 
-    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+    if ($is_owner) {
 
         $html .= <<<HTML
             <div class="tile-options" style="display:none">
@@ -242,23 +129,17 @@ HTML;
                     </ul>
                 </div>
             </div>
-
-
 HTML;
     }
 
-
     $html .= <<<HTML
-
         </div>
-
 HTML;
 
     print($html);
 }
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
-
 ?>
 
         </div>
@@ -266,62 +147,104 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 
 
-
-
-    <div class="span3">
-        <div>
-            <h2>Album Collaborators</h2>
-            <h4>Collaborators can <b style="color:#444444">add</b> photos</h4>
-
-            <div id="collaborators-list" style="margin:10px 0px;">
 <?php
 
-$collaborators_info = get_collaborators_info($album_to_display);
+if ($is_owner || $is_collaborator) {
 
-$html = "";
-
-foreach ($collaborators_info as $collaborator) {
-    $html .= <<<HTML
-<div id="collaborator-{$collaborator["id"]}" style="padding:3px;">
-
-    <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
-        <a href="javascript:void(0);"
-           onclick="if (confirm('Sure you want to remove this collaborator?')) {
-                            deleteCollaborator({$collaborator["id"]},
-                                               {$album_info["id"]},
-                                               '{$album_info["token"]}');
-                        }">
-            <i class="icon-remove"></i>
-        </a>
-    </div>
-
-    <div style="overflow:hidden;">
-        <b>{$collaborator["username"]}</b>
-        <br>
-        <span style="color:#aaaaaa">{$collaborator["email"]}</span>
-    </div>
+    $collaborators_info = get_collaborators_info($album_to_display);
 
 
-</div>
+
+    if ($is_owner) {
+        $you_html = "- this is you";
+    } else {
+        $you_html = "";
+    }
+
+    $html = <<<HTML
+        <div class="span3">
+            <div>
+                <h2>Album Collaborators</h2>
+                <h4>Collaborators can <b style="color:#444444">add</b> photos and invite others</h4>
+
+                <div id="collaborators-list" style="margin:10px 0px;">
+                    <div style="padding:3px;">
+                        <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">&nbsp;</div>
+                        <div style="overflow:hidden;">
+                            <b>{$album_owner_info["username"]} (owner)</b> {$you_html}
+                            <br>
+                            <span style="color:#999999">{$album_owner_info["email"]}</span>
+                        </div>
+                    </div>
 HTML;
-}
 
-print($html);
 
-?>
+    foreach ($collaborators_info as $collaborator) {
+        if ($collaborator["id"] == $_SESSION["user_id"]) {
+            $you_html = "- this is you";
+        } else {
+            $you_html = "";
+        }
+        $html .= <<<HTML
+                    <div id="collaborator-{$collaborator["id"]}" style="padding:3px;">
 
+                        <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
+                            <a href="javascript:void(0);"
+                               onclick="if (confirm('Sure you want to remove this collaborator?')) {
+                                                deleteCollaborator({$collaborator["id"]},
+                                                                   {$album_info["id"]},
+                                                                   '{$album_info["token"]}');
+                                            }">
+                                <i class="icon-remove"></i>
+                            </a>
+                        </div>
+
+                        <div style="overflow:hidden;">
+                            <b>{$collaborator["username"]}</b> {$you_html}
+                            <br>
+                            <span style="color:#999999">{$collaborator["email"]}</span>
+                        </div>
+                    </div>
+HTML;
+    }
+
+    $html .= <<<HTML
+                </div>
+                <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
             </div>
 
-            <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite collaborators</button>
-        </div>
+            <div style="height:70px"></div>
 
-        <div style="height:40px"></div>
+            <div>
+                <h2>Privacy</h2>
+                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
 
-        <div>
-            <h2>Privacy</h2>
-            <h4>Who is allowed to <b style="color:#444444">view</b> this album?</h4>
+                <label class="radio">
+                    <input type="radio" name="album-privacy" id="album-privacy-1" value="1" checked="" onclick="changeAlbumPrivacy();">
+                    <b>Album collaborators only</b> <span id="album-privacy-saved-1" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                </label>
+                <p style="margin-left:20px; color:#999999;">
+                    Just the folks listed above
+                </p>
+
+
+                <label class="radio">
+                    <input type="radio" name="album-privacy" id="album-privacy-2" value="2" checked="" onclick="changeAlbumPrivacy();">
+                    <b>Anyone on the web</b> <span id="album-privacy-saved-2" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                </label>
+                <p style="margin-left:20px; color:#999999;">
+                     Album visible to all at {$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}
+                </p>
+
+            </div>
         </div>
-    </div>
+HTML;
+
+    print($html);
+
+}
+
+?>
 
 
 </div>
@@ -352,7 +275,7 @@ $(function() {
 
     <?php
 
-    if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
+    if ($is_owner || $is_collaborator) {
         print("gAlbum = " . json_encode($album_info));
     }
 
@@ -389,6 +312,10 @@ $(function() {
             $(this).find(".tile-options").stop(true, true).fadeOut();
         });
     });
+
+    // Set the privacy radio button
+
+    $("#album-privacy-" + gAlbum["read_permissions"]).prop('checked', true);
 
 <?php
 

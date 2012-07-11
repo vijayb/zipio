@@ -7,11 +7,11 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
-if (!isset($_GET["album_id"]) || !isset($_GET["permissions"]) || !isset($_GET["token"])) {
+if (!isset($_GET["album_id"]) || !isset($_GET["read_permissions"]) || !isset($_GET["token"])) {
     exit();
 } else {
     $album_id = $_GET["album_id"];
-    $permissions = $_GET["permissions"];
+    $read_permissions = $_GET["read_permissions"];
     $token = $_GET["token"];
 }
 
@@ -20,7 +20,7 @@ if (!check_token($album_id, $token, "Albums")) {
     exit();
 }
 
-$result = update_data("Albums", $album_id, array("permissions" => mysql_real_escape_string($permissions)));
+$result = update_data("Albums", $album_id, array("read_permissions" => mysql_real_escape_string($read_permissions)));
 
 print("1");
 

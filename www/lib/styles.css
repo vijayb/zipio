@@ -62,12 +62,9 @@ body {
     position: absolute;
     background: rgba(0, 0, 0, 0.7);
     top: 0px;
-    padding: 5px;
+    padding: 3px;
     color: #ffffff;
-}
-
-.follow-button {
-    width: 100%;
+    font-size: 13px;
 }
 
 .width-fix {

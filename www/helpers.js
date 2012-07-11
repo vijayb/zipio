@@ -1,9 +1,4 @@
-var albumPrivacyConstants = [];
 var imageFilters = {};
-
-albumPrivacyConstants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
-albumPrivacyConstants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
-albumPrivacyConstants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
 
 function changeFilter(photoID, albumphotoID, filter) {
     var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
@@ -36,29 +31,6 @@ function showLoginModal() {
     $("#login-email-check").empty();
     $('#login-password').val('');
     $('#login-email').val('').focus();
-}
-
-function showFollowModal() {
-    $("#follow-modal input").val("");
-    $("#follow-email-check").empty();
-    $("#follow-submit").prop("disabled", true);
-    if (isLoggedIn()) {
-        // If the user is logged in, simply create the follower relationship
-        $("#follow-submit").button("loading");
-
-    } else {
-        // If the user is not logged in, we need to ask for his email address
-        // to make sure the rightful owner of the email address actually wants
-        // to follow the album
-        $("#follow-modal").modal('show');
-        $("#follow-email").focus();
-    }
-}
-
-function showAlbumSettingsModal() {
-    var currSetting = parseInt(gAlbum["permissions"]);
-    $("input[id='album-setting-" + currSetting + "']").attr("checked", true);
-    $('#album-settings-modal').modal('show');
 }
 
 function showForgotPasswordModal() {
@@ -153,27 +125,6 @@ function submitForgotPassword() {
     });
 }
 
-function submitEmailToFollow(albumID) {
-    $("#follow-submit").button("loading");
-    var email = $("#follow-email").val();
-    var urlString = "/send_follow_email.php?email=" + email + "&album_id=" + albumID;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            $("#follow-modal").modal('hide');
-            $("#header-alert-title").html("You're not quite done!");
-            $("#header-alert-text").html("Click the link in the email we just sent you to confirm that you want to follow this album.");
-            $("#header-alert").addClass("alert-info");
-            $("#header-alert").delay(500).fadeIn();
-
-            $("#follow-submit").button("reset");
-        },
-        async: true
-    });
-}
-
 function submitUsernamePassword() {
     $("#register-submit").button("loading");
     var username = gUser["username"];
@@ -202,18 +153,19 @@ function submitUsernamePassword() {
 
 }
 
-function submitAlbumSettings() {
+function changeAlbumPrivacy() {
     $("#album-settings-submit").button("loading");
-    var newSetting = parseInt($('input[name=album-settings-radios]:checked').val());
-    var urlString = "/change_album_permissions.php?album_id=" + gAlbum['id'] + "&permissions=" + newSetting + "&token=" + gAlbum['token'];
+    var newSetting = parseInt($('input[name=album-privacy]:checked').val());
+    var urlString = "/change_album_read_permissions.php?album_id=" + gAlbum['id'] + "&read_permissions=" + newSetting + "&token=" + gAlbum['token'];
 
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                window.location.replace(window.location.href.split('#')[0] + "#alert=4&setting=" + newSetting);
-                window.location.reload(true);
+                $("#album-privacy-saved-" + newSetting).show().delay(2000).fadeOut();
+                // window.location.replace(window.location.href.split('#')[0] + "#alert=4&setting=" + newSetting);
+                // window.location.reload(true);
             } else {
                 // bad token
             }
@@ -245,15 +197,6 @@ function submitSignup() {
 // SET MODAL BUTTONS
 ////////////////////////////////////////////////////////////////////////////////
 
-
-function setFollowSubmitButton() {
-    $("#follow-submit").attr("disabled", true);
-    if ($("#follow-email-check").data("correct") == 1) {
-       $("#follow-submit").removeAttr("disabled");
-    } else {
-       $("#follow-submit").attr("disabled", true);
-    }
-}
 
 function setSignupSubmitButton() {
     debug("setSignupSubmitButton called");
@@ -321,28 +264,6 @@ function deleteCollaborator(collaboratorID, albumID, albumToken) {
 
 
 
-function unfollowAlbum(userID, albumID, token) {
-    $("#unfollow-submit").button("loading");
-
-    var urlString = "/unfollow_album.php?user_id=" + userID + "&album_id=" + albumID + "&token=" + token;
-
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            if (parseInt(data) == 1) {
-                window.location.replace(window.location.href.split('#')[0] + "#alert=2");
-                window.location.reload(true);
-            } else {
-                // bad token
-            }
-        },
-        async: true
-    });
-
-}
-
-
 function flipChangeUsername() {
     if ($("#register-username-panel").is(":visible")) {
         $('#register-username-panel').hide();
@@ -369,12 +290,6 @@ function checkEmailIsOkay(prefix) {
 
     if (!validateEmail(emailEntered)) {
         $("#" + prefix + "-email-check").html("<i class='icon-remove'></i> That doesn't appear to be a valid address");
-        return;
-    }
-
-    if (prefix == "follow") {
-        $("#follow-email-check").html("<i class='icon-ok'></i> We'll send you notifications to this email");
-        $("#follow-email-check").data("correct", 1);
         return;
     }
 
@@ -559,21 +474,15 @@ function getAlert(alert) {
     var returnArr = new Array();
 
     if (alert == 1) {
-        returnArr["title"] = "You're now following this album.";
-        returnArr["text"]  = "You'll get an email when photos are added to this album. You can add photos to this album by emailing them to the address below! (May require the album owner to approve you.)";
-        returnArr["class"] = "alert-success";
+        // legacy
     } else if (alert == 2) {
-        returnArr["title"] = "You're no longer following this album.";
-        returnArr["text"]  = "";
-        returnArr["class"] = "alert-success";
+        // legacy
     } else if (alert == 3) {
         returnArr["title"] = hashParams["email"] + " can now add photos to this album.";
         returnArr["text"]  = "We'll email " + hashParams["email"] + " when this album is updated.";
         returnArr["class"] = "alert-success";
     } else if (alert == 4) {
-        returnArr["title"] = "Album settings have been saved.";
-        returnArr["text"]  = "This is now a " + albumPrivacyConstants[hashParams["setting"]] + " album.";
-        returnArr["class"] = "alert-success";
+        // legacy
     } else if (alert == 5) {
         returnArr["title"] = "The user '" + hashParams["username"] + "' doesn't exist.";
         returnArr["text"]  = "";
