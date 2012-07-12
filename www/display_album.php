@@ -125,27 +125,33 @@ HTML;
         $html .= <<<HTML
             <div class="tile-options" style="display:none;">
                 <div class="btn-group" style="float:left; margin-right:5px;">
-                    <button class="btn btn-mini btn-inverse dropdown-toggle" data-toggle="dropdown">
+                    <button id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" data-loading-text="Filtering...">
                         Filter <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu">
-                        <li><a href="javascript:void(0);" onclick="resetPhotoToOriginal({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mimeType=image/jpeg');">Original</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 1);">1</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 2);">2</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 3);">3</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 4);">4</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 5);">5</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 6);">6</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 7);">7</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 8);">8</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg', 10);">10</a></li>
-                        <!--
-                        <li id="filter-save"><a href="javascript:void(0);" onclick="saveFiltered({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg','{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mimeType=image/jpeg');">Save</a></li>
-                        <li id="filter-undo"><a href="javascript:void(0);" onclick="undoFilter('{$albumphoto_id}');">Undo</a></li>
-                        -->
+                        <li>
+                            <a href="javascript:void(0);" onclick="resetPhotoToOriginal({$albumphoto_id},
+                                                                                        '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped',
+                                                                                        '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big');">
+                                Original
+                            </a>
+                        </li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 1);">1</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 2);">2</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 3);">3</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 4);">4</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 5);">5</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 6);">6</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 7);">7</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 8);">8</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">10</a></li>
                     </ul>
                 </div>
-                <button id="save-{$albumphoto_id}" class="btn btn-primary btn-mini" href="#" style="display:none" onclick="saveFiltered({$albumphoto_id},'{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mimeType=image/jpeg','{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mimeType=image/jpeg');">
+                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="display:none" onclick="saveFiltered({$albumphoto_id},
+                                                                                                                               '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg',
+                                                                                                                               '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mime_type=image/jpeg',
+                                                                                                                               '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big'
+                                                                                                                               );">
                     Save
                 </button>
               </div>
@@ -153,6 +159,10 @@ HTML;
     }
 
     $html .= <<<HTML
+
+            <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
+                <span style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
+            </div>
         </div>
 HTML;
 
@@ -368,7 +378,7 @@ $(function() {
             $(this).find(".tile-options", ".album-privacy").stop(true, true).show();
         });
         $(this).mouseleave(function() {
-            $(this).find(".tile-options", ".album-privacy").stop(true, true).fadeOut();
+            $(this).find(".tile-options", ".album-privacy").stop(true, true).delay(750).fadeOut();
         });
     });
 

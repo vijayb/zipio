@@ -384,14 +384,17 @@ function resetPhotoToOriginal(albumphotoID, croppedOriginalSrc, bigOriginalSrc) 
     imageFiltered[albumphotoID.toString()] = 0;
 }
 
-function applyFilter(albumphotoID, imageSrc, filter) {
-    $("#save-" + albumphotoID).show();
-    RUN_EFFECT['e' + filter](albumphotoID, imageSrc);
+function applyFilter(albumphotoID, imageProxySrc, filter) {
+    $("#filter-" + albumphotoID).button("loading");
+    RUN_EFFECT['e' + filter](albumphotoID, imageProxySrc);
     imageFiltered[albumphotoID.toString()] = filter;
+    // Button is reset and save button is shown in filter_and_cover_img
 }
 
-function saveFiltered(albumphotoID, croppedImageSrc, bigImageSrc) {
+function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigOriginalSrc) {
     if (imageFiltered.hasOwnProperty(albumphotoID)) {
+
+        $("#cover-" + albumphotoID).fadeIn();
 
         if (imageFiltered[albumphotoID] == 0) {
             $.ajax({
@@ -401,14 +404,16 @@ function saveFiltered(albumphotoID, croppedImageSrc, bigImageSrc) {
                 success: function(data) {
                     console.log(data);
                     $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
+                    $("#save-" + albumphotoID).hide();
+                    $("#cover-" + albumphotoID).fadeOut();
                 }
             });
 
         } else {
-            SAVE_EFFECT['e' + imageFiltered[albumphotoID]](albumphotoID, croppedImageSrc, bigImageSrc);
+            SAVE_EFFECT['e' + imageFiltered[albumphotoID]](albumphotoID, croppedImageProxySrc, bigImageProxySrc);
         }
         delete imageFiltered[albumphotoID.toString()];
-        $("#save-" + albumphotoID).hide();
+        // Save button and cover are hidden in filter_and_save
     } else {
         alert("No filter selected");
     }

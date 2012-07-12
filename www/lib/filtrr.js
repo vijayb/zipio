@@ -838,6 +838,10 @@
                 $(canvas).insertBefore($("#image-" + albumphotoID));
 
                 callback(new filtr(canvas));
+
+                $("#filter-" + albumphotoID).button("reset");
+                $("#save-" + albumphotoID).show();
+
             };
 
             img.src = imgSrc;
@@ -896,7 +900,16 @@
                 success: function(data) {
                     console.log(data);
                     $("#image-" + albumphotoID).attr("src", $("#image-" + albumphotoID).attr("src").replace(/_cropped$/, "_cropped_filtered"));
-                    $("#fancybox-" + albumphotoID).attr("href", $("#fancybox-" + albumphotoID).attr("href").replace(/_big$/, "_big_filtered?random=" + Math.random()));
+
+                    // If the current fancybox href ends with _big, turn that into _big_filtered with a random string to force reload
+                    $("#fancybox-" + albumphotoID).attr("href", $("#fancybox-" + albumphotoID).attr("href").replace(/_big$/, "_big_filtered?" + new Date().getTime()));
+
+                    // If the current fancybox href already ends with _big_filtered, just add the random string to force reload
+                    $("#fancybox-" + albumphotoID).attr("href", $("#fancybox-" + albumphotoID).attr("href").replace(/_big_filtered$/, "_big_filtered?" + new Date().getTime()));
+
+                    $("#save-" + albumphotoID).hide();
+                    $("#cover-" + albumphotoID).fadeOut();
+
                 }
             });
         };
@@ -942,7 +955,7 @@
 /* Predefine our effects as functions for easy calling. */
 var RUN_EFFECT = {
 
-    e1 : function(albumphotoID, imageSrc) {
+    e1 : function(albumphotoID, imageProxySrc) {
 
         /* This is the starting point to apply filtrr on your images.
          * Using the img() function you can pass in an id or the img element,
@@ -950,7 +963,7 @@ var RUN_EFFECT = {
          * The callback function is given a filtr parameter which is a wrapper around
          * the canvas element, and contains all the filter and blending methods.
          */
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
 
             /* filtr.duplicate() can be used to get a duplicate of the filtr object
              * so you can blend many together.*/
@@ -979,30 +992,30 @@ var RUN_EFFECT = {
         });
     },
 
-    e2 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e2 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.saturation(0.3).posterize(70).tint([50, 35, 10], [190, 190, 230]);
             filtr.put();
         });
     },
 
-    e3 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e3 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.tint([60, 35, 10], [170, 170, 230]).contrast(0.8);
             filtr.put();
         });
     },
 
-    e4 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e4 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
             filtr.put();
         filtr.canvas().getContext("2d").scale(0.5,0.5);
         });
     },
 
-    e5 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e5 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.tint([30, 40, 30], [120, 170, 210])
                       .contrast(0.75)
                       .bias(1)
@@ -1012,15 +1025,15 @@ var RUN_EFFECT = {
         });
     },
 
-    e6 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e6 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.saturation(0.4).contrast(0.75).tint([20, 35, 10], [150, 160, 230]);
             filtr.put();
         });
     },
 
-    e7 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e7 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             topFiltr.core.tint([20, 35, 10], [150, 160, 230]).saturation(0.6);
             filtr.core.adjust(0.1,0.7,0.4).saturation(0.6).contrast(0.8);
@@ -1029,8 +1042,8 @@ var RUN_EFFECT = {
         });
     },
 
-    e8 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e8 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             /* In this example we are creating 3 different duplicate layers. Each one is filtered
              * and then blended on the filtr object. Note that you could say blend topFiltr1 and
              * topFiltr2 together and then blend the resuln on filtr.
@@ -1049,8 +1062,8 @@ var RUN_EFFECT = {
         });
     },
 
-    e9 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e9 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             var topFiltr1 = filtr.duplicate();
             topFiltr1.core.fill(226, 217, 113).saturation(0.2);
@@ -1063,8 +1076,8 @@ var RUN_EFFECT = {
         });
     },
 
-    e10 : function(albumphotoID, imageSrc) {
-        filtrr.filter_and_cover_img(albumphotoID, imageSrc, function(filtr) {
+    e10 : function(albumphotoID, imageProxySrc) {
+        filtrr.filter_and_cover_img(albumphotoID, imageProxySrc, function(filtr) {
             filtr.core.sepia().bias(0.6);
             filtr.put();
         });
@@ -1080,7 +1093,7 @@ var RUN_EFFECT = {
 /* Run effect and then run ajax call to send filtered image to backend */
 var SAVE_EFFECT = {
 
-    e1 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
+    e1 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
 
         /* This is the starting point to apply filtrr on your images.
          * Using the img() function you can pass in an id or the img element,
@@ -1088,7 +1101,7 @@ var SAVE_EFFECT = {
          * The callback function is given a filtr parameter which is a wrapper around
          * the canvas element, and contains all the filter and blending methods.
          */
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
 
             /* filtr.duplicate() can be used to get a duplicate of the filtr object
              * so you can blend many together.*/
@@ -1117,30 +1130,30 @@ var SAVE_EFFECT = {
         });
     },
 
-    e2 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e2 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.saturation(0.3).posterize(70).tint([50, 35, 10], [190, 190, 230]);
             filtr.put();
         });
     },
 
-    e3 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e3 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.tint([60, 35, 10], [170, 170, 230]).contrast(0.8);
             filtr.put();
         });
     },
 
-    e4 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e4 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.grayScale().tint([60,60,30], [210, 210, 210]);
             filtr.put();
         filtr.canvas().getContext("2d").scale(0.5,0.5);
         });
     },
 
-    e5 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e5 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.tint([30, 40, 30], [120, 170, 210])
                       .contrast(0.75)
                       .bias(1)
@@ -1150,15 +1163,15 @@ var SAVE_EFFECT = {
         });
     },
 
-    e6 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e6 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.saturation(0.4).contrast(0.75).tint([20, 35, 10], [150, 160, 230]);
             filtr.put();
         });
     },
 
-    e7 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e7 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             topFiltr.core.tint([20, 35, 10], [150, 160, 230]).saturation(0.6);
             filtr.core.adjust(0.1,0.7,0.4).saturation(0.6).contrast(0.8);
@@ -1167,8 +1180,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e8 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e8 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             /* In this example we are creating 3 different duplicate layers. Each one is filtered
              * and then blended on the filtr object. Note that you could say blend topFiltr1 and
              * topFiltr2 together and then blend the resuln on filtr.
@@ -1187,8 +1200,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e9 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e9 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             var topFiltr = filtr.duplicate();
             var topFiltr1 = filtr.duplicate();
             topFiltr1.core.fill(226, 217, 113).saturation(0.2);
@@ -1201,8 +1214,8 @@ var SAVE_EFFECT = {
         });
     },
 
-    e10 : function(albumphotoID, croppedImgSrc, bigImageSrc) {
-        filtrr.filter_and_save(albumphotoID, croppedImgSrc, bigImageSrc, function(filtr) {
+    e10 : function(albumphotoID, croppedImageProxySrc, bigimageProxySrc) {
+        filtrr.filter_and_save(albumphotoID, croppedImageProxySrc, bigimageProxySrc, function(filtr) {
             filtr.core.sepia().bias(0.6);
             filtr.put();
         });

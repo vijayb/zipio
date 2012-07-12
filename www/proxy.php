@@ -3,7 +3,7 @@
 // Is it a POST or a GET?
 $url = $_GET['url'];
 //$headers = $_GET['headers'];
-$mimeType = $_GET['mimeType'];
+$mime_type = $_GET['mime_type'];
 
 
 //Start the Curl session
@@ -21,11 +21,11 @@ curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($session);
 
 
-if ($mimeType != "")
+if ($mime_type != "")
 {
 	// The web service returns XML. Set the Content-Type appropriately
-	header("Content-Type: ".$mimeType);
-    //echo("Content-Type: ".$mimeType);
+	header("Content-Type: ".$mime_type);
+    //echo("Content-Type: ".$mime_type);
 }
 
 echo $response;
