@@ -180,7 +180,7 @@ if ($target_album_id > 0) {
             You added a photo to your <b>{$target_album_info["handle"]}</b> album.
             <a href='{$display_album_link}'>See the album</a>!
             <br><br>
-            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
+            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.{$g_zipio}.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 
 EMAIL;
 
@@ -307,7 +307,7 @@ EMAIL;
             You created a new album called <b>{$target_album_info["handle"]}</b>.
             <a href='{$display_album_link}'>See the album</a>!
             <br><br>
-            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.zipio.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
+            To add more photos, email them to <b>{$target_album_info["handle"]}@{$user_info["username"]}.{$g_zipio}.com</b>. Anyone can add photos, so share this email address! (We'll ask you to approve anyone who tries to add photos.)
 EMAIL;
 
     } else {

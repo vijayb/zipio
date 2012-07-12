@@ -43,7 +43,7 @@ $page_subtitle = "";
         </h2>
         <br><br><br>
         <h1>
-            <span class="highlight" style="font-weight:700">To begin, send a photo to myphotos@zipio.com</span>
+            <span class="highlight" style="font-weight:700">To begin, send a photo to myphotos@<?php print($g_zipio); ?>.com</span>
         </h1>
 
         <br><br>

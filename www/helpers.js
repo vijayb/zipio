@@ -1,18 +1,4 @@
-var imageFilters = {};
-
-function changeFilter(photoID, albumphotoID, filter) {
-    var urlString = "/change_filter.php?albumphoto_id=" + albumphotoID;
-
-    var fancyboxHref = $("#fancybox-" + photoID).attr("href");
-    fancyboxHref = fancyboxHref.replace(/_[0-9]+$/gi, "_" + filter);
-    debug(fancyboxHref);
-    $("#fancybox-" + photoID).attr("href", fancyboxHref);
-
-    var imageSrc = $("#image-" + photoID).attr("src");
-    imageSrc = imageSrc.replace(/_[0-9]+$/gi, "_" + filter);
-    debug(imageSrc);
-    $("#image-" + photoID).attr("src", imageSrc);
-}
+var imageFiltered = {};
 
 ////////////////////////////////////////////////////////////////////////////////
 // SHOW MODALS
@@ -242,6 +228,12 @@ function setPasswordSubmitButton() {
 
 
 
+
+
+
+
+
+
 function deleteCollaborator(collaboratorID, albumID, albumToken) {
     var urlString = "/delete_collaborator.php?collaborator_id=" + collaboratorID +
                                             "&album_id=" + albumID +
@@ -367,26 +359,71 @@ function checkUsernameIsUnique(prefix) {
 
 
 
-function applyFilter(imageID, imageSrc, filter) {
-    var imgID = "image-" + imageID;
-    RUN_EFFECT['e' + filter](imgID, imageSrc);
 
-    imageFilters[imageID.toString()] = filter;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function resetPhotoToOriginal(albumphotoID, croppedOriginalSrc, bigOriginalSrc) {
+    $("#save-" + albumphotoID).show();
+    $("#albumphoto-" + albumphotoID).find("canvas").remove();
+    $("#image-" + albumphotoID).attr("src", croppedOriginalSrc);
+    $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
+    imageFiltered[albumphotoID.toString()] = 0;
 }
 
-function undoFilter(imageID) {
-    delete imageFilters[imageID.toString()];
-    $("#image-"+imageID).parent().parent().find("canvas").remove();
+function applyFilter(albumphotoID, imageSrc, filter) {
+    $("#save-" + albumphotoID).show();
+    RUN_EFFECT['e' + filter](albumphotoID, imageSrc);
+    imageFiltered[albumphotoID.toString()] = filter;
 }
 
+function saveFiltered(albumphotoID, croppedImageSrc, bigImageSrc) {
+    if (imageFiltered.hasOwnProperty(albumphotoID)) {
 
-function saveFiltered(imageID, croppedImageSrc, bigImageSrc) {
-    if (imageFilters.hasOwnProperty(imageID)) {
-        SAVE_EFFECT['e' + imageFilters[imageID]](imageID, croppedImageSrc, bigImageSrc);
+        if (imageFiltered[albumphotoID] == 0) {
+            $.ajax({
+                type: 'GET',
+                url: '/save_filtered.php?albumphoto_id=' + albumphotoID + '&reset_to_original',
+                sync: false,
+                success: function(data) {
+                    console.log(data);
+                    $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
+                }
+            });
+
+        } else {
+            SAVE_EFFECT['e' + imageFiltered[albumphotoID]](albumphotoID, croppedImageSrc, bigImageSrc);
+        }
+        delete imageFiltered[albumphotoID.toString()];
+        $("#save-" + albumphotoID).hide();
     } else {
         alert("No filter selected");
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

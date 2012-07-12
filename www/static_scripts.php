@@ -68,6 +68,15 @@ $(function() {
 
     ?>
 
+    $(window).resize(function() {
+        $("canvas").remove();
+        imageFiltered = {};
+
+        $('button').filter(function() {
+            return this.id.match(/save-*/);
+        }).hide();
+    });
+
     // If there is an alert URL parameter, show the alert
     var alert = getURLHashParameter("alert");
     if (alert != "null") {

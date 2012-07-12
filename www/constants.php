@@ -2,11 +2,12 @@
 
 /*
 
-1. Compile LESS and use static CSS in static_top.php
-2. Change $g_debug from 1 to 0 in constants.php
-3. Change $g_database from TEST to PROD in constants.php
-4. Change zipiyo to zipio in process_email.php (used in preg_match at least twice)
-5. Change the $g_s3_folder_name variable in constants.php from photos_test to photos
+- Compile LESS and use static CSS in static_top.php
+- Change $g_debug from 1 to 0 in constants.php
+- Change $g_database from TEST to PROD in constants.php
+- Change zipiyo to zipio in process_email.php (used in preg_match at least twice)
+- Change $g_zipio to zipio
+- Change the $g_s3_folder_name variable in constants.php from photos_test to photos
 
     TRUNCATE TABLE AlbumPhotos;
     TRUNCATE TABLE Collaborators;
@@ -22,6 +23,7 @@ $g_s3_folder_name = "photos_test";
 $g_s3_root = "http://s3.zipio.com/$g_s3_folder_name";
 $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
+$g_zipio = "zipiyo";
 
 // When set to 1, certain debug statements are turned ON. This must be set to
 // 0 before pushing to production because the debug statements might reveal

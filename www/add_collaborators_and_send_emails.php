@@ -71,7 +71,7 @@ foreach ($emails as $email) {
             <br><br>
             To add photos, email them to:
             <br><br>
-            {$album_info["handle"]}@{$album_owner_info["username"]}.zipio.com
+            {$album_info["handle"]}@{$album_owner_info["username"]}.{$g_zipio}.com
 
 EMAIL;
 

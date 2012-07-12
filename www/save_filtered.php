@@ -3,7 +3,15 @@
 require("constants.php");
 require("db.php");
 require("helpers.php");
-require "S3.php";
+
+if (isset($_GET["reset_to_original"]) && isset($_GET["albumphoto_id"]) && is_numeric($_GET["albumphoto_id"])) {
+    update_data("AlbumPhotos", $_GET["albumphoto_id"], array("filtered" => "0"));
+    print("1");
+    exit();
+}
+
+require("S3.php");
+
 
 if (!class_exists('S3')) require_once 'S3.php';
 if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
@@ -26,6 +34,8 @@ if (!$s3->putObject($image_data,
                     S3::ACL_PUBLIC_READ,
                     array(),
                     array("Content-Type" => "image/jpeg"))) {
+    print("0");
+    exit();
 }
 
 
@@ -44,10 +54,13 @@ if (!$s3->putObject($image_data,
                     S3::ACL_PUBLIC_READ,
                     array(),
                     array("Content-Type" => "image/jpeg"))) {
+    print("0");
+    exit();
 }
 
 
 update_data("AlbumPhotos", $_POST["albumphoto_id"], array("filtered" => "1"));
 
+print("1");
 
 ?>
