@@ -513,7 +513,7 @@ function get_album_info($album_id) {
     }
 }
 
-function get_albums_info($user_id) {
+function get_albums_info_where_owner($user_id) {
 
     global $con;
 
@@ -528,7 +528,23 @@ function get_albums_info($user_id) {
         array_push($albums_array, $album);
     }
     return $albums_array;
+}
 
+function get_albums_info_where_collaborator($collaborator_id) {
+
+    global $con;
+
+    $query = "SELECT * FROM Collaborators WHERE collaborator_id='$collaborator_id'";
+
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $albums_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $album = get_album_info($row["album_id"]);
+        array_push($albums_array, $album);
+    }
+    return $albums_array;
 }
 
 

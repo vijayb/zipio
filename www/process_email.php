@@ -329,7 +329,7 @@ if ($brand_new_user) {
     $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
 }
 
-if (!preg_match("/zipiyo.com$/", $sender)) {
+if (!preg_match("/zipiyo\.com$/", $sender)) {
     send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
         send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);

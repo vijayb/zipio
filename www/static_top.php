@@ -498,7 +498,7 @@ HTML;
     <div class="row">
         <div class="span9" style="margin-bottom:10px">
             <h1><?php print($page_title); ?></h1>
-            <h2 style="color:#999999; margin: 10px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
+            <h2 style="color:#666666; margin: 10px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
             <?php // if (isset($third_row)) { print($third_row); } ?>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
