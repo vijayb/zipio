@@ -19,24 +19,24 @@
 
 
 $g_s3_bucket_name = "s3.zipio.com";
-$g_s3_folder_name = "photos";
+$g_s3_folder_name = "photos_test";
 $g_s3_root = "http://s3.zipio.com/$g_s3_folder_name";
 $g_www_root = "http://" . $_SERVER["HTTP_HOST"];
 $g_founders_email_address = "Zipio <founders@zipio.com>";
-$g_zipio = "zipio";
+$g_zipio = "zipiyo";
 
 // When set to 1, certain debug statements are turned ON. This must be set to
 // 0 before pushing to production because the debug statements might reveal
 // information that is sensitive.
 
-$g_debug = 0;
+$g_debug = 1;
 
 
 
 // When set to "PROD", the system uses the database at zipio.com. When set to
 // "TEST", the system uses the database at ec2-23-22-14-153.compute-1.amazonaws.com
 
-$g_database_to_use = "PROD";
+$g_database_to_use = "TEST";
 
 
 
