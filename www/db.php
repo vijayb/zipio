@@ -2,7 +2,7 @@
 
 $username = "zipio";
 $password = "daewoo";
-$database = "ZipioJosh";
+$database = "Zipio";
 
 if ($g_database_to_use == "PROD") {
     $con = mysql_connect ("zipio.com", $username, $password, true);

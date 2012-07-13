@@ -43,7 +43,7 @@ $page_title = <<<HTML
     {$album_info["handle"]}<span style="color:#000000">@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com</span> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
-$page_subtitle = "Email a photo to the above address";
+$page_subtitle = "To add photos, email them to the above address";
 
 if ($is_owner || $is_collaborator) {
     $photos_area_width = "span9";
@@ -114,13 +114,13 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
                 <img id="image-{$albumphoto_id}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
 
-                <div class="album-privacy" style="display:none;">
+                <div class="album-privacy" style="opacity:0.6;">
                     by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                 </div>
             </a>
 HTML;
 
-    if ($is_owner) {
+    if ($is_owner || $is_collaborator) {
 
         $html .= <<<HTML
             <div class="tile-options" style="display:none;">
@@ -211,7 +211,7 @@ if ($is_owner || $is_collaborator) {
                         <div style="overflow:hidden;">
                             <b>{$album_owner_info["username"]} (owner)</b> {$you_html}
                             <br>
-                            <span style="color:#999999">{$album_owner_info["email"]}</span>
+                            <span style="color:#666666">{$album_owner_info["email"]}</span>
                         </div>
                     </div>
 HTML;
@@ -240,7 +240,7 @@ HTML;
                         <div style="overflow:hidden;">
                             <a href="/{$collaborator["username"]}"><b>{$collaborator["username"]}</b></a> {$you_html}
                             <br>
-                            <span style="color:#999999">{$collaborator["email"]}</span>
+                            <span style="color:#666666">{$collaborator["email"]}</span>
                         </div>
                     </div>
 HTML;
@@ -249,9 +249,12 @@ HTML;
     $html .= <<<HTML
                 </div>
                 <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
+                <div style="margin-top:10px; color:#666666; font-size:13px">
+                If anyone else tries to add a photo, we'll email the album owner for approval.
+                </div>
             </div>
 
-            <div style="height:70px"></div>
+            <div style="height:50px"></div>
 HTML;
 
 
@@ -266,7 +269,7 @@ HTML;
                     <input type="radio" name="album-privacy" id="album-privacy-1" value="1" checked="" onclick="changeAlbumPrivacy();">
                     <b>Album collaborators only</b> <span id="album-privacy-saved-1" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                 </label>
-                <p style="margin-left:20px; color:#999999;">
+                <p style="margin-left:20px; color:#666666;">
                     Just the folks listed above
                 </p>
 
@@ -275,8 +278,8 @@ HTML;
                     <input type="radio" name="album-privacy" id="album-privacy-2" value="2" checked="" onclick="changeAlbumPrivacy();">
                     <b>Anyone on the web</b> <span id="album-privacy-saved-2" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                 </label>
-                <p style="margin-left:20px; color:#999999;">
-                     Album visible to all at {$_SERVER["HTTP_HOST"]}/{$album_owner_info["username"]}/{$album_info["handle"]}
+                <p style="margin-left:20px; color:#666666;">
+                     Album is visible to <i>everyone</i>, at <a href='{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}'>{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}</a>
                 </p>
 
             </div>
@@ -375,10 +378,11 @@ $(function() {
 
     $(".tile").each(function(index) {
         $(this).mouseenter(function() {
-            $(this).find(".tile-options", ".album-privacy").stop(true, true).show();
+            $(".tile").find(".album-privacy").stop(true, true).delay(500).fadeOut();
+            $(this).find(".tile-options, .album-privacy").stop(true, true).show();
         });
         $(this).mouseleave(function() {
-            $(this).find(".tile-options", ".album-privacy").stop(true, true).delay(750).fadeOut();
+            $(".tile").find(".tile-options, .album-privacy").stop(true, true).delay(500).fadeOut();
         });
     });
 

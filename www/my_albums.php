@@ -7,7 +7,9 @@ if (!isset($_GET["owner_username"])) {
     exit();
 } else {
     $owner_id = get_user_id_from_username($_GET["owner_username"]);
-    $albums_array = get_albums_info($owner_id);
+    $albums_array_where_owner = get_albums_info_where_owner($owner_id);
+    $albums_array_where_collaborator = get_albums_info_where_collaborator($owner_id);
+    $albums_array = array_merge($albums_array_where_owner, $albums_array_where_collaborator);
     $owner_username = get_username_from_user_id($owner_id);
     $owner_info = get_user_info($owner_id);
 
