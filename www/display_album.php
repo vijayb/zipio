@@ -246,12 +246,27 @@ HTML;
 HTML;
     }
 
+
+
     $html .= <<<HTML
                 </div>
-                <button class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
-                <div style="margin-top:10px; color:#666666; font-size:13px">
-                If anyone else tries to add a photo, we'll email the album owner for approval.
-                </div>
+
+                <button style="margin-bottom:10px;" class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
+HTML;
+
+    if ($is_owner) {
+        $html .= <<<HTML
+                <label class="checkbox" style="margin:0px;">
+                    <input type="checkbox" id="write-permissions-checkbox" checked="true" onclick="changeAlbumWritePermissions();">
+                    <span style="color:#666666; font-size:13px;">
+                        If someone who's <i>not</i> listed above tries to add a photo, email me for approval first.
+                        <span id="write-permissions-saved" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                    </span>
+                </label>
+HTML;
+    }
+
+    $html .= <<<HTML
             </div>
 
             <div style="height:50px"></div>

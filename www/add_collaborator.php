@@ -50,7 +50,7 @@ $collaborator_email_body = <<<EMAIL
     Any photos you've already tried to add to the album are now in the album. <a href='{$display_album_link}'>See the album</a>.
 EMAIL;
 
-send_email($collaborator_info["email"], $g_founders_email_address, "Zipio activity notification", $collaborator_email_body);
+send_email($collaborator_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $collaborator_email_body);
 
 $url =  $g_www_root . "/" . $user_info["username"] . "/" . $album_info["handle"] . "#alert=3&email=" . $collaborator_info["email"];
 

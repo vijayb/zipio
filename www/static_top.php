@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Zipio</title>
+<title><?php print($g_Zipio); ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
@@ -66,7 +66,7 @@ rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > 
 
 if (is_logged_in()) {
 
-    $brand_name = "<span style='color:red;'>zipio</span> alpha - may lose data";
+    $brand_name = "<span style='color:red;'>$g_zipio</span> alpha - may lose data";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -86,7 +86,7 @@ HTML;
 
 } else {
 
-    $brand_name = "zipio alpha - may lose data";
+    $brand_name = "$g_zipio alpha - may lose data";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
@@ -101,7 +101,7 @@ HTML;
 // includes static_top.php) to initialize these variables. If that page has
 // not initialized the variables by now, we set defaults below.
 
-if (!isset($page_title)) $page_title = "Zipio";
+if (!isset($page_title)) $page_title = $g_Zipio;
 if (!isset($page_subtitle)) $page_subtitle = "Post photos over email";
 if (!isset($page_title_right)) $page_title_right = "";
 
@@ -119,7 +119,7 @@ if (!isset($page_title_right)) $page_title_right = "";
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '255929901188660', // App ID
-      channelUrl : '//ec2-23-22-14-153.compute-1.amazonaws.com/channel.php', // Channel File
+      channelUrl : '//zipiyo.com/channel.php', // Channel File
       status     : true, // check login status
       cookie     : true, // enable cookies to allow the server to access the session
       xfbml      : true  // parse XFBML
@@ -326,7 +326,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Signup for a Zipio account</h2>
+        <h2>Signup for a <?php print($g_Zipio); ?> account</h2>
     </div>
 
     <div class="modal-body">
@@ -429,7 +429,7 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
     <div id="fb-bar" style="display:none;">
-        <span class="highlight">People you know are already using Zipio!</span>
+        <span class="highlight">People you know are already using <?php print($g_Zipio); ?>!</span>
         <button class="btn btn-primary" href="#" onclick="FB.login();">Find them with Facebook</button>
     </div>
 </div>

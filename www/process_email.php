@@ -54,7 +54,7 @@ if (!defined('awsSecretKey')) define('awsSecretKey', 'xlT7rnKZPbFr1VayGtPu3zU6Tl
 $s3 = new S3(awsAccessKey, awsSecretKey);
 
 
-// First, check if the user who SENT the email is an existing Zipio user
+// First, check if the user who SENT the email is an existing user
 
 $brand_new_user = 0;
 
@@ -120,7 +120,7 @@ output("TIME 4: " . (time() - $start_time) . "\n");
 $s3_urls = array();
 
 // Check if target user is specified explicitly (e.g., vacation@alex.zipio.com)
-if (preg_match("/(.+)\.zipiyo\.com/", $recipient_domain, $matches)) {
+if (preg_match("/(.+)\.$g_zipio\.com/", $recipient_domain, $matches)) {
     $target_username = $matches[1];
     output("target_username: $target_username\n");
     $target_user_id = get_user_id_from_username($target_username);
@@ -326,13 +326,13 @@ EMAIL;
 
 
 if ($brand_new_user) {
-    $user_email_body = "Welcome to Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
+    $user_email_body = "Welcome to $g_Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
 }
 
-if (!preg_match("/zipiyo\.com$/", $sender)) {
-    send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
+if (!preg_match("/$g_zipio\.com$/", $sender)) {
+    send_email($user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $user_email_body);
     if (isset($target_user_email_body)) {
-        send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);
+        send_email($target_user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $target_user_email_body);
         output("$target_user_email_body\n\n");
     }
 }
