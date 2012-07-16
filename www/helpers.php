@@ -346,7 +346,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
 
 
-function email_newly_added_photos_to_collaborators($album_info, $s3_urls) {
+function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s3_urls) {
 
     global $con;
     global $g_www_root;
@@ -379,7 +379,7 @@ function email_newly_added_photos_to_collaborators($album_info, $s3_urls) {
         $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
         $collaborator_email_body = <<<EMAIL
-            These photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$display_album_link}"><b>{$album_info["handle"]}</b> album</a>.
+            <b>{$sender_info["username"]}</b> just added these photos to <b>{$album_owner_info["username"]}</b>'s <a href="{$display_album_link}"><b>{$album_info["handle"]}</b> album</a>.
             <br><br>
 EMAIL;
         $collaborator_email_body .= $pictures_html;

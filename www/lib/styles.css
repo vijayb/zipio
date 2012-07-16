@@ -6,7 +6,6 @@ html {
 body {
     padding-top: 60px;
     padding-bottom: 250px;
-    background-image: url("/tile.png");
 }
 
 .tile {

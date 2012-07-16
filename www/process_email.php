@@ -192,7 +192,7 @@ EMAIL;
 
         $is_collaborator = is_collaborator($user_id, $target_album_id);
 
-        if ($is_collaborator == 1) {
+        if ($is_collaborator == 1 || $target_album_info["write_permissions"] == 2) {
             // The user who SENT the photos is already a collaborator of the target album, so add the photos
             output("User " . $user_info["username"] . " is an access of album with ID $target_album_id.\n");
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
@@ -212,15 +212,17 @@ EMAIL;
             $owner_display_album_ra["timestamp"] = time();
             $owner_display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($owner_display_album_ra)) . "#register=true";
 
-            $user_email_body = <<<EMAIL
-                You added a photo to {$target_user_info["username"]}'s <b>{$target_album_info["handle"]}</b> album.
-                <a href='{$display_album_link}'>See the album</a>!
-EMAIL;
-
             $target_user_email_body = <<<EMAIL
                 {$user_info["email"]} added a photo to your {$target_album_info["handle"]} album.
                  <a href='{$owner_display_album_link}'>See the album</a>!
 EMAIL;
+            $pictures_html = "";
+            for ($i = 0; $i < count($s3_urls); $i++) {
+                $pictures_html .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
+            }
+            $target_user_email_body .= "<br><br>" . $pictures_html;
+
+
 
             output("TIME 8: " . (time() - $start_time) . "\n");
 
@@ -330,8 +332,13 @@ if ($brand_new_user) {
 }
 
 if (!preg_match("/$g_zipio\.com$/", $sender)) {
-    send_email($user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $user_email_body);
-    if (isset($target_user_email_body)) {
+
+    if (isset($user_email_body) && strlen($user_email_body) > 0) {
+        send_email($user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $user_email_body);
+        output("$user_email_body\n\n");
+    }
+
+    if (isset($target_user_email_body) && strlen($target_user_email_body) > 0) {
         send_email($target_user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $target_user_email_body);
         output("$target_user_email_body\n\n");
     }
@@ -339,6 +346,28 @@ if (!preg_match("/$g_zipio\.com$/", $sender)) {
 
 output("$user_email_body\n");
 output("TIME 11: " . (time() - $start_time) . "\n");
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 
 
 function output($string) {

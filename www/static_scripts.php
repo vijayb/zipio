@@ -12,13 +12,14 @@
 <script src="/bootstrap/js/bootstrap-modal.js"></script>
 <script src="/bootstrap/js/bootstrap-dropdown.js"></script>
 <script src="/bootstrap/js/bootstrap-button.js"></script>
+<script src="/bootstrap/js/bootstrap-tooltip.js"></script>
+<script src="/bootstrap/js/bootstrap-popover.js"></script>
 
 <!--
 <script src="/bootstrap/js/bootstrap-collapse.js"></script>
 <script src="/bootstrap/js/bootstrap-scrollspy.js"></script>
 <script src="/bootstrap/js/bootstrap-tab.js"></script>
 <script src="/bootstrap/js/bootstrap-tooltip.js"></script>
-<script src="/bootstrap/js/bootstrap-popover.js"></script>
 <script src="/bootstrap/js/bootstrap-carousel.js"></script>
 <script src="/bootstrap/js/bootstrap-transition.js"></script>
 <script src="/bootstrap/js/bootstrap-typeahead.js"></script>
@@ -105,7 +106,7 @@ $(function() {
 
 
 
-    var delayBeforeChecking = 300;
+    var delayBeforeChecking = 600;
 
     // -------------------------------------------------------------------------
     // REGISTER
@@ -196,7 +197,11 @@ $(function() {
 
     // Clear the hash if there was one
     window.location.hash = "";
-    //removeHash();
+
+    if (!isLoggedIn()) {
+        $("body").css({"background-color":"#ffdddd"});
+    }
+
 
 });
 
