@@ -112,8 +112,8 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
                 <img id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
 
-                <div class="album-privacy" style="opacity:0.8;">
-                    by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
+                <div class="album-privacy">
+                    posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                 </div>
             </a>
 HTML;
@@ -166,6 +166,22 @@ HTML;
 
     print($html);
 }
+
+
+$html = <<<HTML
+
+<!--
+<div class="span3 tile">
+    <div style="width:100%; height:100%; background-color:#dddddd;">
+        <img src="http://s3.zipiyo.com/photos/1_1_08d481fc329626acd51cff1adf7f28a3f8952b32_cropped_filtered">
+    </div>
+</div>
+-->
+
+HTML;
+
+print($html);
+
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 ?>
@@ -257,7 +273,7 @@ HTML;
                 <label class="checkbox" style="margin:0px;">
                     <input type="checkbox" id="write-permissions-checkbox" onclick="changeAlbumWritePermissions();">
                     <span style="color:#666666;">
-                        Allow people <i>not</i> listed above to add photos, too. <a href="#" id="write-permissions-qm" rel="popover"><i class="icon-question-sign"></i></a>
+                        Allow people <i>not</i> listed above to add photos without my approval. <a href="#" id="write-permissions-qm" rel="popover"><i class="icon-question-sign"></i></a>
                         <span id="write-permissions-saved" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                     </span>
                 </label>

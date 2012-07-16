@@ -50,7 +50,7 @@ for ($i = 0; $i < count($albums_array); $i++) {
 
     $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
     $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
-    $upper_left = $album_owner_info["username"];
+    $upper_left = "owner: <b>" . $album_owner_info["username"] . "</b>";
 
 
     $html = <<<HTML
@@ -122,6 +122,12 @@ $(function() {
             $(this).find(".tile-options").stop(true, true).fadeOut();
         });
     });
+
+    if (isLoggedIn()) {
+        $("#right-links li").removeClass("active");
+        $("#right-links-1").addClass("active");
+    }
+
 
 });
 

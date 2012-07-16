@@ -199,7 +199,7 @@ $(function() {
     window.location.hash = "";
 
     if (!isLoggedIn()) {
-        $("body").css({"background-color":"#ffdddd"});
+        // $("body").css({"background-color":"#ffdddd"});
     }
 
 

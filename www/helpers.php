@@ -17,6 +17,9 @@ function login_user($user_id) {
     $_SESSION["user_id"] = $user_id;
     $_SESSION["user_info"] = get_user_info($user_id);
     $_SESSION["user_info"]["token"] = calculate_token_from_id($user_id, "Users");
+
+    header("Location: " . "/" . $_SESSION["user_info"]["username"]);
+
 }
 
 function is_logged_in() {
@@ -215,8 +218,6 @@ function create_album($user_id, $handle) {
     return $album_id;
 }
 
-//$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
-
 function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
                         $visible, $path_to_photo, &$s3_url_parameter) {
 
@@ -231,11 +232,6 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     $visible_string = "";
     if (!$visible) $visible_string = "<b>invisible</b>";
 
-    // 1_1_pu423oriu34pour234pu_cropped
-    // 1_1_pu423oriu34pour234pu_big
-    // 1_1_pu423oriu34pour234pu_cropped_filtered
-    // 1_1_pu423oriu34pour234pu_big_filtered
-
     $s3_base_image_url =
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_base_image_url;
@@ -249,6 +245,25 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     $image->setImageFormat('jpeg');
     $image->setImageCompression(Imagick::COMPRESSION_JPEG);
     $image->setImageCompressionQuality(85);
+
+    $exif = exif_read_data($path_to_photo);
+
+    print("EXIF: ");
+    print_r($exif);
+
+    $orientation = $exif['Orientation'];
+
+    print("orientation: " . $orientation . "\n");
+
+    switch($orientation) {
+        case 6:
+            $image->rotateImage(new ImagickPixel('none'), 90);
+        break;
+        case 8:
+           $image->rotateImage(new ImagickPixel('none'), -90);
+        break;
+    }
+
     $image->stripImage();
 
     $big_image = clone $image;
