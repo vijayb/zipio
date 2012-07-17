@@ -19,17 +19,16 @@
 
 
 
-
+<!--
+Run the following from the zipio directory:
+  rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
+  rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
+-->
 
 
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
 
-
-<!--
-rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
-rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
--->
 
 <!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
@@ -77,6 +76,7 @@ if (is_logged_in()) {
         <ul id="right-links" class="nav pull-right" style="font-size:18px">
             <li><a href="/{$_SESSION["user_info"]["username"]}"><b>{$_SESSION["user_info"]["email"]}</b></a></li>
             <li id="right-links-3"><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
+            <li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li>
         </ul>
 HTML;
 
@@ -136,6 +136,12 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 <!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!--  MODALS ------------------------------------------------------------------>
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 
 <?php if (is_logged_in()) { ?>
 
@@ -191,9 +197,12 @@ if (!isset($page_title_right)) $page_title_right = "";
 <div class="modal hide" id="login-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <a class="close" data-dismiss="modal">x</a>
         <h2>Login</h2>
     </div>
+
+
+
 
     <div class="modal-body">
         <div class="alert fade in alert-error" id="login-error" style="display:none;">
@@ -219,6 +228,9 @@ if (!isset($page_title_right)) $page_title_right = "";
         </div>
     </div>
 
+
+
+
     <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="submitLogin();"
@@ -227,6 +239,8 @@ if (!isset($page_title_right)) $page_title_right = "";
                 Login
         </button>
     </div>
+
+
 
 </div>
 
@@ -355,7 +369,15 @@ if (!isset($page_title_right)) $page_title_right = "";
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
-
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 
 
 <div class="navbar navbar-fixed-top">
@@ -419,6 +441,14 @@ HTML;
 </div>
 
 
+
+
+
+
+
+
+
+
 <div class="container">
 
     <div class="row">
@@ -431,13 +461,14 @@ HTML;
         </div>
     </div>
 
-    <div class="row">
+
+
+    <div class="row" style="margin-bottom:25px">
         <div class="span9" style="margin-bottom:10px">
             <h1><?php print($page_title); ?></h1>
-            <h2 style="color:#666666; margin: 10px 0px 5px 0px; font-weight:normal;"><?php print($page_subtitle); ?></h2>
-            <?php // if (isset($third_row)) { print($third_row); } ?>
+            <h2 style="color:#666666; margin: 10px 0px 5px 0px; font-weight:normal;">
+                <?php print($page_subtitle); ?>
+            </h2>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>
-
-    <div class="row" style="height:25px"></div>

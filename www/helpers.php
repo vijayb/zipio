@@ -272,11 +272,8 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     $exif = exif_read_data($path_to_photo);
 
     print("EXIF: ");
-    print_r($exif);
 
     $orientation = $exif['Orientation'];
-
-    print("orientation: " . $orientation . "\n");
 
     switch($orientation) {
         case 6:
@@ -558,10 +555,10 @@ function get_album_info($album_id) {
                 $likes_array[$likes_row["albumphoto_id"]] = 0;
             }
             $likes_array[$likes_row["albumphoto_id"]]++;
-            
+
             $user_likes_array[$likes_row["user_id"]."_".$likes_row["albumphoto_id"]] = 1;
         }
-        
+
         $row["likes"] = $likes_array;
         $row["user_likes"] = $user_likes_array;
 

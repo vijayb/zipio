@@ -4,9 +4,15 @@
 
 BEFORE PUSHING:
 
-- Compile LESS and use static CSS in static_top.php
+- Compile LESS and use static CSS in static_top.php (if you need to)
 - Change $g_database from TEST to PROD in constants.php
-- Change $g_zipio to zipio
+- Change $g_zipio/$g_Zipio to zipio/Zipio in constants.php
+
+
+
+
+
+To delete the database:
 
     TRUNCATE TABLE AlbumPhotos;
     TRUNCATE TABLE Collaborators;
@@ -20,9 +26,9 @@ http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-too
 */
 
 
-$g_zipio = "zipio";
-$g_Zipio = "Zipio";
-$g_database_to_use = "PROD";    // When set to "PROD", the system uses the database at zipio.com. When set to "TEST", the system uses the database at zipiyo.com
+$g_zipio = "zipiyo";
+$g_Zipio = "Zipiyo";
+$g_database_to_use = "TEST";    // When set to "PROD", the system uses the database at zipio.com. When set to "TEST", the system uses the database at zipiyo.com
 
 
 $g_s3_bucket_name = "s3.$g_zipio.com";

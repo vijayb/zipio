@@ -25,6 +25,10 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
+if (is_logged_in()) {
+    $user_id = $_SESSION['user_id'];
+}
+
 $is_owner = 0;
 $is_collaborator = 0;
 
@@ -103,11 +107,25 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $photo_owners[$albumphotos_array[$i]["photo_owner_id"]] = $photo_owner;
     }
 
+
     if (isset($album_info["likes"][$albumphoto_id])) {
         $like_count = $album_info["likes"][$albumphoto_id];
     } else {
         $like_count = 0;
     }
+
+
+    if (is_logged_in()) {
+
+        if (isset($album_info["user_likes"][$user_id . "_" . $albumphoto_id])) {
+            $heart_color = "red";
+        } else {
+            $heart_color = "gray";
+        }
+
+    }
+
+
 
     $html = <<<HTML
         <div class="span3 tile" id="albumphoto-{$albumphoto_id}" likes={$like_count}>
@@ -118,7 +136,13 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                rel="fancybox"
                href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}">
 
+                <!------------------------------------------------------------->
+                <!------------------------------------------------------------->
+                <!-- THE ACTUAL PHOTO ----------------------------------------->
                 <img id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
+                <!------------------------------------------------------------->
+                <!------------------------------------------------------------->
+                <!------------------------------------------------------------->
 
                 <div class="album-privacy">
                     posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
@@ -126,23 +150,38 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
             </a>
 HTML;
 
+print($html);
+
+
+
+
+if (is_logged_in()) {
+
+    $html = <<<HTML
+            <div class="like-panel">
+                <span id="like-count-{$albumphoto_id}">{$like_count}</span>
+                <a href="javascript:void(0)" onclick="toggleLikePhoto({$user_id}, {$albumphoto_id}, {$album_to_display});" class="no-underline">
+                    <i id='like-{$albumphoto_id}' class="icon-heart {$heart_color}-heart"></i>
+                </a>
+            </div>
+HTML;
+
+} else {
+
+    $html = <<<HTML
+            <div class="like-panel">
+                <span id="like-count-{$albumphoto_id}">{$like_count}</span>
+                <i id='like-{$albumphoto_id}' class="icon-heart gray-heart"></i>
+            </div>
+HTML;
+
+}
+
+print($html);
 
     if ($is_owner || $is_collaborator || $album_info["write_permissions"] == 2) {
-        $user_id = $_SESSION['user_id'];
-
-        if (isset($album_info["user_likes"][$user_id."_".$albumphoto_id])) {
-            $heart_color = "red";
-        } else {
-            $heart_color = "grey";
-        }
-        
-        $html .= <<<HTML
+        $html = <<<HTML
             <div class="tile-options" style="display:none;">
-            <a href="javascript:void(0)" onclick="toggleLikePhoto($user_id, $albumphoto_id, $album_to_display);">
-            <img alt="{$like_count}" id='like-{$albumphoto_id}' src='{$g_www_root}/{$heart_color}_heart.png' style='float:left; margin-right:5px;'>
-            </a>
-
-
 
                 <div class="btn-group" style="float:left; margin-right:5px;">
                     <button id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" data-loading-text="Filtering...">
@@ -216,6 +255,10 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 <?php
 
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -427,11 +470,11 @@ $(function() {
 
     $(".tile").each(function(index) {
         $(this).mouseenter(function() {
-            $(".tile").find(".album-privacy").stop(true, true).delay(500).fadeOut();
-            $(this).find(".tile-options, .album-privacy").stop(true, true).show();
+            $(".tile").find(".album-privacy, .like-panel").stop(true, true).delay(500).fadeOut();
+            $(this).find(".tile-options, .album-privacy, .like-panel").stop(true, true).show();
         });
         $(this).mouseleave(function() {
-            $(".tile").find(".tile-options, .album-privacy").stop(true, true).delay(500).fadeOut();
+            $(".tile").find(".tile-options, .album-privacy, .like-panel").stop(true, true).delay(500).fadeOut();
         });
     });
 

@@ -448,7 +448,18 @@ function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigO
 
 
 
-
+function fbLogin() {
+    FB.login(function (response) {
+        if (response.authResponse) {
+            console.log('Welcome!  Fetching your information.... ');
+            FB.api('/me', function (response) {
+                console.log('Good to see you, ' + response.name + '.');
+            });
+        } else {
+            console.log('User cancelled login or did not fully authorize.');
+        }
+    }, {scope: 'email, publish_stream'});
+}
 
 
 
@@ -457,48 +468,50 @@ function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigO
 
 
 function toggleLikePhoto(userID, albumphotoID, albumID) {
+
     var likedNew;
 
-    if ($('#like-'+albumphotoID).attr('src').match(/red_/) != null) {
-	$('#albumphoto-'+albumphotoID).attr('likes', parseInt($('#albumphoto-'+albumphotoID).attr('likes')) - 1);
-	likedNew = 0;
+    if ($('#like-' + albumphotoID).hasClass("red-heart")) {
+        $('#albumphoto-' + albumphotoID).attr('likes', parseInt($('#albumphoto-' + albumphotoID).attr('likes')) - 1);
+        likedNew = 0;
     } else {
-	$('#albumphoto-'+albumphotoID).attr('likes', parseInt($('#albumphoto-'+albumphotoID).attr('likes')) + 1);
-	likedNew = 1;
+        $('#albumphoto-' + albumphotoID).attr('likes', parseInt($('#albumphoto-' + albumphotoID).attr('likes')) + 1);
+        likedNew = 1;
     }
-    
+
+    $('#like-count-' + albumphotoID).html($('#albumphoto-' + albumphotoID).attr('likes'));
+
     if (likedNew) {
-	$('#like-'+albumphotoID).attr('src', '/red_heart.png');
+        $('#like-' + albumphotoID).addClass("red-heart").removeClass("gray-heart");
     } else {
-	$('#like-'+albumphotoID).attr('src', '/grey_heart.png');
+        $('#like-' + albumphotoID).addClass("gray-heart").removeClass("red-heart");
     }
-    
+
     jQuery.ajax({
         type: "GET",
-        url: "/record_like_activity.php?like="+likedNew+"&userID="+userID+"&albumphotoID="+albumphotoID+"&albumID="+albumID,
-	async: true,
-        success: function(data) {
+        url: "/record_like_activity.php?like=" + likedNew + "&userID=" + userID + "&albumphotoID=" + albumphotoID + "&albumID=" + albumID,
+        async: true,
+        success: function (data) {
             console.log(data);
         }
     });
-    
+
 }
 
 function unlikePhoto(userID, albumphotoID, albumID) {
     //alert('#like-'+albumphotoID);
-    $('#like-'+albumphotoID).attr('src', '/grey_heart.png');
-    $('#a-like-'+albumphotoID).attr('onclick', 'likePhoto('+userID +',' + albumphotoID + ',' + albumID +')');
+    $('#like-' + albumphotoID).attr('src', '/grey_heart.png');
+    $('#a-like-' + albumphotoID).attr('onclick', 'likePhoto(' + userID + ',' + albumphotoID + ',' + albumID + ')');
 
     jQuery.ajax({
         type: "GET",
-        url: "/record_like_activity.php?like=0&userID="+userID+"&albumphotoID="+albumphotoID+"&albumID="+albumID,
-	async: true,
-        success: function(data) {
+        url: "/record_like_activity.php?like=0&userID=" + userID + "&albumphotoID=" + albumphotoID + "&albumID=" + albumID,
+        async: true,
+        success: function (data) {
             console.log(data);
         }
     });
 }
-
 
 function isLoggedIn() {
     if (typeof gUser != 'undefined') {

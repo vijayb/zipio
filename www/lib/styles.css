@@ -8,6 +8,30 @@ body {
     padding-bottom: 250px;
 }
 
+.no-underline:hover {
+    text-decoration: none;
+}
+
+.like-panel {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    top: 0px;
+    right: 0px;
+    padding: 6px;
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.red-heart {
+    color: red;
+    text-decoration: none;
+}
+
+.gray-heart {
+    color: rgba(255, 255, 255, .3);
+    text-decoration: none;
+}
+
 .tile {
     position: relative;
     margin-bottom: 20px;
@@ -66,15 +90,7 @@ body {
     font-size: 13px;
 }
 
-.like-panel {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.7);
-    top: 0px;
-    right: 0px;
-    padding: 3px;
-    color: #ffffff;
-    font-size: 13px;
-}
+
 
 .width-fix {
     width: 100%;
