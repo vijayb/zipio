@@ -103,8 +103,14 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $photo_owners[$albumphotos_array[$i]["photo_owner_id"]] = $photo_owner;
     }
 
+    if (isset($album_info["likes"][$albumphoto_id])) {
+        $like_count = $album_info["likes"][$albumphoto_id];
+    } else {
+        $like_count = 0;
+    }
+
     $html = <<<HTML
-        <div class="span3 tile" id="albumphoto-{$albumphoto_id}">
+        <div class="span3 tile" id="albumphoto-{$albumphoto_id}" likes={$like_count}>
 
             <a id="fancybox-{$albumphoto_id}"
                class="fancybox"
@@ -113,17 +119,32 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}">
 
                 <img id="image-{$albumphoto_id}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
-
                 <div class="album-privacy" style="opacity:0.6;">
                     by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
+                     
+
                 </div>
             </a>
 HTML;
 
-    if ($is_owner || $is_collaborator) {
 
+    if ($is_owner || $is_collaborator) {
+        $user_id = $_SESSION['user_id'];
+
+        if (isset($album_info["user_likes"][$user_id."_".$albumphoto_id])) {
+            $heart_color = "red";
+        } else {
+            $heart_color = "grey";
+        }
+        
         $html .= <<<HTML
             <div class="tile-options" style="display:none;">
+            <a href="javascript:void(0)" onclick="toggleLikePhoto($user_id, $albumphoto_id, $album_to_display);">
+            <img alt="{$like_count}" id='like-{$albumphoto_id}' src='{$g_www_root}/{$heart_color}_heart.png' style='float:left; margin-right:5px;'>
+            </a>
+
+
+
                 <div class="btn-group" style="float:left; margin-right:5px;">
                     <button id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" data-loading-text="Filtering...">
                         Filter <i class="icon-sort-down icon-white"></i>

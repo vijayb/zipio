@@ -430,8 +430,48 @@ function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigO
 
 
 
+function toggleLikePhoto(userID, albumphotoID, albumID) {
+    var likedNew;
 
+    if ($('#like-'+albumphotoID).attr('src').match(/red_/) != null) {
+	$('#albumphoto-'+albumphotoID).attr('likes', parseInt($('#albumphoto-'+albumphotoID).attr('likes')) - 1);
+	likedNew = 0;
+    } else {
+	$('#albumphoto-'+albumphotoID).attr('likes', parseInt($('#albumphoto-'+albumphotoID).attr('likes')) + 1);
+	likedNew = 1;
+    }
+    
+    if (likedNew) {
+	$('#like-'+albumphotoID).attr('src', '/red_heart.png');
+    } else {
+	$('#like-'+albumphotoID).attr('src', '/grey_heart.png');
+    }
+    
+    jQuery.ajax({
+        type: "GET",
+        url: "/record_like_activity.php?like="+likedNew+"&userID="+userID+"&albumphotoID="+albumphotoID+"&albumID="+albumID,
+	async: true,
+        success: function(data) {
+            console.log(data);
+        }
+    });
+    
+}
 
+function unlikePhoto(userID, albumphotoID, albumID) {
+    //alert('#like-'+albumphotoID);
+    $('#like-'+albumphotoID).attr('src', '/grey_heart.png');
+    $('#a-like-'+albumphotoID).attr('onclick', 'likePhoto('+userID +',' + albumphotoID + ',' + albumID +')');
+
+    jQuery.ajax({
+        type: "GET",
+        url: "/record_like_activity.php?like=0&userID="+userID+"&albumphotoID="+albumphotoID+"&albumID="+albumID,
+	async: true,
+        success: function(data) {
+            console.log(data);
+        }
+    });
+}
 
 
 function isLoggedIn() {
@@ -445,7 +485,6 @@ function debug(string) {
     if (this.console && typeof console.log != "undefined") {
         console.log(string);
     }
-
 }
 
 function preload(arrayOfImages) {
