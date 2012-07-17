@@ -22,21 +22,20 @@
 
 
 
-<!--
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
--->
+
 
 <!--
 rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
 rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 -->
 
+<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
-
-
+-->
 
 
 
@@ -66,32 +65,29 @@ rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > 
 
 if (is_logged_in()) {
 
-    $brand_name = "<span style='color:red;'>$g_zipio</span> alpha - may lose data";
+    $brand_name = "<span style='color:red;'>$g_zipio</span> beta";
 
     $logged_in_status = <<<HTML
-        <ul class="nav pull-right">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" style=''>
-                    <b>{$_SESSION["user_info"]["email"]}</b><b class="caret"></b>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
-                    <li class="divider"></li>
-                    <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
-                </ul>
-            </li>
+        <ul id="right-links" class="nav" style="font-size:18px">
+            <li class="divider-vertical"></li>
+            <li id="right-links-1"><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> Albums</a></li>
+        </ul>
+
+
+        <ul id="right-links" class="nav pull-right" style="font-size:18px">
+            <li><a href="/{$_SESSION["user_info"]["username"]}"><b>{$_SESSION["user_info"]["email"]}</b></a></li>
+            <li id="right-links-3"><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
         </ul>
 HTML;
 
 
 } else {
 
-    $brand_name = "$g_zipio alpha - may lose data";
+    $brand_name = "$g_zipio beta";
 
     $logged_in_status = <<<HTML
-        <ul class="nav pull-right">
+        <ul class="nav pull-right" style="font-size:18px">
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Login</a></li>
-            <!-- <li><a href="javascript:void(0);" onclick="showSignupModal();">Sign up</a></li> -->
         </ul>
 HTML;
 

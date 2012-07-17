@@ -78,9 +78,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     $albumphoto_id = $albumphotos_array[$i]["id"];
 
     if ($albumphotos_array[$i]["visible"] == 0) {
-        $opacity = "0.4";
-    } else {
-        $opacity = "1.0";
+        continue;
     }
 
     if ($albumphotos_array[$i]["filtered"] > 0) {
@@ -118,17 +116,16 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                rel="fancybox"
                href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}">
 
-                <img id="image-{$albumphoto_id}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
-                <div class="album-privacy" style="opacity:0.6;">
-                    by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
-                     
+                <img id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
 
+                <div class="album-privacy">
+                    posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                 </div>
             </a>
 HTML;
 
 
-    if ($is_owner || $is_collaborator) {
+    if ($is_owner || $is_collaborator || $album_info["write_permissions"] == 2) {
         $user_id = $_SESSION['user_id'];
 
         if (isset($album_info["user_likes"][$user_id."_".$albumphoto_id])) {
@@ -175,7 +172,7 @@ HTML;
                                                                                                                                );">
                     Save
                 </button>
-              </div>
+            </div>
 HTML;
     }
 
@@ -189,6 +186,22 @@ HTML;
 
     print($html);
 }
+
+
+$html = <<<HTML
+
+<!--
+<div class="span3 tile">
+    <div style="width:100%; height:100%; background-color:#dddddd;">
+        <img src="http://s3.zipiyo.com/photos/1_1_08d481fc329626acd51cff1adf7f28a3f8952b32_cropped_filtered">
+    </div>
+</div>
+-->
+
+HTML;
+
+print($html);
+
 
 $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 ?>
@@ -272,15 +285,15 @@ HTML;
     $html .= <<<HTML
                 </div>
 
-                <button style="margin-bottom:10px;" class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
+                <button style="margin-bottom:15px;" class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
 HTML;
 
     if ($is_owner) {
         $html .= <<<HTML
                 <label class="checkbox" style="margin:0px;">
-                    <input type="checkbox" id="write-permissions-checkbox" checked="true" onclick="changeAlbumWritePermissions();">
-                    <span style="color:#666666; font-size:13px;">
-                        If someone who's <i>not</i> listed above tries to add a photo, email me for approval first.
+                    <input type="checkbox" id="write-permissions-checkbox" onclick="changeAlbumWritePermissions();">
+                    <span style="color:#666666;">
+                        Allow people <i>not</i> listed above to add photos without my approval. <a href="#" id="write-permissions-qm" rel="popover"><i class="icon-question-sign"></i></a>
                         <span id="write-permissions-saved" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                     </span>
                 </label>
@@ -422,9 +435,20 @@ $(function() {
         });
     });
 
-    // Set the privacy radio button
+    // Set some things if the user is logged in
+    if (isLoggedIn()) {
+        $("#album-privacy-" + gAlbum["read_permissions"]).prop('checked', true);
 
-    $("#album-privacy-" + gAlbum["read_permissions"]).prop('checked', true);
+        if (gAlbum["write_permissions"] == 2) {
+            $("#write-permissions-checkbox").attr("checked", true);
+        }
+
+        $("#write-permissions-qm").popover({
+            content: "<b>If this is unchecked,</b> we'll email you for approval if someone who's <i>not</i> a collaborator tries to add a photo to this album. \
+                      <br><br> \
+                      <b>If this is checked,</b> <i>anyone in the world</i> can add photos to this album without your approval."
+        });
+    }
 
 <?php
 

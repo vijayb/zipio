@@ -30,7 +30,7 @@ create_collaborator($collaborator_id, $album_id);
 
 // Now, all of collabortor_id's photos that live in target_user_id's albums need to be made visible
 
-$query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_owner_id=$collaborator_id AND album_id=$user_id";
+$query = "UPDATE AlbumPhotos SET visible=1 WHERE photo_owner_id=$collaborator_id AND album_id=$album_id";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query: ' . $query . " - " . mysql_error());
 

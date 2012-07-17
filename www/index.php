@@ -5,12 +5,20 @@ require("static_supertop.php");
 
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////
 // Page-specific PHP goes here
 
+if (is_logged_in()) {
+    header("Location: " . "/" . $_SESSION["user_info"]["username"]);
+}
 
 
+////////////////////////////////////////////////////////////////////////////////
 
 // The following variables should be set
+
 $page_title = "";
 $page_subtitle = "";
 
@@ -46,10 +54,7 @@ $page_subtitle = "";
             <span class="highlight" style="font-weight:700">To begin, send a photo to myphotos@<?php print($g_zipio); ?>.com</span>
         </h1>
 
-        <br><br>
-        <span style="font-size:10px; color:#cccccc;">
-            <?php print($g_www_root); ?>
-        </span>
+
 
     </div>
 
@@ -68,6 +73,13 @@ $page_subtitle = "";
 <script>
 
 // Page-specific JS goes here
+
+$(function() {
+
+
+
+
+});
 
 </script>
 

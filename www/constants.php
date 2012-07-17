@@ -15,11 +15,8 @@ BEFORE PUSHING:
     TRUNCATE TABLE Photos;
     TRUNCATE TABLE Users;
 
-    add   `write_permissions` int(11) unsigned NOT NULL DEFAULT 1 to Albums
-
 To run ec2 tools:
-    http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
-
+http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
 
 */
 

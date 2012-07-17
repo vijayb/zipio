@@ -149,9 +149,7 @@ function changeAlbumPrivacy() {
         url: urlString,
         success: function(data) {
             if (parseInt(data) == 1) {
-                $("#album-privacy-saved-" + newSetting).show().delay(2000).fadeOut();
-                // window.location.replace(window.location.href.split('#')[0] + "#alert=4&setting=" + newSetting);
-                // window.location.reload(true);
+                $("#album-privacy-saved-" + newSetting).show().delay(700).fadeOut();
             } else {
                 // bad token
             }
@@ -159,6 +157,34 @@ function changeAlbumPrivacy() {
         async: true
     });
 }
+
+
+function changeAlbumWritePermissions() {
+    $("#album-settings-submit").button("loading");
+
+    if ($("#write-permissions-checkbox").attr("checked") == "checked") {
+        newSetting = 2;
+    } else {
+        newSetting = 1;
+    }
+
+    var urlString = "/change_album_write_permissions.php?album_id=" + gAlbum['id'] + "&write_permissions=" + newSetting + "&token=" + gAlbum['token'];
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#write-permissions-saved").show().delay(700).fadeOut();
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+}
+
+
 
 function submitSignup() {
     $("#signup-submit").button("loading");
