@@ -184,59 +184,6 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 </div>
 
-<!----------------------------------------------------------------------------->
-
-<div class="modal hide" id="album-settings-modal">
-
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
-        <h2>Who can see and add photos to this album?</h2>
-    </div>
-
-    <div class="modal-body">
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
-            <b><?php print($g_album_privacy_contants[1]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Only you can see and add photos to this album.
-        </p>
-
-        <br>
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
-            <b><?php print($g_album_privacy_contants[2]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Only you and your friends can see and add photos to this album.
-            <br>
-            <a href="/<?php print($_SESSION["user_info"]["username"]); ?>/_friends">See a list of my friends</a>
-        </p>
-
-        <br>
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
-            <b><?php print($g_album_privacy_contants[3]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
-        </p>
-
-    </div>
-
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="submitAlbumSettings();"
-                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
-                Save album settings
-        </button>
-    </div>
-
-</div>
-
 <?php } ?>
 
 <!----------------------------------------------------------------------------->
@@ -436,6 +383,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 <div class="navbar navbar-fixed-bottom" style="z-index:-1000">
 
 
+
 <?php
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -445,27 +393,19 @@ if (!isset($page_title_right)) $page_title_right = "";
 if ($g_debug) {
 
     $html = <<<HTML
-    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
+    <div style="background-color:black; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
         {$_SERVER["HTTP_HOST"]}
     </div>
 HTML;
     print($html);
 
-    if ($g_database_to_use == "PROD") {
-        $html = <<<HTML
-        <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
-            USING THE PRODUCTION DATABASE - {$database}
-        </div>
+    $html = <<<HTML
+    <div style="background-color:black; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
+        DB: {$g_database_to_use} - zipio: {$g_zipio}/{$g_Zipio}
+    </div>
 HTML;
-        print($html);
-    } else if ($g_database_to_use == "TEST") {
-        $html = <<<HTML
-        <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
-            USING THE TEST DATABASE - {$database}
-        </div>
-HTML;
-        print($html);
-    }
+    print($html);
+
 }
 
 

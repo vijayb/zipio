@@ -10,12 +10,14 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
     $album_owner_info = get_user_info($album_info["user_id"]);
+    $collaborators_info = get_collaborators_info($album_to_display);
 
     if ($g_debug) {
         print("<!-- GET: " . print_r($_GET, true) . "-->");
         print("<!-- album_to_display: $album_to_display -->\n");
         print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
         print("<!-- album_info: " . print_r($album_info, true) . "-->");
+        print("<!-- collaborators_info: " . print_r($collaborators_info, true) . "-->");
     }
 }
 
@@ -203,10 +205,6 @@ $albumphotos_array_js = rtrim($albumphotos_array_js, ",");
 
 if ($is_owner || $is_collaborator) {
 
-    $collaborators_info = get_collaborators_info($album_to_display);
-
-
-
     if ($is_owner) {
         $you_html = "- this is you";
     } else {
@@ -321,7 +319,9 @@ HTML;
             $read_permissions_html = "Only album collaborators (listed above) can see this album.";
         } else if ($album_info["read_permissions"] == 2) {
             $read_permissions_html = <<<HTML
-                Anyone on the web can see this album at {$_SERVER["HTTP_HOST"]}/{$album_owner_info["username"]}/{$album_info["handle"]}
+                <i>Anyone</i> can see this album at:
+                <br>
+                <a href='{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}'>{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}</a>
 HTML;
         }
 
@@ -330,7 +330,7 @@ HTML;
                 <h2>Privacy</h2>
                 <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
                 <p>
-                    <b>{$read_permissions_html}</b>
+                    {$read_permissions_html}
                 </p>
             </div>
 HTML;

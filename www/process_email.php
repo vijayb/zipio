@@ -8,6 +8,21 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
+
+
+if (!isset($_POST["attachment-count"]) || (isset($_POST["attachment-count"]) && $_POST["attachment-count"] == 0)) {
+    $user_email_body = <<<EMAIL
+        Woops, looks like you forgot to attach a photo to your email.
+        <br><br>
+        To get started with {$g_Zipio}, send a photo (as an attachment) to myphotos@{$g_zipio}.com.
+EMAIL;
+
+    send_email($_POST["sender"], $g_founders_email_address, "$g_Zipio activity notification", $user_email_body);
+    exit();
+}
+
+
+
 if (isset($_POST["sender"]) && isset($_POST["recipient"])) {
     $sender = strtolower($_POST["sender"]);
     $recipient = strtolower($_POST["recipient"]);
