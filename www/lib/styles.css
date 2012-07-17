@@ -66,6 +66,16 @@ body {
     font-size: 13px;
 }
 
+.like-panel {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    top: 0px;
+    right: 0px;
+    padding: 3px;
+    color: #ffffff;
+    font-size: 13px;
+}
+
 .width-fix {
     width: 100%;
 
