@@ -13,12 +13,22 @@
 <link href="/lib/styles.css" rel="stylesheet" />
 <link href="/lib/fonts.css" rel="stylesheet" />
 
+
+
+
+
+
+
+
+
+
+
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
 
 <!--
-lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
-lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
+rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
+rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 -->
 
 <!--
@@ -26,6 +36,15 @@ lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
 -->
+
+
+
+
+
+
+
+
+
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -98,7 +117,34 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <body>
 
+<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '255929901188660', // App ID
+      channelUrl : '//ec2-23-22-14-153.compute-1.amazonaws.com/channel.php', // Channel File
+      status     : true, // check login status
+      cookie     : true, // enable cookies to allow the server to access the session
+      xfbml      : true  // parse XFBML
+    });
+
+    // Additional initialization code here
+  };
+
+  // Load the SDK Asynchronously
+  (function(d){
+     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement('script'); js.id = id; js.async = true;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     ref.parentNode.insertBefore(js, ref);
+   }(document));
+</script>
+
+
 <!----------------------------------------------------------------------------->
+
+<?php if (is_logged_in()) { ?>
 
 <div class="modal hide" id="register-modal">
 
@@ -144,6 +190,61 @@ if (!isset($page_title_right)) $page_title_right = "";
     </div>
 
 </div>
+
+<!----------------------------------------------------------------------------->
+
+<div class="modal hide" id="album-settings-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Who can see and add photos to this album?</h2>
+    </div>
+
+    <div class="modal-body">
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
+            <b><?php print($g_album_privacy_contants[1]); ?> album</b>
+        </label>
+        <p style="margin-left:20px">
+            Only you can see and add photos to this album.
+        </p>
+
+        <br>
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
+            <b><?php print($g_album_privacy_contants[2]); ?> album</b>
+        </label>
+        <p style="margin-left:20px">
+            Only you and your friends can see and add photos to this album.
+            <br>
+            <a href="/<?php print($_SESSION["user_info"]["username"]); ?>/_friends">See a list of my friends</a>
+        </p>
+
+        <br>
+
+        <label class="radio">
+            <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
+            <b><?php print($g_album_privacy_contants[3]); ?> album</b>
+        </label>
+        <p style="margin-left:20px">
+            Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
+        </p>
+
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitAlbumSettings();"
+                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
+                Save album settings
+        </button>
+    </div>
+
+</div>
+
+<?php } ?>
 
 <!----------------------------------------------------------------------------->
 
@@ -307,62 +408,6 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <!----------------------------------------------------------------------------->
 
-<div class="modal hide" id="album-settings-modal">
-
-    <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
-        <h2>Who can see and add photos to this album?</h2>
-    </div>
-
-    <div class="modal-body">
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-1" value="1" checked="">
-            <b><?php print($album_privacy_contants[1]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Only you can see and add photos to this album.
-        </p>
-
-        <br>
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-2" value="2" checked="">
-            <b><?php print($album_privacy_contants[2]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Only you and your friends can see and add photos to this album.
-            <br>
-            <a href="/<?php print($_SESSION["user_info"]["username"]); ?>/_friends">See a list of my friends</a>
-        </p>
-
-        <br>
-
-        <label class="radio">
-            <input type="radio" name="album-settings-radios" id="album-setting-3" value="3" checked="">
-            <b><?php print($album_privacy_contants[3]); ?> album</b>
-        </label>
-        <p style="margin-left:20px">
-            Anyone can <i>see</i> this album, but only you and your friends can add photos. If anyone else tries to add a photo, we'll ask you first for your approval.
-        </p>
-
-
-    </div>
-
-    <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
-        <button onclick="submitAlbumSettings();"
-                class="btn btn-primary" id="album-settings-submit" data-loading-text="Please wait...">
-                Save album settings
-        </button>
-    </div>
-
-</div>
-
-
-<!----------------------------------------------------------------------------->
-
-
 <div class="modal hide" id="invite-modal">
 
     <div class="modal-header">
@@ -391,9 +436,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 </div>
 
-
 <!----------------------------------------------------------------------------->
-
 
 <div class="modal hide" id="confirmation-modal">
 
@@ -432,12 +475,6 @@ if (!isset($page_title_right)) $page_title_right = "";
     <div class="navbar-inner">
         <div class="container">
 
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </a>
-
             <a class="brand" href="/<? if (is_logged_in()) { print($_SESSION["user_info"]["username"]); } ?>">
                 <?php print($brand_name); ?>
             </a>
@@ -446,6 +483,84 @@ if (!isset($page_title_right)) $page_title_right = "";
 
         </div>
     </div>
+
+    <div id="fb-bar" style="display:none;">
+        <span class="highlight">People you know are already using Zipio!</span>
+        <button class="btn btn-primary" href="#" onclick="FB.login();">Find them with Facebook</button>
+    </div>
+</div>
+
+
+
+
+<div class="navbar navbar-fixed-bottom">
+
+
+<?php
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+if ($_SERVER["HTTP_HOST"] == "localhost") {
+    $html = <<<HTML
+    <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
+        {$_SERVER["HTTP_HOST"]}
+    </div>
+HTML;
+    print($html);
+
+        if ($g_database_to_use == "PROD") {
+            $html = <<<HTML
+            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE PRODUCTION DATABASE
+            </div>
+HTML;
+            print($html);
+        } else if ($g_database_to_use == "TEST") {
+            $html = <<<HTML
+            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE TEST DATABASE
+            </div>
+HTML;
+            print($html);
+        }
+
+
+} else if ($_SERVER["HTTP_HOST"] == "ec2-23-22-14-153.compute-1.amazonaws.com") {
+    $html = <<<HTML
+    <div style="background-color:orange; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:50px;">
+        {$_SERVER["HTTP_HOST"]}
+    </div>
+HTML;
+    print($html);
+
+        if ($g_database_to_use == "PROD") {
+            $html = <<<HTML
+            <div style="background-color:red; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE PRODUCTION DATABASE
+            </div>
+HTML;
+            print($html);
+        } else if ($g_database_to_use == "TEST") {
+            $html = <<<HTML
+            <div style="background-color:green; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px;">
+                USING THE TEST DATABASE
+            </div>
+HTML;
+            print($html);
+        }
+
+
+
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+?>
+
 </div>
 
 

@@ -77,6 +77,15 @@ function showInviteModal() {
     $("#invite-emails").val("").focus();
 }
 
+function showFBBar() {
+    $("#fb-bar").slideDown();
+    $("body").css("padding-top", "120px");
+}
+
+function hideFBBar() {
+    $("#fb-bar").slideUp();
+    $("body").css("padding-top", "60px");
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // SUBMIT MODALS
@@ -285,9 +294,6 @@ function setPasswordSubmitButton() {
         $("#password-submit").attr("disabled", true);
     }
 }
-
-
-
 
 
 

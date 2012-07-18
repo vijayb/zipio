@@ -3,22 +3,12 @@
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
-$s3_bucket_name = "s3.zipio.com";
-$s3_root = "http://s3.zipio.com/photos";
-$www_root = "http://zipio.com";
-$founders_email_address = "Zipio <founders@zipio.com>";
-
-$debug = 0;
-
 define('CACHE_PATH', 'opticrop-cache/');
 
-$album_privacy_contants[1] = "<i class='icon-lock' style='color:red;'></i> Private";
-$album_privacy_contants[2] = "<i class='icon-group' style='color:orange;'></i> Friends";
-$album_privacy_contants[3] = "<i class='icon-globe' style='color:green;'></i> Public";
 
 function goto_homepage($args) {
     if (!isset($args)) $args = "";
-    header("Location: $www_root/index.php$args");
+    header("Location: $g_www_root/index.php$args");
 }
 
 function login_user($user_id) {
@@ -37,6 +27,8 @@ function is_logged_in() {
 }
 
 function check_request_for_login($_GET) {
+    print("<!--" . print_r($_GET, true) . "-->\n");
+    exit();
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
         if (isset($request["user_id"])) {
@@ -102,10 +94,10 @@ function debug($string, $color = "black") {
 
 function send_email($to, $from, $subject, $html) {
 
-    global $founders_email_address;
+    global $g_founders_email_address;
 
     if ($from == "") {
-        $from = $founders_email_address;
+        $from = $g_founders_email_address;
     }
 
     $html = "<span style='color:black;' id='" . time() . "'>" . $html . "</span><br><br><span style='font-size:10px; color:#aaaaaa;'>Email confirmation number: " . time() . "</span>";
@@ -174,15 +166,17 @@ function is_friend($user_id, $potential_friend_id) {
     return 0;
 }
 
-function create_user($username, $password_hash, $email) {
+function create_user($name, $username, $password_hash, $email) {
 
     global $con;
 
     $query = "INSERT INTO Users (
+                name,
                 email,
                 username,
                 password_hash
               ) VALUES (
+                '$name',
                 '$email',
                 '$username',
                 '$password_hash'
@@ -221,7 +215,7 @@ function create_album($user_id, $handle) {
 
 function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
     global $s3;
-    global $s3_bucket_name;
+    global $g_s3_bucket_name;
 
     $tmp_image_path = $image_path . "_tmp";
 
@@ -250,12 +244,8 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
 
     }
 
-    echo $tmp_image_path." ***<BR>\n";
-    echo $s3_name." ***<BR>\n";
-    if (!$s3->putObjectFile($tmp_image_path, $s3_bucket_name,
+    if (!$s3->putObjectFile($tmp_image_path, $g_s3_bucket_name,
                             "photos/" . $s3_name, S3::ACL_PUBLIC_READ)) {
-        debug("Error in writing to S3");
-        debug($tmp_image_path);
         return 1;
     }
 
@@ -266,7 +256,7 @@ function filterImageAndWriteToS3($image, $image_path, $s3_name, $filter) {
 //$cmd = "/usr/bin/convert \( /tmp/input.jpg -gamma 0.75 -modulate 100,130 -contrast \) \( +clone -sparse-color Barycentric '0,0 black 0,%h white' -function polynomial 4,-4,1 -level 0,50% \) -compose blur -set option:compose:args 5 -composite /tmp/output.jpg";
 
 function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
-                        $visible = 1, $path_to_photo, &$s3_url_parameter) {
+                        $visible, $path_to_photo, &$s3_url_parameter) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -281,7 +271,8 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_url;
 
-    $sizes = array(800);
+    $sizes = array(1024);
+    $max_size = max($sizes);
 
     $failed = 0;
 
@@ -328,10 +319,12 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     if (!$failed) {
         $query = "INSERT INTO Photos (
                     user_id,
-                    s3_url
+                    s3_url,
+                    max_size
                   ) VALUES (
                     '$owner_user_id',
-                    '$s3_url'
+                    '$s3_url',
+                    $max_size
                   ) ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
@@ -367,8 +360,8 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 function email_followers($album_info, $s3_urls) {
 
     global $con;
-    global $www_root;
-    global $s3_root;
+    global $g_www_root;
+    global $g_s3_root;
 
     $query = "SELECT follower_id, email FROM Followers LEFT JOIN Users ON follower_id=Users.id WHERE album_id=" . $album_info["id"];
     $result = mysql_query($query, $con);
@@ -377,16 +370,16 @@ function email_followers($album_info, $s3_urls) {
     $album_owner_info = get_user_info($album_info["user_id"]);
 
     $follower_email_body = <<<EMAIL
-        Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
+        Photos were just added to <b>{$album_owner_info["username"]}</b>'s <a href="{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}"><b>{$album_info["handle"]}</b> album</a>!
         <br><br>
 EMAIL;
 
     for ($i = 0; $i < count($s3_urls); $i++) {
-        $follower_email_body .= "<img src='" . $s3_root . "/" . $s3_urls[$i] . "_cropped_0'><br><br>";
+        $follower_email_body .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped_0'><br><br>";
     }
 
     while ($row = mysql_fetch_assoc($result)) {
-        send_email($row["email"], $founders_email_address, "New photos!", $follower_email_body);
+        send_email($row["email"], $g_founders_email_address, "New photos!", $follower_email_body);
     }
 
 }
@@ -636,6 +629,7 @@ function get_albumphoto_info($albumphoto_id) {
                 visible,
                 filter_code,
                 s3_url,
+                max_size,
                 AlbumPhotos.created
               FROM AlbumPhotos
               LEFT JOIN Photos

@@ -6,6 +6,7 @@ session_start();
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
+require("constants.php");
 require("db.php");
 require("helpers.php");
 
@@ -54,7 +55,7 @@ $display_album_ra = array();
 $display_album_ra["user_id"] = $user_info["id"];
 $display_album_ra["token"] = $user_info["token"];
 $display_album_ra["timestamp"] = time();
-$display_album_link = $www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
+$display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra));
 
 
 $target_user_email_body = <<<EMAIL
@@ -71,10 +72,10 @@ $user_email_body = <<<EMAIL
     <a href='{$display_album_link}'>See album</a>
 EMAIL;
 
-send_email($target_user_info["email"], $founders_email_address, "Zipio activity notification", $target_user_email_body);
-send_email($user_info["email"], $founders_email_address, "Zipio activity notification", $user_email_body);
+send_email($target_user_info["email"], $g_founders_email_address, "Zipio activity notification", $target_user_email_body);
+send_email($user_info["email"], $g_founders_email_address, "Zipio activity notification", $user_email_body);
 
-$url =  $www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
+$url =  $g_www_root . "/" . $target_user_info["username"] . "/" . $album_info["handle"] . "#alert=3";
 
 login_user($target_user_id);
 

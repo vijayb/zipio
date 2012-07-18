@@ -11,7 +11,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $album_owner_info = get_user_info($album_info["user_id"]);
     $followers_info = get_followers_user_info($album_to_display);
 
-    if ($debug) {
+    if ($g_debug) {
         print("<!-- GET: " . print_r($_GET, true) . "-->");
         print("<!-- album_to_display: $album_to_display -->\n");
         print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
@@ -140,7 +140,7 @@ HTML;
     $follow_album_ra["album_owner_username"] = $album_owner_info["username"];
     $follow_album_ra["album_owner_email"] = $album_owner_info["email"];
     $follow_album_ra["timestamp"] = time();
-    $follow_album_link = $www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
+    $follow_album_link = $g_www_root . "/follow_album.php?request=" . urlencode(encrypt_json($follow_album_ra));
 
     if ($logged_in_username == $album_owner_info["username"]) {
         // =====================================================================
@@ -213,9 +213,9 @@ HTML;
 // Set the "third row" string
 
 if (is_logged_in() && $_SESSION["user_id"] == $album_info["user_id"]) {
-    $permissions_html = $album_privacy_contants[$album_info["permissions"]] . " album - <a href='javascript:void(0);' onclick='showAlbumSettingsModal();'>Change</a>";
+    $permissions_html = $g_album_privacy_contants[$album_info["permissions"]] . " album - <a href='javascript:void(0);' onclick='showAlbumSettingsModal();'>Change</a>";
 } else {
-    $permissions_html = $album_privacy_contants[$album_info["permissions"]] . " album";
+    $permissions_html = $g_album_privacy_contants[$album_info["permissions"]] . " album";
 }
 
 $following_html = count($followers_info) . " followers";
@@ -251,17 +251,17 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $opacity = "1.0";
     }
 
-    $albumphotos_array_js .= "'" . $s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_800_" . $albumphotos_array[$i]["filter_code"] . "',";
+    $albumphotos_array_js .= "'" . $g_s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_" . $albumphotos_array[$i]["max_size"] . "_" . $albumphotos_array[$i]["filter_code"] . "',";
 
     $html = <<<HTML
 
         <div class="span3 tile" id="albumphoto-{$albumphotos_array[$i]["id"]}">
 
-            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_800_{$albumphotos_array[$i]["filter_code"]}">
+            <a id="fancybox-{$albumphotos_array[$i]["id"]}" class="fancybox" data-fancybox-type="image" rel="fancybox" href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_{$albumphotos_array[$i]["max_size"]}_{$albumphotos_array[$i]["filter_code"]}">
                 <!--
-                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$www_root}/proxy.php?url={$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
+                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}&mime_type=image/jpg'>
                 -->
-                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
+                <img id="image-{$albumphotos_array[$i]["id"]}" style='opacity:{$opacity};' src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped_{$albumphotos_array[$i]["filter_code"]}'>
             </a>
 HTML;
 
@@ -333,6 +333,7 @@ $(function() {
         prevEffect: 'none',
         nextEffect: 'none',
         padding: '1',
+        arrows: false,
         helpers: {
             title: {
                 type: 'outside'
@@ -344,8 +345,8 @@ $(function() {
                 }
             },
             thumbs: {
-                width: 50,
-                height: 50
+                width: 100,
+                height: 100
             }
         }
     });
