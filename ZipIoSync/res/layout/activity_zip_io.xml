@@ -30,32 +30,6 @@
         android:layout_marginTop="51dp" >
     </RadioGroup>
 
-    <EditText
-        android:id="@+id/emailForm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:ems="10"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/passwordForm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/emailForm"
-        android:layout_below="@+id/emailForm"
-        android:ems="10"
-        android:inputType="textPassword" />
-
-    <Button
-        android:id="@+id/uploadButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/passwordForm"
-        android:layout_below="@+id/passwordForm"
-        android:text="Upload" />
-
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
@@ -65,23 +39,12 @@
         android:text="Albums"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/textView2"
+    <Button
+        android:id="@+id/uploadButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/emailForm"
-        android:text="Email"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/passwordForm"
-        android:layout_alignBottom="@+id/passwordForm"
-        android:layout_toLeftOf="@+id/passwordForm"
-        android:text="Password"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:text="Upload" />
 
 </RelativeLayout>

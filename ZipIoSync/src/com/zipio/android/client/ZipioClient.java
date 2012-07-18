@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntity;
@@ -64,7 +65,6 @@ public class ZipioClient {
         password == null || password.length() == 0) {
       return new ArrayList<Album>();
     }
-      
     HttpPost post = new HttpPost();
     post.setURI(URI.create(
         String.format("%s/get_albums_info.php?email=%s&password_hash=%s",
@@ -107,14 +107,6 @@ public class ZipioClient {
 
   public boolean uploadPhoto(Uri photo, String album, int albumId)
       throws IOException {
-    HttpPost post = new HttpPost();
-    post.setURI(URI.create(
-        String.format("%s/post_photo.php", HOST)));
-    System.err.println("URI: " + post.getURI());
-    MultipartEntity mpEntity = new MultipartEntity();
-    mpEntity.addPart("email", new StringBody("" + email));
-    mpEntity.addPart("password_hash", new StringBody(computeSha1(password)));
-    mpEntity.addPart("album_id", new StringBody("" + albumId));
     String[] filePathColumn = {MediaStore.Images.Media.DATA};
     Cursor cursor = activity.getContentResolver().
         query(photo, filePathColumn, null, null, null);
@@ -124,7 +116,21 @@ public class ZipioClient {
     String filePath = cursor.getString(columnIndex);
     System.err.println("File Path: " + filePath);
     cursor.close();
-    ContentBody cbFile = new FileBody(new File(filePath), "image/jpeg");
+    File file = new File(filePath);
+    return uploadPhoto(file, albumId);
+  }
+
+  public boolean uploadPhoto(File file, int albumId)
+      throws UnsupportedEncodingException, IOException, ClientProtocolException {
+    ContentBody cbFile = new FileBody(file, "image/jpeg");
+    HttpPost post = new HttpPost();
+    post.setURI(URI.create(
+        String.format("%s/post_photo.php", HOST)));
+    System.err.println("URI: " + post.getURI());
+    MultipartEntity mpEntity = new MultipartEntity();
+    mpEntity.addPart("email", new StringBody("" + email));
+    mpEntity.addPart("password_hash", new StringBody(computeSha1(password)));
+    mpEntity.addPart("album_id", new StringBody("" + albumId));
     mpEntity.addPart("photo", cbFile);
     post.setEntity(mpEntity);
     HttpResponse response = client.execute(post);
