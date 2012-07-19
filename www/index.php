@@ -22,8 +22,6 @@ if (is_logged_in()) {
 $page_title = "";
 $page_subtitle = "";
 
-
-
 ?>
 
 

@@ -6,7 +6,13 @@ CREATE TABLE IF NOT EXISTS `Albums` (
   `handle_hash` binary(20) NOT NULL,
   `title` varchar(500) DEFAULT NULL,
   `caption` varchar(2000) DEFAULT NULL,
+-- READ PERMISSIONS:
+--   1 = Only collaborators can see the album
+--   2 = The whole world can see the album
   `read_permissions` int(11) unsigned NOT NULL DEFAULT 2,
+-- WRITE PERMISSIONS:
+--   1 = Only collaborators can write to an album WITHOUT approval
+--   2 = Anyone in the whole world can write to an album WITHOUT approval
   `write_permissions` int(11) unsigned NOT NULL DEFAULT 1,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `num_views` int(11) NOT NULL,

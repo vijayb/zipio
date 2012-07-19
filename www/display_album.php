@@ -13,6 +13,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
     $collaborators_info = get_collaborators_info($album_to_display);
 
     if ($g_debug) {
+        print("<!--" . $_SERVER["SCRIPT_FILENAME"] . "-->");
         print("<!-- GET: " . print_r($_GET, true) . "-->");
         print("<!-- album_to_display: $album_to_display -->\n");
         print("<!-- album_owner_info['username']: " . $album_owner_info["username"] . " -->\n");
@@ -79,6 +80,17 @@ $albumphotos_array_js = "";
 
 $photo_owners = array();
 
+// The first albumphoto that is VISIBLE is 0, the second is 1, and so on. We
+// cannot simply use $i in the loop below because some albumphotos in the array
+// won't be visible (hence the "continue").
+$index_of_albumphoto_in_album = 0;
+
+// If this page is being loaded with an albumphoto GET paramter, then we need to
+// know the fancybox index (which is the index of the albumphoto in the album
+// AS DISPLAYED, such that the first photo DISPLAYED in the album has index 0)
+// so that we can open that image up with fancybox.
+$fancybox_image_to_show = 0;
+
 for ($i = 0; $i < count($albumphotos_array); $i++) {
 
     $albumphoto_id = $albumphotos_array[$i]["id"];
@@ -95,7 +107,6 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
     $albumphotos_array_js .= "'" . $g_s3_root . "/" . $albumphotos_array[$i]["s3_url"] . "_big" . $is_filtered . "',";
 
-
     // Get the owner of the current photo. $photo_owners is a temporary store of
     // user objects (who are various photo owners) so that we don't need to do
     // a get_user_info each time for the same potential owner. We can make this
@@ -108,27 +119,8 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     }
 
 
-    if (isset($album_info["likes"][$albumphoto_id])) {
-        $like_count = $album_info["likes"][$albumphoto_id];
-    } else {
-        $like_count = 0;
-    }
-
-
-    if (is_logged_in()) {
-
-        if (isset($album_info["user_likes"][$user_id . "_" . $albumphoto_id])) {
-            $heart_color = "red";
-        } else {
-            $heart_color = "gray";
-        }
-
-    }
-
-
-
     $html = <<<HTML
-        <div class="span3 tile" id="albumphoto-{$albumphoto_id}" likes={$like_count}>
+        <div class="span3 tile" id="albumphoto-{$albumphoto_id}">
 
             <a id="fancybox-{$albumphoto_id}"
                class="fancybox"
@@ -137,8 +129,8 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}">
 
                 <!------------------------------------------------------------->
-                <!------------------------------------------------------------->
                 <!-- THE ACTUAL PHOTO ----------------------------------------->
+                <!------------------------------------------------------------->
                 <img id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
                 <!------------------------------------------------------------->
                 <!------------------------------------------------------------->
@@ -150,38 +142,61 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
             </a>
 HTML;
 
-print($html);
 
 
 
 
-if (is_logged_in()) {
 
-    $html = <<<HTML
-            <div class="like-panel">
-                <span id="like-count-{$albumphoto_id}">{$like_count}</span>
-                <a href="javascript:void(0)" onclick="toggleLikePhoto({$user_id}, {$albumphoto_id}, {$album_to_display});" class="no-underline">
-                    <i id='like-{$albumphoto_id}' class="icon-heart {$heart_color}-heart"></i>
-                </a>
-            </div>
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FACEBOOK LIKE BUTTON
+////////////////////////////////////////////////////////////////////////////////
+
+    $html .= <<<HTML
+
+        <div class="likes-panel">
+            <fb:like href="{$g_www_root}/{$album_owner_info["username"]}/{$album_info["handle"]}?albumphoto={$albumphoto_id}"
+                     send="false"
+                     layout="button_count"
+                     show_faces="true"
+                     font="arial">
+            </fb:like>
+        </div>
 HTML;
 
-} else {
+    if (isset($_GET["albumphoto"]) && $albumphoto_id == $_GET["albumphoto"]) {
+        $fancybox_image_to_show = $index_of_albumphoto_in_album;
+    }
 
-    $html = <<<HTML
-            <div class="like-panel">
-                <span id="like-count-{$albumphoto_id}">{$like_count}</span>
-                <i id='like-{$albumphoto_id}' class="icon-heart gray-heart"></i>
-            </div>
-HTML;
+////////////////////////////////////////////////////////////////////////////////
+// END FACEBOOK LIKE BUTTON
+////////////////////////////////////////////////////////////////////////////////
 
-}
 
-print($html);
+
+
+
+
+
+
 
     if ($is_owner || $is_collaborator || $album_info["write_permissions"] == 2) {
-        $html = <<<HTML
+        $html .= <<<HTML
             <div class="tile-options" style="display:none;">
+
+                <div class="btn-group" style="float:left; margin-right:5px;">
+                    <button id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
+                        Options <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:void(0);" onclick="deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}');">
+                                <i class="icon-trash"></i> Delete this photo
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 <div class="btn-group" style="float:left; margin-right:5px;">
                     <button id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" data-loading-text="Filtering...">
@@ -195,15 +210,15 @@ print($html);
                                 Original
                             </a>
                         </li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 1);">1</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 2);">2</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 3);">3</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 4);">4</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 5);">5</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 6);">6</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 7);">7</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 8);">8</a></li>
-                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">10</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 1);">Hoppe</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 2);">Hayek</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 3);">Sowell</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 4);">Spooner</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 5);">Paul</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 6);">Walter</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 7);">Mises</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 8);">Menger</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">Rothbard</a></li>
                     </ul>
                 </div>
                 <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="display:none" onclick="saveFiltered({$albumphoto_id},
@@ -226,6 +241,8 @@ HTML;
 HTML;
 
     print($html);
+
+    $index_of_albumphoto_in_album++;
 }
 
 
@@ -317,6 +334,7 @@ HTML;
                             <br>
                             <span style="color:#666666">{$collaborator["email"]}</span>
                         </div>
+
                     </div>
 HTML;
     }
@@ -470,16 +488,17 @@ $(function() {
 
     $(".tile").each(function(index) {
         $(this).mouseenter(function() {
-            $(".tile").find(".album-privacy, .like-panel").stop(true, true).delay(500).fadeOut();
-            $(this).find(".tile-options, .album-privacy, .like-panel").stop(true, true).show();
+            $(".tile").find(".album-privacy, .likes-panel").stop(true, true).delay(500).fadeOut();
+            $(this).find(".tile-options, .album-privacy, .likes-panel").stop(true, true).show();
         });
         $(this).mouseleave(function() {
-            $(".tile").find(".tile-options, .album-privacy, .like-panel").stop(true, true).delay(500).fadeOut();
+            $(".tile").find(".tile-options, .album-privacy, .likes-panel").stop(true, true).delay(500).fadeOut();
         });
     });
 
-    // Set some things if the user is logged in
-    if (isLoggedIn()) {
+    // Set some things if the user is logged in AND gAlbum is set. gAlbum is set
+    // only if the user is EITHER a collaborator OR an owner
+    if (isLoggedIn() && (typeof gAlbum != 'undefined')) {
         $("#album-privacy-" + gAlbum["read_permissions"]).prop('checked', true);
 
         if (gAlbum["write_permissions"] == 2) {
@@ -502,6 +521,34 @@ HTML;
 print($output_js);
 
 ?>
+
+
+    if (getURLParameter("albumphoto") != "null") {
+
+        $.fancybox.open($(".fancybox"), {
+            prevEffect: 'none',
+            nextEffect: 'none',
+            padding: '1',
+            arrows: false,
+            index: <?php print($fancybox_image_to_show); ?>,
+            helpers: {
+                title: {
+                    type: 'outside'
+                },
+                overlay: {
+                    opacity: 0.8,
+                    css: {
+                        'background-color': '#000'
+                    }
+                },
+                thumbs: {
+                    width: 100,
+                    height: 100
+                }
+            }
+        });
+    }
+
 
 });
 

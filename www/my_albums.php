@@ -52,6 +52,10 @@ $page_subtitle = "";
 
 for ($i = 0; $i < count($albums_array); $i++) {
 
+    if ($albums_array[$i]["read_permissions"] == 1) {
+        continue;
+    }
+
     $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
     $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
     $upper_left = "owner: <b>" . $album_owner_info["username"] . "</b>";

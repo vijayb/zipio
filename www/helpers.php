@@ -92,30 +92,6 @@ function create_collaborator($collaborator_id, $album_id) {
     return $id;
 }
 
-
-function update_likes($albumphoto_id, $album_id, $user_id, $like) {
-    global $con;
-
-    if ($like) {
-        $query ="INSERT INTO Likes (
-                albumphoto_id,
-                album_id,
-                user_id
-              ) VALUES (
-                '$albumphoto_id',
-                '$album_id',
-                '$user_id'
-              ) ON DUPLICATE KEY UPDATE id=id";
-        $result = mysql_query($query, $con);
-        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-    } else {
-        $query ="DELETE FROM Likes where albumphoto_id='$albumphoto_id' and user_id='$user_id'";
-        $result = mysql_query($query, $con);
-        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-    }
-}
-
-
 function debug($string, $color = "black") {
     print("<span style='color:$color;'>$string</span>" . "\n<br>");
 }
@@ -543,25 +519,6 @@ function get_album_info($album_id) {
 
     if ($row = mysql_fetch_assoc($result)) {
         $row["token"] = calculate_token($row["id"], $row["created"]);
-
-        $likes_query = "SELECT * from Likes where album_id='$album_id'";
-        $likes_result = mysql_query($likes_query, $con);
-        if (!$likes_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
-
-        $likes_array = array();
-        $user_likes_array = array();
-        while ($likes_row = mysql_fetch_assoc($likes_result)) {
-            if (!isset($likes_array[$likes_row["albumphoto_id"]])) {
-                $likes_array[$likes_row["albumphoto_id"]] = 0;
-            }
-            $likes_array[$likes_row["albumphoto_id"]]++;
-
-            $user_likes_array[$likes_row["user_id"]."_".$likes_row["albumphoto_id"]] = 1;
-        }
-
-        $row["likes"] = $likes_array;
-        $row["user_likes"] = $user_likes_array;
-
         return $row;
     } else {
         return 0;

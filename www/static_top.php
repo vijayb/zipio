@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:fb="http://ogp.me/ns/fb#">
 <head>
 <meta charset="utf-8">
 <title><?php print($g_Zipio); ?></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
+
+<?php
+
+if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php") &&
+    isset($_GET["albumphoto"])) {
+
+    $albumphoto_id = $_GET["albumphoto"];
+    $albumphoto_info = get_albumphoto_info($albumphoto_id);
+    $tags = <<<TAG
+        <meta property="og:image" content="{$g_s3_root}/{$albumphoto_info["s3_url"]}_big" />
+TAG;
+    print($tags);
+}
+
+?>
 
 <link href="/fancybox/helpers/jquery.fancybox-thumbs.css?v=2.0.6" rel="stylesheet" />
 <link href="/fancybox/jquery.fancybox.css?v=2.0.6" rel="stylesheet" media="screen" />
@@ -76,7 +91,7 @@ if (is_logged_in()) {
         <ul id="right-links" class="nav pull-right" style="font-size:18px">
             <li><a href="/{$_SESSION["user_info"]["username"]}"><b>{$_SESSION["user_info"]["email"]}</b></a></li>
             <li id="right-links-3"><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
-            <li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li>
+            <!-- <li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li> -->
         </ul>
 HTML;
 
