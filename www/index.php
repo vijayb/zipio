@@ -39,7 +39,7 @@ $page_subtitle = "";
 
     <div class="span12" style="text-align:center">
         <h1 style="font-size:60px; font-weight:700;">
-            Photo-sharing over email.
+            Online photo album collaboration over email.
         </h1>
         <br><br>
         <h2>

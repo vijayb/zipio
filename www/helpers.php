@@ -17,9 +17,6 @@ function login_user($user_id) {
     $_SESSION["user_id"] = $user_id;
     $_SESSION["user_info"] = get_user_info($user_id);
     $_SESSION["user_info"]["token"] = calculate_token_from_id($user_id, "Users");
-
-    header("Location: " . "/" . $_SESSION["user_info"]["username"]);
-
 }
 
 function is_logged_in() {
@@ -231,11 +228,10 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     $visible_string = "";
     if (!$visible) $visible_string = "<b>invisible</b>";
 
-    $s3_base_image_url =
-        $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
+    $s3_base_image_url = $owner_user_id ."_". $target_album_id . "_" . sha1(rand_string(20));
     $s3_url_parameter = $s3_base_image_url;
 
-    $big_size = 1024;
+    $big_size = 1600;
     $cropped_size = 300;
 
     $failed = 0;
@@ -247,23 +243,24 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
     $exif = exif_read_data($path_to_photo);
 
-    print("EXIF: ");
-
     $orientation = $exif['Orientation'];
 
     switch($orientation) {
         case 6:
             $image->rotateImage(new ImagickPixel('none'), 90);
-        break;
+            break;
         case 8:
            $image->rotateImage(new ImagickPixel('none'), -90);
-        break;
+            break;
     }
 
     $image->stripImage();
 
     $big_image = clone $image;
-    $big_image->scaleImage($big_size, $big_size, true);
+
+    if ($image->getImageWidth() > $big_size || $image->getImageHeight() > $big_size) {
+        $big_image->scaleImage($big_size, $big_size, true);
+    }
 
     $s3_big_image_name = $s3_base_image_url . "_big";
     $big_image_path = $path_to_photo . "_big";
@@ -354,51 +351,6 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
 
 
-
-
-
-function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s3_urls) {
-
-    global $con;
-    global $g_www_root;
-    global $g_s3_root;
-    global $g_founders_email_address;
-
-    $query = "SELECT
-                Collaborators.collaborator_id,
-                Users.email
-              FROM Collaborators
-              LEFT JOIN Users
-              ON collaborator_id=Users.id
-              WHERE Collaborators.album_id=" . $album_info["id"];
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
-
-    $album_owner_info = get_user_info($album_info["user_id"]);
-
-    $pictures_html = "";
-    for ($i = 0; $i < count($s3_urls); $i++) {
-        $pictures_html .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
-    }
-
-    while ($row = mysql_fetch_assoc($result)) {
-
-        $display_album_ra = array();
-        $display_album_ra["user_id"] = $row["collaborator_id"];
-        $display_album_ra["timestamp"] = time();
-        $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"];
-        $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
-
-        $collaborator_email_body = <<<EMAIL
-            <b>{$sender_info["username"]}</b> just added these photos to <b>{$album_owner_info["username"]}</b>'s <a href="{$display_album_link}"><b>{$album_info["handle"]}</b> album</a>.
-            <br><br>
-EMAIL;
-        $collaborator_email_body .= $pictures_html;
-
-        send_email($row["email"], $g_founders_email_address, "New photos!", $collaborator_email_body);
-    }
-
-}
 
 
 

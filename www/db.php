@@ -4,6 +4,7 @@ $username = "zipio";
 $password = "daewoo";
 $database = $g_Zipio;
 
+
 if ($g_database_to_use == "PROD") {
     $con = mysql_connect ("zipio.com", $username, $password, true);
 } else if ($g_database_to_use == "TEST") {

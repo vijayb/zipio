@@ -32,10 +32,6 @@ if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com
 }
 
 
-
-$g_database_to_use = "PROD";    // When set to "PROD", the system uses the database at zipio.com. When set to "TEST", the system uses the database at zipiyo.com
-
-
 $g_s3_bucket_name = "s3.$g_zipio.com";
 $g_s3_folder_name = "photos";
 $g_s3_root = "http://$g_s3_bucket_name/$g_s3_folder_name";
