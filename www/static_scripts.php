@@ -6,7 +6,7 @@
 <script src="/lib/filtrr.js"></script>
 <script src="/helpers.js"></script>
 
-
+<script type="text/javascript" src="http://assets.pinterest.com/js/pinit.js"></script>
 
 <script src="/bootstrap/js/bootstrap-alert.js"></script>
 <script src="/bootstrap/js/bootstrap-modal.js"></script>
