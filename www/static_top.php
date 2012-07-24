@@ -7,20 +7,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<?php
 
-if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php") &&
-    isset($_GET["albumphoto"])) {
-
-    $albumphoto_id = $_GET["albumphoto"];
-    $albumphoto_info = get_albumphoto_info($albumphoto_id);
-    $tags = <<<TAG
-        <meta property="og:image" content="{$g_s3_root}/{$albumphoto_info["s3_url"]}_big" />
-TAG;
-    print($tags);
-}
-
-?>
 
 <link href="/fancybox/helpers/jquery.fancybox-thumbs.css?v=2.0.6" rel="stylesheet" />
 <link href="/fancybox/jquery.fancybox.css?v=2.0.6" rel="stylesheet" media="screen" />
@@ -29,27 +16,59 @@ TAG;
 <link href="/lib/fonts.css" rel="stylesheet" />
 
 
-
-
-
-
-
 <!--
 Run the following from the zipio directory:
   rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
   rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 -->
 
-
+<!--
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
+-->
 
 
-<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
--->
+
+
+
+
+<?php
+
+if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php")) {
+
+    if (isset($_GET["albumphoto"])) {
+        $albumphoto_id = $_GET["albumphoto"];
+        $albumphoto_info = get_albumphoto_info($albumphoto_id);
+        $html = <<<HTML
+            <meta property="og:image" content="{$g_s3_root}/{$albumphoto_info["s3_url"]}_big" />
+HTML;
+        print($html);
+    }
+
+} else if (strstr($_SERVER["SCRIPT_FILENAME"], "index.php")) {
+
+    $html = <<<HTML
+
+
+<style>
+
+body {
+    background-color: #004183;
+}
+
+</style>
+
+HTML;
+
+    print($html);
+
+}
+
+?>
+
 
 
 
@@ -70,6 +89,13 @@ Run the following from the zipio directory:
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
 <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
 
+
+
+
+
+
+
+
 </head>
 
 
@@ -77,13 +103,12 @@ Run the following from the zipio directory:
 
 // Define default values for templates
 
-if (is_logged_in()) {
+$brand_name = "<img src='/images/" . $g_zipio . "_white_small.png'>";
 
-    $brand_name = "<span style='color:red;'>$g_zipio</span> beta";
+if (is_logged_in()) {
 
     $logged_in_status = <<<HTML
         <ul id="right-links" class="nav" style="font-size:18px">
-            <li class="divider-vertical"></li>
             <li id="right-links-1"><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> Albums</a></li>
         </ul>
 
@@ -91,14 +116,12 @@ if (is_logged_in()) {
         <ul id="right-links" class="nav pull-right" style="font-size:18px">
             <li><a href="/{$_SESSION["user_info"]["username"]}"><b>{$_SESSION["user_info"]["email"]}</b></a></li>
             <li id="right-links-3"><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
-            <!-- <li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li> -->
+            <!--<li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li>-->
         </ul>
 HTML;
 
 
 } else {
-
-    $brand_name = "$g_zipio beta";
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right" style="font-size:18px">
@@ -127,26 +150,61 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <div id="fb-root"></div>
 <script>
-  window.fbAsyncInit = function() {
+
+gFB = new Array();
+gFB["status"] = -1;
+gFB["userID"] = -1;
+gFB["accessToken"] = -1;
+
+window.fbAsyncInit = function() {
     FB.init({
-      appId      : '255929901188660', // App ID
-      channelUrl : '//zipiyo.com/channel.php', // Channel File
-      status     : true, // check login status
-      cookie     : true, // enable cookies to allow the server to access the session
-      xfbml      : true  // parse XFBML
+        appId      : '255929901188660', // App ID
+        channelUrl : '//zipiyo.com/channel.php', // Channel File
+        status     : true, // check login status
+        cookie     : true, // enable cookies to allow the server to access the session
+        xfbml      : true  // parse XFBML
     });
 
-    // Additional initialization code here
-  };
+    FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            gFB["userID"] = response.authResponse.userID;
+            gFB["accessToken"] = response.authResponse.accessToken;
+            gFB["status"] = 1;
+            debug("1");
+        } else if (response.status === 'not_authorized') {
+            gFB["status"] = 2;
+            debug("2");
+        } else {
+            gFB["status"] = 3;
+            debug("3");
+        }
+    });
 
-  // Load the SDK Asynchronously
-  (function(d){
-     var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement('script'); js.id = id; js.async = true;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     ref.parentNode.insertBefore(js, ref);
-   }(document));
+    FB.Event.subscribe('auth.authResponseChange', function(response) {
+        if (response.status === 'connected') {
+            gFB["userID"] = response.authResponse.userID;
+            gFB["accessToken"] = response.authResponse.accessToken;
+            gFB["status"] = 1;
+            debug("1");
+        } else if (response.status === 'not_authorized') {
+            gFB["status"] = 2;
+            debug("2");
+        } else {
+            gFB["status"] = 3;
+            debug("3");
+        }
+    });
+};
+
+// Load the SDK Asynchronously
+(function(d){
+    var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement('script'); js.id = id; js.async = true;
+    js.src = "//connect.facebook.net/en_US/all.js";
+    ref.parentNode.insertBefore(js, ref);
+}(document));
+
 </script>
 
 
@@ -164,7 +222,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Hi, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
+        <h2>Welcome, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
         <h3>Set a password and change your username (if you want)</h3>
     </div>
 
@@ -380,6 +438,37 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 <!----------------------------------------------------------------------------->
 
+<div class="modal hide" id="facebook-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Post this photo to Facebook</h2>
+        <h3></h3>
+    </div>
+
+    <div class="modal-body">
+
+        <p>
+            Say something about the photo (if you want):
+        </p>
+
+        <p>
+            <textarea id="facebook-comment" class="width-fix" style="width:100%; max-width:100%;"></textarea>
+        </p>
+
+        <img id="facebook-image" style="height:100px;">
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="postToFacebook();"
+                class="btn btn-primary" id="facebook-submit" data-loading-text="Posting to Facebook...">
+                Post
+        </button>
+    </div>
+
+</div>
+
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
@@ -396,7 +485,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 <div class="navbar navbar-fixed-top">
-    <div class="navbar-inner">
+    <div class="navbar-inner" style="background-color:initial">
         <div class="container">
 
             <a class="brand" href="/<? if (is_logged_in()) { print($_SESSION["user_info"]["username"]); } ?>">
@@ -422,7 +511,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 
 
 <?php
-
+/*
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -430,14 +519,7 @@ if (!isset($page_title_right)) $page_title_right = "";
 if ($g_debug) {
 
     $html = <<<HTML
-    <div style="background-color:black; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
-        {$_SERVER["HTTP_HOST"]}
-    </div>
-HTML;
-    print($html);
-
-    $html = <<<HTML
-    <div style="background-color:black; color:#ffffff; font-weight:700; text-align:center; font-size:24px; padding:10px; opacity:0.3;">
+    <div style="color:#999999; font-weight:700; text-align:center; font-size:20px; padding:10px;">
         DB: {$g_database_to_use} - zipio: {$g_zipio}/{$g_Zipio}
     </div>
 HTML;
@@ -451,6 +533,7 @@ HTML;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+*/
 ?>
 
 </div>
@@ -467,21 +550,19 @@ HTML;
 <div class="container">
 
     <div class="row">
-        <div class="span12">
-            <div class="alert" style="display:none;" id="header-alert">
+        <div class="span12" style="margin-bottom:10px;">
+            <div class="alert" style="display:none; padding:10px 35px 10px 15px;" id="header-alert">
                 <button class="close">×</button>
-                <h3 class="alert-heading" id="header-alert-title" style="font-weight:bold;"></h3>
-                <span style="font-size:16px" id="header-alert-text"></span>
+                <h2 class="alert-heading" id="header-alert-title"></h2>
+                <span style="margin-top:5px;" id="header-alert-text"></span>
             </div>
         </div>
     </div>
 
-
-
-    <div class="row" style="margin-bottom:25px">
-        <div class="span9" style="margin-bottom:10px">
+    <div class="row">
+        <div class="span9" style="margin-bottom:20px">
             <h1><?php print($page_title); ?></h1>
-            <h2 style="color:#666666; margin: 10px 0px 5px 0px; font-weight:normal;">
+            <h2 style="color:#888888; margin: 10px 0px 5px 0px;">
                 <?php print($page_subtitle); ?>
             </h2>
         </div>

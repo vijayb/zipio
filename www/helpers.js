@@ -36,6 +36,8 @@ function showInviteModal() {
     $("#invite-emails").val("").focus();
 }
 
+
+
 function showFBBar() {
     $("#fb-bar").slideDown();
     $("body").css("padding-top", "120px");
@@ -64,6 +66,7 @@ function submitLogin() {
                 window.location.replace(window.location.href.split('#')[0]);
             } else {
                 $("#login-error").show();
+                $("#login-password").select();
                 $("#login-submit").button("reset");
                 $("#login-submit").prop("disabled", true);
             }
@@ -329,7 +332,7 @@ function checkEmailIsOkay(prefix) {
             } else if (data == 1) {
                 // 1 means the email DOES exist in the database
                 if (prefix == "password") {
-                    $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> We'll send a password reset link to <b>" + emailEntered + "</b>");
+                    $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> Click the blue button below and we'll email you a reset password link.");
                     $("#" + prefix + "-email-check").data("correct", 1);
                 } else if (prefix == "login") {
                     $("#" + prefix + "-email-check").html("<i class='icon-ok'></i> Welcome back!");
@@ -452,9 +455,6 @@ function fbLogin() {
     FB.login(function (response) {
         if (response.authResponse) {
             console.log('Welcome!  Fetching your information.... ');
-            FB.api('/me', function (response) {
-                console.log('Good to see you, ' + response.name + '.');
-            });
         } else {
             console.log('User cancelled login or did not fully authorize.');
         }
@@ -475,6 +475,56 @@ function createLikeButton(element, url) {
     }
 }
 
+
+
+
+function showFacebookModal(albumphotoID) {
+
+    if (gFB["status"] == 1) {
+
+        imageURL = $("#image-" + albumphotoID).attr("src");
+
+        $(".modal").modal('hide');
+        $("#facebook-comment").empty().focus();
+        $("#facebook-image").attr("src", imageURL);
+        $("#facebook-modal").modal('show');
+        return;
+
+    } else {
+
+        FB.login(function (response) {
+            if (response.authResponse) {
+                showFacebookModal(albumphotoID);
+            } else {
+                console.log('User cancelled login or did not fully authorize.');
+            }
+        }, {scope: 'email, publish_stream'});
+    }
+
+}
+
+
+function postToFacebook() {
+    $("#facebook-submit").button("loading");
+    FB.api('/me/photos',
+           'post',
+           {
+                message: $("#facebook-comment").val(),
+                url: $("#facebook-image").attr("src"),
+           },
+           function(response) {
+        if (!response || response.error) {
+            alert('Error occured');
+        } else {
+            $("#facebook-submit").button("reset");
+            $(".modal").modal('hide');
+            $("#header-alert-title").html("Posted to Facebook");
+            $("#header-alert-text").html("");
+            $("#header-alert").addClass("alert-success");
+            $("#header-alert").delay(1000).fadeIn();
+        }
+    });
+}
 
 
 
@@ -522,6 +572,33 @@ function deletePhotoFromAlbum(albumPhotoID, token) {
         async: true
     });
 }
+
+
+
+function setAsAlbumCover(albumPhotoID, albumID, token) {
+    var urlString = "/set_as_album_cover.php?albumphoto_id=" + albumPhotoID +
+                                           "&album_id=" + albumID +
+                                           "&token=" + token;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#header-alert-title").html("Album cover changed");
+                $("#header-alert-text").html("");
+                $("#header-alert").addClass("alert-success");
+                $("#header-alert").fadeIn();
+            } else if (parseInt(data) == 0) {
+                debug("Could not delete photo because the token's wrong.");
+            } else {
+                debug("Could not delete photo (unknown error).");
+            }
+        },
+        async: true
+    });
+}
+
+
 
 
 function deleteAlbum(albumID, token) {
@@ -578,6 +655,14 @@ function getAlert(alert) {
     } else if (alert == 6) {
         returnArr["title"] = "Emails sent and collaborators added.";
         returnArr["text"]  = "The people you just invited can now add photos to this album (they're now listed in the Album Collaborators list).";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 7) {
+        returnArr["title"] = hashParams["username"] + " wants you to add photos to this album!";
+        returnArr["text"]  = "Adding photos is easy. Just email them as attachments to the email address above. Or, <a href=''>download the Zipio camera</a> to add photos as you take them.";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 8) {
+        returnArr["title"] = "Welcome to Zipio! Here's your first album.";
+        returnArr["text"]  = "Now, invite people to add their photos! Photos can be added by email, so there's no sign-up required. Click the blue \"Invite\" button below to add collaborators (we'll send them invites).";
         returnArr["class"] = "alert-success";
     }
 

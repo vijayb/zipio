@@ -85,7 +85,7 @@ $(function() {
         $("#header-alert-title").html(getAlert(alert)["title"]);
         $("#header-alert-text").html(getAlert(alert)["text"]);
         $("#header-alert").addClass(getAlert(alert)["class"]);
-        $("#header-alert").fadeIn();
+        $("#header-alert").delay(1000).fadeIn();
     }
 
     // If the user is logged in but has not yet registered (i.e., set a
@@ -103,6 +103,8 @@ $(function() {
             $(this).parent().removeClass("alert-info");
         });
     });
+
+
 
 
 

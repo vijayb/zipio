@@ -28,11 +28,8 @@ function is_logged_in() {
 }
 
 function check_request_for_login($_GET) {
-    print("<!-- IN CHECK_REQUEST_FOR_LOGIN -->\n");
-    print("<!-- GET:" . print_r($_GET, true) . "-->\n");
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
-        print("<!-- REQUEST:" . print_r($request, true) . "-->");
         if (isset($request["user_id"])) {
             login_user($request["user_id"]);
             $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -447,6 +444,8 @@ function get_user_info_from_email($email) {
 
     global $con;
 
+
+
     $query = "SELECT * FROM Users WHERE email_hash=UNHEX(SHA1('$email'))";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -460,6 +459,24 @@ function get_user_info_from_email($email) {
 }
 
 
+function normalize_email($email) {
+
+    $email = strtolower($email);
+    $parts = explode("@", $email);
+
+    if ($parts[1] == "gmail.com") {
+        $before_plus = strstr($parts[0], '+', TRUE);
+        $before_at = $before_plus ? $before_plus : $parts[0];
+        $before_at = str_replace('.', '', $before_at);
+        $normalized_email = $before_at . '@' . $parts[1];
+        print($normalized_email);
+    } else {
+
+    }
+
+
+}
+
 
 function get_album_info($album_id) {
 
@@ -470,6 +487,17 @@ function get_album_info($album_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
     if ($row = mysql_fetch_assoc($result)) {
+
+        $inner_query = "SELECT id FROM AlbumPhotos WHERE album_id='$album_id'";
+        $inner_result = mysql_query($inner_query, $con);
+        if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+        $row["albumphoto_ids"] = array();
+
+        while ($inner_row = mysql_fetch_assoc($inner_result)) {
+            array_push($row["albumphoto_ids"], $inner_row["id"]);
+        }
+
         $row["token"] = calculate_token($row["id"], $row["created"]);
         return $row;
     } else {

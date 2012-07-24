@@ -319,6 +319,11 @@ EMAIL;
         $display_album_ra["timestamp"] = time();
         $display_album_link = $g_www_root . "/" . $target_user_info["username"] . "/" . $target_album_info["handle"] . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
 
+        if ($brand_new_user) {
+            $display_album_link .= "&alert=8";
+        }
+
+
         $user_email_body = <<<EMAIL
             You created a new album called <b>{$target_album_info["handle"]}</b>.
             <a href='{$display_album_link}'>See the album</a>!
@@ -341,14 +346,16 @@ EMAIL;
 }
 
 
+$subject_to_user = "$g_Zipio activity notification";
 if ($brand_new_user) {
     $user_email_body = "Welcome to $g_Zipio! We've assigned you a username of <b>" . $user_info["username"] . "</b>." .  $user_email_body;
+    $subject_to_user = "Welcome to $g_Zipio!";
 }
 
 if (!preg_match("/$g_zipio\.com$/", $sender)) {
 
     if (isset($user_email_body) && strlen($user_email_body) > 0) {
-        send_email($user_info["email"], $g_founders_email_address, "$g_Zipio activity notification", $user_email_body);
+        send_email($user_info["email"], $g_founders_email_address, $subject_to_user, $user_email_body);
         output("$user_email_body\n\n");
     }
 

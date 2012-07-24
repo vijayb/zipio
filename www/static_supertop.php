@@ -10,8 +10,4 @@ require("helpers.php");
 
 check_request_for_login($_GET);
 
-if ($g_debug) {
-    print("<!-- SESSION: " . print_r($_SESSION, true) . "-->");
-}
-
 ?>

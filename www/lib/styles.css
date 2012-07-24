@@ -12,6 +12,7 @@ body {
     text-decoration: none;
 }
 
+
 .likes-panel {
     position: absolute;
     top: 0px;
@@ -36,7 +37,7 @@ body {
     margin-bottom: 20px;
 }
 
-.tile img {
+.albumphoto-image {
     width: 100%;
 }
 

@@ -1,5 +1,7 @@
 <?php
 
+// File for Android app to get a list of a user's albums
+
 ini_set("display_errors", 1);
 error_reporting(E_ALL | E_STRICT);
 
@@ -19,7 +21,7 @@ if (count($_POST) == 2) {
     if (!isset($_GET["email"]) || !isset($_GET["password_hash"])) {
         exit();
     } else {
-        $email = $_GET["email"];
+        $email = strtolower($_GET["email"]);
         $password_hash = $_GET["password_hash"];
     }
 } else {

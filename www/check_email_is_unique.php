@@ -10,7 +10,7 @@ require("helpers.php");
 if (!isset($_GET["email"])) {
     exit();
 } else {
-    $email = $_GET["email"];
+    $email = strtolower($_GET["email"]);
 }
 
 $query = "SELECT id FROM Users WHERE email='$email' LIMIT 1";

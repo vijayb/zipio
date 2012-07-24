@@ -31,6 +31,7 @@ if (!check_token($inviter_id, $inviter_token, "Users") || !check_token($album_id
 $album_info = get_album_info($album_id);
 $album_owner_info = get_user_info($album_info["user_id"]);
 
+$emails = strtolower($emails);
 $emails = preg_split("/[\s,]+/", $emails);
 
 // These are the only valid characters in an email address
@@ -60,7 +61,7 @@ foreach ($emails as $email) {
         $display_album_ra["user_id"] = $user_id_corresponding_to_this_email;
         $display_album_ra["timestamp"] = time();
         $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"];
-        $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+        $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true&alert=7&username=" . $album_owner_info["username"];
 
 
         $email_body = <<<EMAIL

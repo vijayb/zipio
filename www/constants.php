@@ -8,14 +8,14 @@ BEFORE PUSHING:
 
 To delete the database:
 
-    TRUNCATE TABLE AlbumPhotos;
-    TRUNCATE TABLE Collaborators;
-    TRUNCATE TABLE Albums;
-    TRUNCATE TABLE Photos;
-    TRUNCATE TABLE Users;
+    TRUNCATE TABLE Zipiyo.AlbumPhotos;
+    TRUNCATE TABLE Zipiyo.Collaborators;
+    TRUNCATE TABLE Zipiyo.Albums;
+    TRUNCATE TABLE Zipiyo.Photos;
+    TRUNCATE TABLE Zipiyo.Users;
 
-To run ec2 tools:
-http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
+To run ec2 tools
+    http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
 
 */
 
@@ -31,6 +31,9 @@ if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com
     $g_database_to_use = "PROD";
 }
 
+if ($_SERVER["HTTP_HOST"] == "localhost") {
+    //$g_database_to_use = "LOCAL";
+}
 
 $g_s3_bucket_name = "s3.$g_zipio.com";
 $g_s3_folder_name = "photos";

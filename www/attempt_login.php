@@ -10,7 +10,7 @@ require("helpers.php");
 if (!isset($_GET["email"]) || !isset($_GET["password_hash"])) {
     exit();
 } else {
-    $email = mysql_real_escape_string($_GET["email"]);
+    $email = strtolower($_GET["email"]);
     $password_hash = mysql_real_escape_string($_GET["password_hash"]);
 }
 

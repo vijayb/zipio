@@ -10,7 +10,7 @@ require("helpers.php");
 if (!isset($_GET["email"])) {
     exit();
 } else {
-    $email = mysql_real_escape_string($_GET["email"]);
+    $email = strtolower($_GET["email"]);
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -29,6 +29,8 @@ $email_body = <<<EMAIL
     <a href="$logged_in_link_link">Reset your password</a>
 EMAIL;
 
+
+print($email_body);
 send_email($email, $g_founders_email_address, "Reset your password", $email_body);
 
 

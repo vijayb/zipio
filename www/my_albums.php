@@ -38,21 +38,27 @@ $page_subtitle = "";
 
 
 ?>
-
-
-
-
-<!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 <?php require("static_top.php"); ?>
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
 
 <div class="row">
+
 <?php
 
 for ($i = 0; $i < count($albums_array); $i++) {
 
-    if ($albums_array[$i]["read_permissions"] == 1) {
+    $is_owner = 0;
+    $is_collaborator = 0;
+
+    if (is_logged_in() && is_collaborator($_SESSION["user_id"], $albums_array[$i]["id"])) {
+        $is_collaborator = 1;
+    } else if (is_logged_in() && $albums_array[$i]["user_id"] == $_SESSION["user_id"]) {
+        $is_owner = 1;
+    }
+
+
+    if ($albums_array[$i]["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
         continue;
     }
 
