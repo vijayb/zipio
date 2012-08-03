@@ -158,8 +158,8 @@ gFB["accessToken"] = -1;
 
 window.fbAsyncInit = function() {
     FB.init({
-        appId      : '255929901188660', // App ID
-        channelUrl : '//zipiyo.com/channel.php', // Channel File
+        appId      : '<?php print($g_fb_app_id); ?>', // App ID
+        channelUrl : '//<?php print($g_zipio); ?>.com/channel.php', // Channel File
         status     : true, // check login status
         cookie     : true, // enable cookies to allow the server to access the session
         xfbml      : true  // parse XFBML

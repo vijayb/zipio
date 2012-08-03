@@ -506,11 +506,15 @@ function showFacebookModal(albumphotoID) {
 
 function postToFacebook() {
     $("#facebook-submit").button("loading");
+
+    imageURL = $("#facebook-image").attr("src");
+    imageURL = imageURL.replace("_cropped", "_big");
+
     FB.api('/me/photos',
            'post',
            {
                 message: $("#facebook-comment").val(),
-                url: $("#facebook-image").attr("src"),
+                url: imageURL,
            },
            function(response) {
         if (!response || response.error) {
