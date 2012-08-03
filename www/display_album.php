@@ -152,19 +152,25 @@ HTML;
 ////////////////////////////////////////////////////////////////////////////////
 
     $link_to_album_with_image_opened = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"] . "?albumphoto=" . $albumphoto_id;
-    
+
     $pin_website = urlencode($g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"]);
     $pin_image = urlencode($g_s3_root."/".$albumphotos_array[$i]["s3_url"]."_big" . $is_filtered);
     $html .= <<<HTML
 
         <div class="likes-panel">
-            <fb:like href="{$link_to_album_with_image_opened}"
-                     send="false"
-                     layout="button_count"
-                     show_faces="true"
-                     font="arial">
-            </fb:like>
-            <a href="http://pinterest.com/pin/create/button/?url={$pin_website}&media={$pin_image}&description='I liked this photo I found on zipio'" class="pin-it-button" count-layout="none"><img src="//assets.pinterest.com/images/PinExt.png" alt="Pin it" / ></a>
+
+            <div>
+                <fb:like href="{$link_to_album_with_image_opened}"
+                         send="false"
+                         layout="button_count"
+                         show_faces="true"
+                         font="arial">
+                </fb:like>
+            </div>
+
+            <div style="margin-top:5px;">
+                <a href="http://pinterest.com/pin/create/button/?url={$pin_website}&media={$pin_image}&description='I liked this photo I found on zipio'" class="pin-it-button" count-layout="none"><img src="//assets.pinterest.com/images/PinExt.png" alt="Pin it" / ></a>
+            </div>
 
         </div>
 HTML;
@@ -189,10 +195,11 @@ HTML;
         $html .= <<<HTML
             <div class="tile-options" style="display:none;">
 
+            <!--
                 <div rel="tooltip" title="Post to Facebook" style="float:left; margin-right:5px;" class="btn btn-inverse ttip" onclick="showFacebookModal({$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
-
+            -->
                 <div class="btn-group" style="float:left; margin-right:5px;">
                     <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown">
                         <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>

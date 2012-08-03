@@ -37,6 +37,8 @@ Run the following from the zipio directory:
 
 <?php
 
+// =============================================================================
+
 if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php")) {
 
     if (isset($_GET["albumphoto"])) {
