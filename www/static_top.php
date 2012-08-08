@@ -266,22 +266,18 @@ window.fbAsyncInit = function() {
 
 </div>
 
-
+<!----------------------------------------------------------------------------->
 
 <div class="modal hide" id="caption-modal">
 
     <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
-        <h2>Edit the caption</h2>
+        <h2>Edit caption</h2>
     </div>
 
     <div class="modal-body">
         <div class="form-horizontal">
-            <div class="control-group">
-                <div class="controls">
-                    <input class="input-xlarge" id="caption-input" albumphotoid="">
-                </div>
-            </div>
+            <input type="text" class="input-xlarge" id="caption-input" albumphoto-id="" style="width:99%">
         </div>
     </div>
 

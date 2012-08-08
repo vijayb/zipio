@@ -119,7 +119,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
     $link_to_album_with_image_opened = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"] . "?albumphoto=" . $albumphoto_id;
 
     $html = <<<HTML
-        <div class="span3 tile" id="albumphoto-{$albumphoto_id}" one-up-link="{$link_to_album_with_image_opened}>
+        <div class="span3 tile" id="albumphoto-{$albumphoto_id}" one-up-link="{$link_to_album_with_image_opened}">
 
             <a id="fancybox-{$albumphoto_id}"
                class="fancybox"
@@ -144,8 +144,19 @@ HTML;
 
     if (isset($albumphotos_array[$i]["caption"]) && $albumphotos_array[$i]["caption"] != "") {
         $html .= <<<HTML
-            <div class="albumphoto-caption" id="albumphoto-caption-{$albumphotos_array[$i]["id"]}" caption="{$albumphotos_array[$i]["caption"]}" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})">
-            {$albumphotos_array[$i]["caption"]}
+            <div class="albumphoto-caption">
+
+                <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
+HTML;
+
+        if ($is_owner || $is_collaborator) {
+            $html .= <<<HTML
+                <a href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})"><i class="icon-edit"></i></a>
+HTML;
+        }
+
+
+        $html .= <<<HTML
             </div>
 HTML;
     }

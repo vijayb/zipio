@@ -170,6 +170,16 @@ $(function() {
     });
 
     // -------------------------------------------------------------------------
+    // CAPTION
+
+    $("#caption-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#caption-submit").attr("disabled")) {
+            $("#caption-submit").click();
+        }
+    });
+
+
+    // -------------------------------------------------------------------------
     // INVITE
 
     $("#invite-modal textarea").keyup(function(e) {

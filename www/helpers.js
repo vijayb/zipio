@@ -117,13 +117,37 @@ function submitForgotPassword() {
 }
 
 function showCaptionModal(id) {
-    $('#caption-input').val($("#albumphoto-caption-"+id).attr("caption"));
-    $('#caption-modal').attr("albumphotoid", id);
+    $('#caption-input').val($("#albumphoto-caption-"+id).html());
+    $('#caption-modal').attr("albumphoto-id", id);
     $('#caption-modal').modal('show');
+    $('#caption-input').focus();
 }
 
 function submitCaption() {
-    alert($('#caption-modal').attr("albumphotoid"));
+
+    var albumphotoID = $('#caption-modal').attr("albumphoto-id");
+    var caption = $("#caption-input").val();
+
+    jQuery.ajax({
+        type: 'POST',
+        url: "/update_caption.php",
+        data: {
+            "albumphoto_id": albumphotoID,
+            "caption": caption,
+            "token": gAlbum["token"],
+            "album_id": gAlbum["id"]
+        },
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#caption-modal").modal('hide');
+                $("#albumphoto-caption-" + albumphotoID).html(caption);
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+
 }
 
 
@@ -526,7 +550,7 @@ function postToFacebook() {
     imageURL = imageURL.replace("_cropped", "_big");
 
     albumphotoID = $("#facebook-image").data("albumphotoID");
-    
+
     FB.api('/me/feed',
            'post',
            {
