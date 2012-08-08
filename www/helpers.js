@@ -116,6 +116,17 @@ function submitForgotPassword() {
     });
 }
 
+function showCaptionModal(id) {
+    $('#caption-input').val($("#albumphoto-caption-"+id).attr("caption"));
+    $('#caption-modal').attr("albumphotoid", id);
+    $('#caption-modal').modal('show');
+}
+
+function submitCaption() {
+    alert($('#caption-modal').attr("albumphotoid"));
+}
+
+
 function submitUsernamePassword() {
     $("#register-submit").button("loading");
     var username = gUser["username"];

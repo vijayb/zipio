@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `AlbumPhotos` (
   `visible` int(11) NOT NULL DEFAULT '1',
   `filtered` int(11) NOT NULL DEFAULT '0',
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `caption` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY (`photo_id`),
   KEY (`album_id`),

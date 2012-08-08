@@ -138,8 +138,17 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                 <div class="album-privacy">
                     posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b> - {$albumphoto_id}
                 </div>
+
             </a>
 HTML;
+
+    if (isset($albumphotos_array[$i]["caption"]) && $albumphotos_array[$i]["caption"] != "") {
+        $html .= <<<HTML
+            <div class="albumphoto-caption" id="albumphoto-caption-{$albumphotos_array[$i]["id"]}" caption="{$albumphotos_array[$i]["caption"]}" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})">
+            {$albumphotos_array[$i]["caption"]}
+            </div>
+HTML;
+    }
 
 
 
@@ -577,10 +586,10 @@ $(function() {
     $(".tile").each(function(index) {
         $(this).mouseenter(function() {
             $(".tile").find(".album-privacy, .likes-panel").stop(true, true).delay(500).fadeOut();
-            $(this).find(".tile-options, .album-privacy, .likes-panel").stop(true, true).show();
+            $(this).find(".tile-options, .album-privacy, .likes-panel, .albumphoto-caption").stop(true, true).show();
         });
         $(this).mouseleave(function() {
-            $(".tile").find(".tile-options, .album-privacy, .likes-panel").stop(true, true).delay(500).fadeOut();
+            $(".tile").find(".tile-options, .album-privacy, .likes-panel, .albumphoto-caption").stop(true, true).delay(500).fadeOut();
         });
     });
 

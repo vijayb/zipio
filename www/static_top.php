@@ -266,6 +266,35 @@ window.fbAsyncInit = function() {
 
 </div>
 
+
+
+<div class="modal hide" id="caption-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Edit the caption</h2>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="control-group">
+                <div class="controls">
+                    <input class="input-xlarge" id="caption-input" albumphotoid="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitCaption();"
+                class="btn btn-primary" id="caption-submit" data-loading-text="Please wait...">
+                Save caption
+        </button>
+    </div>
+
+</div>
+
 <?php } ?>
 
 <!----------------------------------------------------------------------------->

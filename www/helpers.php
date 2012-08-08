@@ -572,6 +572,7 @@ function get_albumphoto_info($albumphoto_id) {
                 album_owner_id,
                 visible,
                 filtered,
+                caption,
                 s3_url,
                 AlbumPhotos.created
               FROM AlbumPhotos

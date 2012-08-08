@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `Photos` (
   `s3_url` varchar(1000) DEFAULT NULL,
   `s3_url_hash` binary(20) NOT NULL,
   `num_views` int(11) NOT NULL,
-  `caption` varchar(1000) DEFAULT NULL,
   `width` int(11) NOT NULL,
   `height` int(11) NOT NULL,
   `mime_type` varchar(100) DEFAULT NULL,
