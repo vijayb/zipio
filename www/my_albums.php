@@ -7,13 +7,6 @@ if (!isset($_GET["owner_username"])) {
     exit();
 } else {
     $owner_id = get_user_id_from_username($_GET["owner_username"]);
-    $albums_array_where_owner = get_albums_info_where_owner($owner_id);
-    $albums_array_where_collaborator = get_albums_info_where_collaborator($owner_id);
-    if (is_logged_in() && $_SESSION["user_id"] == $owner_id) {
-        $albums_array = array_merge($albums_array_where_owner, $albums_array_where_collaborator);
-    } else {
-        $albums_array = $albums_array_where_owner;
-    }
     $owner_username = get_username_from_user_id($owner_id);
     $owner_info = get_user_info($owner_id);
 
@@ -21,7 +14,6 @@ if (!isset($_GET["owner_username"])) {
         print("<!-- owner_id: $owner_id -->\n");
         print("<!-- owner_username: $owner_username -->\n");
         print("<!-- owner_info: " . print_r($owner_info, true) . "-->");
-        print("<!-- albums_array: " . print_r($albums_array, true) . "-->");
     }
 }
 
@@ -42,45 +34,80 @@ $page_subtitle = "";
 <!--|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||-->
 
 
-<div class="row">
-
 <?php
 
-for ($i = 0; $i < count($albums_array); $i++) {
+$albums_array_where_owner = get_albums_info_where_owner($owner_id);
+$albums_array_where_collaborator = get_albums_info_where_collaborator($owner_id);
 
-    $is_owner = 0;
-    $is_collaborator = 0;
+$albums_to_display = array();
+array_push($albums_to_display, $albums_array_where_owner);
 
-    if (is_logged_in() && is_collaborator($_SESSION["user_id"], $albums_array[$i]["id"])) {
-        $is_collaborator = 1;
-    } else if (is_logged_in() && $albums_array[$i]["user_id"] == $_SESSION["user_id"]) {
-        $is_owner = 1;
+if (is_logged_in() && $_SESSION["user_id"] == $owner_id) {
+    array_push($albums_to_display, $albums_array_where_collaborator);
+}
+
+
+
+for ($k = 0; $k < count($albums_to_display); $k++) {
+
+    $albums_array = $albums_to_display[$k];
+
+
+    if ($k == 0) {
+        $section_title = "My albums";
+    } else if ($k == 1) {
+        $section_title = "Others' albums";
     }
-
-
-    if ($albums_array[$i]["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
-        continue;
-    }
-
-    $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
-    $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
-    $upper_left = "owner: <b>" . $album_owner_info["username"] . "</b>";
 
 
     $html = <<<HTML
-    <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
-        <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
-            <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped'>
-            <div class="album-details"></div>
-            <div class="album-title">{$albums_array[$i]["handle"]}</div>
-            <div class="album-privacy">
-                {$upper_left}
-            </div>
-        </a>
+    <div class="row">
+
+        <div class="span12" style="margin-bottom:20px">
+            <h2>$section_title</h2>
+        </div>
+
 HTML;
 
-    if (!isset($_GET["following"]) && is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
+
+    for ($i = 0; $i < count($albums_array); $i++) {
+
+        $is_owner = 0;
+        $is_collaborator = 0;
+
+        if (is_logged_in() && is_collaborator($_SESSION["user_id"], $albums_array[$i]["id"])) {
+            $is_collaborator = 1;
+        } else if (is_logged_in() && $albums_array[$i]["user_id"] == $_SESSION["user_id"]) {
+            $is_owner = 1;
+        }
+
+
+        if ($albums_array[$i]["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
+            continue;
+        }
+
+        $cover_albumphoto_info = get_albumphoto_info($albums_array[$i]["cover_albumphoto_id"], $albums_array[$i]["id"]);
+        $album_owner_info = get_user_info($albums_array[$i]["user_id"]);
+        $upper_left = "owner: <b>" . $album_owner_info["username"] . "</b>";
+
+
         $html .= <<<HTML
+        <!--------------------------------------------------------------------->
+        <!-- TILE BEGIN ------------------------------------------------------->
+
+        <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
+            <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
+                <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped'>
+                <div class="album-details"></div>
+                <div class="album-title">{$albums_array[$i]["handle"]}</div>
+                <div class="album-privacy">{$upper_left}</div>
+            </a>
+
+HTML;
+
+        if (!isset($_GET["following"]) && is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
+            $html .= <<<HTML
+
             <div class="tile-options" style="display:none; padding:10px">
                 <div class="btn-group">
                     <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
@@ -95,16 +122,45 @@ HTML;
                     </ul>
                 </div>
             </div>
+
 HTML;
+        }
+
+        $html .= <<<HTML
+        </div>
+
+        <!-- TILE END --------------------------------------------------------->
+        <!--------------------------------------------------------------------->
+
+
+
+HTML;
+
     }
 
     $html .= <<<HTML
     </div>
+
+
+
+
+
+
+
+
+
+
 HTML;
 
     print($html);
 
 }
+
+
+
+
+
+
 
 ?>
 </div>

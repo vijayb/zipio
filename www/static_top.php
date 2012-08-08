@@ -44,6 +44,7 @@ if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php")) {
     if (isset($_GET["albumphoto"])) {
         $albumphoto_id = $_GET["albumphoto"];
         $albumphoto_info = get_albumphoto_info($albumphoto_id);
+        print("<!-- GET: " . print_r($albumphoto_info, true) . "-->");
         $html = <<<HTML
             <meta property="og:image" content="{$g_s3_root}/{$albumphoto_info["s3_url"]}_big" />
 HTML;

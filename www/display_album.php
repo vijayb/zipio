@@ -116,9 +116,10 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
         $photo_owners[$albumphotos_array[$i]["photo_owner_id"]] = $photo_owner;
     }
 
+    $link_to_album_with_image_opened = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"] . "?albumphoto=" . $albumphoto_id;
 
     $html = <<<HTML
-        <div class="span3 tile" id="albumphoto-{$albumphoto_id}">
+        <div class="span3 tile" id="albumphoto-{$albumphoto_id}" one-up-link="{$link_to_album_with_image_opened}>
 
             <a id="fancybox-{$albumphoto_id}"
                class="fancybox"
@@ -135,7 +136,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                 <!------------------------------------------------------------->
 
                 <div class="album-privacy">
-                    posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
+                    posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b> - {$albumphoto_id}
                 </div>
             </a>
 HTML;
@@ -150,8 +151,6 @@ HTML;
 ////////////////////////////////////////////////////////////////////////////////
 // FACEBOOK LIKE BUTTON
 ////////////////////////////////////////////////////////////////////////////////
-
-    $link_to_album_with_image_opened = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"] . "?albumphoto=" . $albumphoto_id;
 
     $pin_website = urlencode($g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"]);
     $pin_image = urlencode($g_s3_root."/".$albumphotos_array[$i]["s3_url"]."_big" . $is_filtered);
@@ -195,11 +194,11 @@ HTML;
         $html .= <<<HTML
             <div class="tile-options" style="display:none;">
 
-            <!--
+
                 <div rel="tooltip" title="Post to Facebook" style="float:left; margin-right:5px;" class="btn btn-inverse ttip" onclick="showFacebookModal({$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
-            -->
+
                 <div class="btn-group" style="float:left; margin-right:5px;">
                     <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown">
                         <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>

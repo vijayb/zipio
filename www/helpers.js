@@ -1,5 +1,7 @@
 var imageFiltered = {};
 
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // SHOW MODALS
 ////////////////////////////////////////////////////////////////////////////////
@@ -484,6 +486,8 @@ function showFacebookModal(albumphotoID) {
 
         imageURL = $("#image-" + albumphotoID).attr("src");
 
+        $("#facebook-image").data("albumphotoID", albumphotoID);
+
         $(".modal").modal('hide');
         $("#facebook-comment").empty().focus();
         $("#facebook-image").attr("src", imageURL);
@@ -510,23 +514,27 @@ function postToFacebook() {
     imageURL = $("#facebook-image").attr("src");
     imageURL = imageURL.replace("_cropped", "_big");
 
-    FB.api('/me/photos',
+    albumphotoID = $("#facebook-image").data("albumphotoID");
+    
+    FB.api('/me/feed',
            'post',
            {
+                link: imageURL,
                 message: $("#facebook-comment").val(),
-                url: imageURL,
+                picture: imageURL,
            },
            function(response) {
-        if (!response || response.error) {
-            alert('Error occured');
-        } else {
-            $("#facebook-submit").button("reset");
-            $(".modal").modal('hide');
-            $("#header-alert-title").html("Posted to Facebook");
-            $("#header-alert-text").html("");
-            $("#header-alert").addClass("alert-success");
-            $("#header-alert").delay(1000).fadeIn();
-        }
+                if (!response || response.error) {
+                    console.log(response);
+                    alert('Error occured');
+                } else {
+                    $("#facebook-submit").button("reset");
+                    $(".modal").modal('hide');
+                    $("#header-alert-title").html("Posted to Facebook");
+                    $("#header-alert-text").html("");
+                    $("#header-alert").addClass("alert-success");
+                    $("#header-alert").delay(1000).fadeIn();
+                }
     });
 }
 
@@ -662,7 +670,7 @@ function getAlert(alert) {
         returnArr["class"] = "alert-success";
     } else if (alert == 7) {
         returnArr["title"] = hashParams["username"] + " wants you to add photos to this album!";
-        returnArr["text"]  = "Adding photos is easy. Just email them as attachments to the email address above. Or, <a href=''>download the Zipio camera</a> to add photos as you take them.";
+        returnArr["text"]  = "Adding photos is easy. Just email them as attachments to the email address below. Or, <a href=''>download the Zipio camera</a> to add photos as you take them.";
         returnArr["class"] = "alert-success";
     } else if (alert == 8) {
         returnArr["title"] = "Welcome to Zipio! Here's your first album.";

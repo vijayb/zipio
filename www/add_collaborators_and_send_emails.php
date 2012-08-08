@@ -31,13 +31,26 @@ if (!check_token($inviter_id, $inviter_token, "Users") || !check_token($album_id
 $album_info = get_album_info($album_id);
 $album_owner_info = get_user_info($album_info["user_id"]);
 
+print($emails);
+print("\n\n");
+
 $emails = strtolower($emails);
+
+print($emails);
+print("\n\n");
+
 $emails = preg_split("/[\s,]+/", $emails);
+
+print($emails);
+print("\n\n");
 
 // These are the only valid characters in an email address
 $emails = preg_replace('/[^A-Za-z0-9! # $ % &\'*+-\/=?^_`{|}~@]/i', '', $emails);
 
 $valid_emails = array();
+
+print_r($valid_emails);
+exit();
 
 foreach ($emails as $email) {
     if (is_valid_email_address($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {

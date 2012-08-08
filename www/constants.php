@@ -17,13 +17,20 @@ To delete the database:
 To run ec2 tools
     http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
 
+
 */
 
 if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com") {
     $g_debug = 1;
     $g_zipio = "zipiyo";
     $g_Zipio = "Zipiyo";
-    $g_database_to_use = "TEST";
+
+    if ($_SERVER["HTTP_HOST"] == "zipiyo.com") {
+        $g_database_to_use = "TEST";
+    } else if ($_SERVER["HTTP_HOST"] == "localhost") {
+        $g_database_to_use = "LOCAL";
+    }
+
     $g_fb_app_id = "255929901188660";
 } else {
     $g_debug = 0;
@@ -33,9 +40,6 @@ if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com
     $g_fb_app_id = "457795117571468";
 }
 
-if ($_SERVER["HTTP_HOST"] == "localhost") {
-    //$g_database_to_use = "LOCAL";
-}
 
 $g_s3_bucket_name = "s3.$g_zipio.com";
 $g_s3_folder_name = "photos";
