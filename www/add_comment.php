@@ -10,21 +10,21 @@ require("helpers.php");
 if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["comment"]) ||
     !isset($_POST["token"]) ||
-    !isset($_POST["album_id"]) ||
-    !isset($_POST["commenter_id"])
+    !isset($_POST["commenter_id"]) ||
+    !isset($_POST["album_id"])
     ) {
-    print("0");
+    print("03333");
     exit();
 } else {
     $albumphoto_id = $_POST["albumphoto_id"];
     $comment = mysql_real_escape_string($_POST["comment"]);
     $token = $_POST["token"];
-    $album_id = $_POST["album_id"];
     $commenter_id = $_POST["commenter_id"];
+    $album_id = $_POST["album_id"];
 }
 
-if (!check_token($album_id, $token, "Albums")) {
-    print("0");
+if (!check_token($commenter_id, $token, "Users")) {
+    print("11111");
     exit();
 }
 

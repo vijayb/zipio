@@ -485,8 +485,8 @@ HTML;
         $html .= <<<HTML
                     <div id="collaborator-{$collaborator["id"]}" style="padding:3px;">
 HTML;
-	if ($collaborator["id"] == $_SESSION["user_id"] || $is_owner) {
-	  $html .= <<<HTML
+    if ($collaborator["id"] == $_SESSION["user_id"] || $is_owner) {
+        $html .= <<<HTML
                         <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
                             <a href="javascript:void(0);"
                                onclick="if (confirm('Sure you want to remove this collaborator?')) {
@@ -498,14 +498,14 @@ HTML;
                             </a>
                         </div>
 HTML;
-	} else {
-	  $html .= <<<HTML
+    } else {
+        $html .= <<<HTML
                         <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
                                 <i class="icon-user"></i>
                         </div>
 HTML;
-	}
-	$html .= <<<HTML
+    }
+    $html .= <<<HTML
                         <div style="overflow:hidden;">
                             <a href="/{$collaborator["username"]}"><b>{$collaborator["username"]}</b></a> {$you_html}
                             <br>
@@ -633,8 +633,10 @@ $(function() {
     <?php
 
     if ($is_owner || $is_collaborator) {
-        print("gAlbum = " . json_encode($album_info));
+        print("gAlbum = " . json_encode($album_info) . ";");
     }
+
+    print("gAlbumID = " . $album_to_display . ";");
 
     ?>
 

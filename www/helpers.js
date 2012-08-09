@@ -82,22 +82,39 @@ function showCommentsModal(albumphotoID) {
     $("#comment-modal").modal('show');
 
 
-    var urlString = "/get_comments_html.php?albumphoto_id=" + albumphotoID +
-                                          "&token=" + gAlbum["token"] +
-                                          "&album_id=" + gAlbum["id"];
-    jQuery.ajax({
-        type: "GET",
-        url: urlString,
-        success: function(data) {
-            $("#comments").html(data);
-        },
-        async: true
-    });
+    reloadComments(albumphotoID);
 
 
 
 }
 
+
+
+function getCommentsHTML(commentsArray) {
+
+    var html = "";
+
+    for (i = 0; i < commentsArray.length; i++) {
+        html += "\
+            <div style='margin-bottom:8px'>\
+            <b>" + commentsArray[i]["username"] + ":</b>\
+            " + commentsArray[i]["comment"] + "\
+            <span style='font-size:12px; color:#999999'>" + commentsArray[i]["created"] + "</span>";
+
+        if (parseInt(commentsArray[i]["commenter_id"]) == parseInt(gUser["id"]) ||
+            (typeof gAlbum !== "undefined" && parseInt(gAlbum["user_id"]) == parseInt(gUser["id"]))) {
+
+            html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='$(this).parent().slideUp(); deleteComment(" + commentsArray[i]["id"] + ", " + gUser["id"] + ", \"" + gUser["token"] + "\", " + $('#comment-modal').attr('albumphoto-id') + ");' class='no-underline'><i class='icon-remove'></i></a>";
+        }
+
+        html += "\
+            </div>";
+
+    }
+
+    return html;
+
+}
 
 
 function showFBBar() {
@@ -114,6 +131,7 @@ function hideFBBar() {
 // SUBMIT MODALS
 ////////////////////////////////////////////////////////////////////////////////
 
+// addComment
 
 function submitComment() {
 
@@ -126,40 +144,65 @@ function submitComment() {
         data: {
             "albumphoto_id": albumphotoID,
             "comment": comment,
-            "token": gAlbum["token"],
-            "album_id": gAlbum["id"],
-            "commenter_id": gUser["id"]
+            "token": gUser["token"],
+            "commenter_id": gUser["id"],
+            "album_id": gAlbumID
         },
         success: function(data) {
             if (parseInt(data) == 1) {
                 // need to reload comment stream
 
+                reloadComments(albumphotoID);
+
                 $("#comment-input").val("");
                 $("#comment-submit").attr("disabled", true);
 
-                var urlString = "/get_comments_html.php?albumphoto_id=" + albumphotoID +
-                                                      "&token=" + gAlbum["token"] +
-                                                      "&album_id=" + gAlbum["id"];
-                jQuery.ajax({
-                    type: "GET",
-                    url: urlString,
-                    success: function(data) {
-                        $("#comments").html(data);
-                        $("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
-                        $("#comment-count-" + albumphotoID).html($("#ajax-comment-count").val());
-                    },
-                    async: true
-                });
-
-
             } else {
+                alert(data);
                 // bad token
             }
         },
         async: true
     });
+}
 
 
+function reloadComments(albumphotoID) {
+
+    var urlString = "/get_comments_json.php?albumphoto_id=" + albumphotoID;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            var commentsArray = JSON.parse(data);
+            var html = getCommentsHTML(commentsArray);
+            $("#comments").html(html);
+
+            $("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
+            $("#comment-count-" + albumphotoID).html(commentsArray.length);
+        },
+        async: true
+    });
+}
+
+
+function deleteComment(commentID, commenterID, token, albumphotoID) {
+    var urlString = "/delete_comment.php?comment_id=" + commentID +
+                                        "&token=" + token +
+                                        "&commenter_id=" + commenterID;
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (data == 1) {
+                reloadComments(albumphotoID);
+            } else {
+                // bad token or wrong arguments
+            }
+        },
+        async: true
+    });
 }
 
 

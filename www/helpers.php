@@ -121,7 +121,7 @@ function decrypt_json($encrypted_json) {
 }
 
 function calculate_token($id, $created) {
-    return sha1($id . $created);
+    return sha1($id . "_" . $created);
 }
 
 function calculate_token_from_id($id, $table) {
