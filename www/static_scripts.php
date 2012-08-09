@@ -178,12 +178,26 @@ $(function() {
         }
     });
 
+    // -------------------------------------------------------------------------
+    // COMMENT
+
+    $("#comment-input").typeWatch({
+        callback: function(e) { setCommentSubmitButton(); },
+        wait: 0,
+        captureLength: 0
+    });
+
+    $("#comment-modal input").keyup(function(e) {
+        if (e.keyCode == 13 && !$("#comment-submit").attr("disabled")) {
+            $("#comment-submit").click();
+        }
+    });
 
     // -------------------------------------------------------------------------
     // INVITE
 
     $("#invite-modal textarea").keyup(function(e) {
-        if (e.keyCode == 13 && !$("#password-submit").attr("disabled")) {
+        if (e.keyCode == 13 && !$("#invite-submit").attr("disabled")) {
             $("#invite-submit").click();
         }
     });

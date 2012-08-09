@@ -22,7 +22,7 @@ if (!check_token($album_id, $token, "Albums")) {
     exit();
 }
 
-$result = update_data("AlbumPhotos", $albumphoto_id, array("caption" => mysql_real_escape_string($caption)));
+$result = update_data("AlbumPhotos", $albumphoto_id, array("caption" => $caption));
 
 print("1");
 

@@ -142,25 +142,6 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
             </a>
 HTML;
 
-    if (isset($albumphotos_array[$i]["caption"]) && $albumphotos_array[$i]["caption"] != "") {
-        $html .= <<<HTML
-            <div class="albumphoto-caption">
-
-                <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
-HTML;
-
-        if ($is_owner || $is_collaborator) {
-            $html .= <<<HTML
-                <a href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})"><i class="icon-edit"></i></a>
-HTML;
-        }
-
-
-        $html .= <<<HTML
-            </div>
-HTML;
-    }
-
 
 
 
@@ -204,45 +185,33 @@ HTML;
 
 
 
+    $html .= <<<HTML
+        <div class="comment-count">
+            <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id);">
+                <span id="comment-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_comments"]}</span> <i class="icon-comments"></i>
+            </a>
+        </div>
+HTML;
 
 
 
 
 
+
+    $html .= <<<HTML
+        <div style="position:absolute; bottom:0px; left:0px; right:0px">
+HTML;
 
     if ($is_owner || $is_collaborator) {
         $html .= <<<HTML
-            <div class="tile-options" style="display:none;">
+            <div class="tile-options" style="display:none; padding:5px;">
 
 
-                <div rel="tooltip" title="Post to Facebook" style="float:left; margin-right:5px;" class="btn btn-inverse ttip" onclick="showFacebookModal({$albumphoto_id});">
+                <div rel="tooltip" title="Post to Facebook" class="btn btn-inverse ttip" onclick="showFacebookModal({$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
 
-                <div class="btn-group" style="float:left; margin-right:5px;">
-                    <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown">
-                        <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-
-                        <li>
-                            <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}');">
-                                <i class="icon-picture"></i> Set as album cover
-                            </a>
-                        </li>
-
-                        <li>
-                            <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
-                                                                            deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}');
-                                                                        }">
-                                <i class="icon-trash"></i> Delete this photo
-                            </a>
-                        </li>
-
-                    </ul>
-                </div>
-
-                <div class="btn-group" style="float:left; margin-right:5px;">
+                <div class="btn-group" style="float:right; margin-left:5px;">
                     <button rel="tooltip" title="Filters" id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown" data-loading-text="Filtering...">
                          <i class="icon-beaker"></i> <i class="icon-sort-down icon-white"></i>
                     </button>
@@ -266,16 +235,104 @@ HTML;
                         <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">Rothbard</a></li>
                     </ul>
                 </div>
-                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="display:none" onclick="saveFiltered({$albumphoto_id},
+                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="float:right; margin-left:5px; display:none" onclick="saveFiltered({$albumphoto_id},
                                                                                                                                '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg',
                                                                                                                                '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mime_type=image/jpeg',
                                                                                                                                '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big'
                                                                                                                                );">
                     Save
                 </button>
+
+
+
+                <div class="btn-group" style="float:right; margin-left:5px;">
+                    <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown">
+                        <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}');">
+                                <i class="icon-picture"></i> Set as album cover
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
+                                                                            deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}');
+                                                                        }">
+                                <i class="icon-trash"></i> Delete this photo
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
             </div>
 HTML;
     }
+
+    // If there IS a caption -------------------------------------------------//
+
+    if (isset($albumphotos_array[$i]["caption"]) && $albumphotos_array[$i]["caption"] != "") {
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})" class="no-underline">
+                    &nbsp; <i class="icon-pencil"></i> Edit
+                </a>
+HTML;
+        }
+
+        $html .= <<<HTML
+            <div class="albumphoto-caption-always-visible">
+                <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
+                {$edit_caption_string}
+            </div>
+HTML;
+    } else {
+
+    // If there is NO caption ------------------------------------------------//
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})" class="no-underline">
+                    <i class="icon-pencil"></i> Add a caption
+                </a>
+HTML;
+
+            $html .= <<<HTML
+                <div class="albumphoto-caption" style="display:none">
+                    <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
+                    {$edit_caption_string}
+                </div>
+HTML;
+
+
+        }
+
+    }
+
+
+    $html .= <<<HTML
+        </div>
+HTML;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     $html .= <<<HTML
 
@@ -596,7 +653,7 @@ $(function() {
 
     $(".tile").each(function(index) {
         $(this).mouseenter(function() {
-            $(".tile").find(".album-privacy, .likes-panel").stop(true, true).delay(500).fadeOut();
+            $(".tile").find(".tile-options, .album-privacy, .likes-panel, .albumphoto-caption").stop(true, true).delay(500).fadeOut();
             $(this).find(".tile-options, .album-privacy, .likes-panel, .albumphoto-caption").stop(true, true).show();
         });
         $(this).mouseleave(function() {

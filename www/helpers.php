@@ -585,11 +585,31 @@ function get_albumphoto_info($albumphoto_id) {
 
     if ($row = mysql_fetch_assoc($result)) {
         $row["token"] = calculate_token($row["id"], $row["created"]);
+        $row["num_comments"] = get_comment_count($albumphoto_id);
         return $row;
     } else {
         return 0;
     }
 }
+
+function get_comment_count($albumphoto_id) {
+   global $con;
+
+   $query = "SELECT COUNT(id)
+             AS count
+             FROM Comments
+             WHERE albumphoto_id='$albumphoto_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        return $row["count"];
+    }
+
+    return 0;
+
+}
+
 
 function get_collaborators_info($album_id) {
 

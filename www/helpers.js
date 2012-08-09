@@ -38,6 +38,66 @@ function showInviteModal() {
     $("#invite-emails").val("").focus();
 }
 
+function showFacebookModal(albumphotoID) {
+
+    if (gFB["status"] == 1) {
+
+        imageURL = $("#image-" + albumphotoID).attr("src");
+
+        $("#facebook-image").data("albumphotoID", albumphotoID);
+
+        $(".modal").modal('hide');
+        $("#facebook-comment").empty().focus();
+        $("#facebook-image").attr("src", imageURL);
+        $("#facebook-modal").modal('show');
+        return;
+
+    } else {
+
+        FB.login(function (response) {
+            if (response.authResponse) {
+                showFacebookModal(albumphotoID);
+            } else {
+                console.log('User cancelled login or did not fully authorize.');
+            }
+        }, {scope: 'email, publish_stream'});
+    }
+
+}
+
+function showCaptionModal(albumphotoID) {
+    $(".modal").modal('hide');
+
+    $('#caption-input').val($("#albumphoto-caption-"+ albumphotoID).html());
+    $('#caption-modal').attr("albumphoto-id", albumphotoID);
+    $('#caption-modal').modal('show');
+    $('#caption-input').focus();
+}
+
+
+function showCommentsModal(albumphotoID) {
+    $(".modal").modal('hide');
+
+    $('#comment-modal').attr("albumphoto-id", albumphotoID);
+    $("#comment-modal").modal('show');
+
+
+    var urlString = "/get_comments_html.php?albumphoto_id=" + albumphotoID +
+                                          "&token=" + gAlbum["token"] +
+                                          "&album_id=" + gAlbum["id"];
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            $("#comments").html(data);
+        },
+        async: true
+    });
+
+
+
+}
+
 
 
 function showFBBar() {
@@ -53,6 +113,55 @@ function hideFBBar() {
 ////////////////////////////////////////////////////////////////////////////////
 // SUBMIT MODALS
 ////////////////////////////////////////////////////////////////////////////////
+
+
+function submitComment() {
+
+    var albumphotoID = parseInt($('#comment-modal').attr("albumphoto-id"));
+    var comment = $("#comment-input").val();
+
+    jQuery.ajax({
+        type: 'POST',
+        url: "/add_comment.php",
+        data: {
+            "albumphoto_id": albumphotoID,
+            "comment": comment,
+            "token": gAlbum["token"],
+            "album_id": gAlbum["id"],
+            "commenter_id": gUser["id"]
+        },
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                // need to reload comment stream
+
+                $("#comment-input").val("");
+                $("#comment-submit").attr("disabled", true);
+
+                var urlString = "/get_comments_html.php?albumphoto_id=" + albumphotoID +
+                                                      "&token=" + gAlbum["token"] +
+                                                      "&album_id=" + gAlbum["id"];
+                jQuery.ajax({
+                    type: "GET",
+                    url: urlString,
+                    success: function(data) {
+                        $("#comments").html(data);
+                        $("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
+                        $("#comment-count-" + albumphotoID).html($("#ajax-comment-count").val());
+                    },
+                    async: true
+                });
+
+
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+
+
+}
+
 
 function submitLogin() {
     $("#login-submit").button("loading");
@@ -116,13 +225,6 @@ function submitForgotPassword() {
     });
 }
 
-function showCaptionModal(id) {
-    $('#caption-input').val($("#albumphoto-caption-"+id).html());
-    $('#caption-modal').attr("albumphoto-id", id);
-    $('#caption-modal').modal('show');
-    $('#caption-input').focus();
-}
-
 function submitCaption() {
 
     var albumphotoID = $('#caption-modal').attr("albumphoto-id");
@@ -141,6 +243,18 @@ function submitCaption() {
             if (parseInt(data) == 1) {
                 $("#caption-modal").modal('hide');
                 $("#albumphoto-caption-" + albumphotoID).html(caption);
+
+                if (caption != "") {
+                    $("#albumphoto-caption-" + albumphotoID).parent().addClass("albumphoto-caption-always-visible");
+                    $("#albumphoto-caption-" + albumphotoID).parent().removeClass("albumphoto-caption");
+                    $("#albumphoto-caption-" + albumphotoID).parent().show();
+                    $("#add-caption-" + albumphotoID).html('&nbsp; <i class="icon-pencil"></i> Edit');
+                } else {
+                    $("#albumphoto-caption-" + albumphotoID).parent().addClass("albumphoto-caption");
+                    $("#albumphoto-caption-" + albumphotoID).parent().removeClass("albumphoto-caption-always-visible");
+                    $("#albumphoto-caption-" + albumphotoID).parent().hide();
+                    $("#add-caption-" + albumphotoID).html('<i class="icon-pencil"></i> Add a caption');
+                }
             } else {
                 // bad token
             }
@@ -249,6 +363,14 @@ function submitSignup() {
 // SET MODAL BUTTONS
 ////////////////////////////////////////////////////////////////////////////////
 
+function setCommentSubmitButton() {
+    $("#comment-submit").attr("disabled", true);
+    if ($("#comment-input").val() != "") {
+        $("#comment-submit").removeAttr("disabled");
+    } else {
+        $("#comment-submit").attr("disabled", true);
+    }
+}
 
 function setSignupSubmitButton() {
     debug("setSignupSubmitButton called");
@@ -513,34 +635,6 @@ function createLikeButton(element, url) {
 }
 
 
-
-
-function showFacebookModal(albumphotoID) {
-
-    if (gFB["status"] == 1) {
-
-        imageURL = $("#image-" + albumphotoID).attr("src");
-
-        $("#facebook-image").data("albumphotoID", albumphotoID);
-
-        $(".modal").modal('hide');
-        $("#facebook-comment").empty().focus();
-        $("#facebook-image").attr("src", imageURL);
-        $("#facebook-modal").modal('show');
-        return;
-
-    } else {
-
-        FB.login(function (response) {
-            if (response.authResponse) {
-                showFacebookModal(albumphotoID);
-            } else {
-                console.log('User cancelled login or did not fully authorize.');
-            }
-        }, {scope: 'email, publish_stream'});
-    }
-
-}
 
 
 function postToFacebook() {

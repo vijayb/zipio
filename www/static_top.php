@@ -277,7 +277,7 @@ window.fbAsyncInit = function() {
 
     <div class="modal-body">
         <div class="form-horizontal">
-            <input type="text" class="input-xlarge" id="caption-input" albumphoto-id="" style="width:99%">
+            <input type="text" class="input-xlarge" id="caption-input" style="width:99%">
         </div>
     </div>
 
@@ -286,6 +286,41 @@ window.fbAsyncInit = function() {
         <button onclick="submitCaption();"
                 class="btn btn-primary" id="caption-submit" data-loading-text="Please wait...">
                 Save caption
+        </button>
+    </div>
+
+</div>
+
+
+<!----------------------------------------------------------------------------->
+
+<div class="modal hide" id="comment-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Comments</h2>
+    </div>
+
+    <div class="modal-body" id="comment-modal-body">
+        <div id="comments">
+
+        </div>
+
+
+
+    </div>
+
+    <div class="modal-footer">
+
+        <div class="form-horizontal" style="margin-bottom:20px">
+            <input type="text" class="input-xlarge" id="comment-input" style="width:99%" placeholder="Add a comment...">
+        </div>
+
+        <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        <button onclick="submitComment();"
+                disabled
+                class="btn btn-primary" id="comment-submit" data-loading-text="Please wait...">
+                Add comment
         </button>
     </div>
 
@@ -496,6 +531,10 @@ window.fbAsyncInit = function() {
     </div>
 
 </div>
+
+
+
+
 
 
 <!----------------------------------------------------------------------------->

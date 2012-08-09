@@ -15,9 +15,19 @@ body {
 
 .likes-panel {
     position: absolute;
-    top: 0px;
+    top: 27px;
     left: 0px;
     padding: 3px 3px 3px 6px;
+    color: #ffffff;
+    font-size: 24px;
+}
+
+.comment-count {
+    background: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    padding: 6px;
     color: #ffffff;
     font-size: 24px;
 }
@@ -55,13 +65,6 @@ body {
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#cc000000',GradientType=0 );
 }
 
-.tile-options {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    padding: 5px;
-}
-
 .filter-buttons {
     position: absolute;
     top: 0px;
@@ -78,38 +81,26 @@ body {
 }
 
 .big-icon {
-    font-size:26px;
+    font-size: 26px;
 }
 
 .album-privacy {
     position: absolute;
     background: rgba(0, 0, 0, 0.7);
     top: 0px;
-    right: 0px;
-    padding: 3px;
-    color: #ffffff;
-    font-size: 13px;
-}
-
-.albumphoto-caption {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.7);
-    bottom: 0px;
     left: 0px;
-    right: 0px;
     padding: 3px;
     color: #ffffff;
     font-size: 13px;
 }
 
-.albumphoto-caption-form {
-    position: absolute;
-    bottom: 20px;
-    left: 3px;
-    right: 3px;
-    padding: 3px;
-    font-size: 10px;
+.albumphoto-caption, .albumphoto-caption-always-visible {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 6px 7px 3px 7px;
+    color: #ffffff;
+    font-size: 15px;
 }
+
 
 .width-fix {
     width: 100%;
