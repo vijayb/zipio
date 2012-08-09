@@ -466,7 +466,7 @@ if ($is_owner || $is_collaborator) {
 
                 <div id="collaborators-list" style="margin:10px 0px;">
                     <div style="padding:3px;">
-                        <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">&nbsp;</div>
+                        <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;"><i class="icon-asterisk"></i></div>
                         <div style="overflow:hidden;">
                             <b>{$album_owner_info["username"]} (owner)</b> {$you_html}
                             <br>
@@ -484,7 +484,9 @@ HTML;
         }
         $html .= <<<HTML
                     <div id="collaborator-{$collaborator["id"]}" style="padding:3px;">
-
+HTML;
+	if ($collaborator["id"] == $_SESSION["user_id"] || $is_owner) {
+	  $html .= <<<HTML
                         <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
                             <a href="javascript:void(0);"
                                onclick="if (confirm('Sure you want to remove this collaborator?')) {
@@ -495,7 +497,15 @@ HTML;
                                 <i class="icon-remove"></i>
                             </a>
                         </div>
-
+HTML;
+	} else {
+	  $html .= <<<HTML
+                        <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
+                                <i class="icon-user"></i>
+                        </div>
+HTML;
+	}
+	$html .= <<<HTML
                         <div style="overflow:hidden;">
                             <a href="/{$collaborator["username"]}"><b>{$collaborator["username"]}</b></a> {$you_html}
                             <br>
