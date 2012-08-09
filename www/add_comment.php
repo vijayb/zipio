@@ -11,7 +11,8 @@ if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["comment"]) ||
     !isset($_POST["token"]) ||
     !isset($_POST["commenter_id"]) ||
-    !isset($_POST["album_id"])
+    !isset($_POST["album_id"]) ||
+    !isset($_POST["album_owner_id"])
     ) {
     print("03333");
     exit();
@@ -21,6 +22,7 @@ if (!isset($_POST["albumphoto_id"]) ||
     $token = $_POST["token"];
     $commenter_id = $_POST["commenter_id"];
     $album_id = $_POST["album_id"];
+    $album_owner_id = $_POST["album_owner_id"];
 }
 
 if (!check_token($commenter_id, $token, "Users")) {
@@ -33,11 +35,13 @@ $query ="INSERT INTO Comments (
             albumphoto_id,
             comment,
             album_id,
+            album_owner_id,
             commenter_id
           ) VALUES (
             '$albumphoto_id',
             '$comment',
             '$album_id',
+            '$album_owner_id',
             '$commenter_id'
           )";
 $result = mysql_query($query, $con);

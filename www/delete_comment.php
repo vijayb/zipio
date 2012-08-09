@@ -26,7 +26,7 @@ if (!check_token($commenter_id, $token, "Users")) {
 }
 
 
-$query = "DELETE FROM Comments WHERE id='$comment_id'";
+$query = "DELETE FROM Comments WHERE id='$comment_id' and (commenter_id='$commenter_id' or album_owner_id='$commenter_id')";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 

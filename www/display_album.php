@@ -626,6 +626,8 @@ HTML;
 <script>
 
 var gAlbum;
+var gAlbumID;
+var gAlbumOwnerID;
 
 $(function() {
 
@@ -637,6 +639,8 @@ $(function() {
     }
 
     print("gAlbumID = " . $album_to_display . ";");
+
+    print("gAlbumOwnerID = " . $album_info["user_id"] . ";");
 
     ?>
 

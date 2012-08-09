@@ -146,7 +146,8 @@ function submitComment() {
             "comment": comment,
             "token": gUser["token"],
             "commenter_id": gUser["id"],
-            "album_id": gAlbumID
+            "album_id": gAlbumID,
+	    "album_owner_id": gAlbumOwnerID
         },
         success: function(data) {
             if (parseInt(data) == 1) {
