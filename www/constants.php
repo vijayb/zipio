@@ -10,6 +10,7 @@ To delete the database:
 
     TRUNCATE TABLE Zipiyo.AlbumPhotos;
     TRUNCATE TABLE Zipiyo.Collaborators;
+    TRUNCATE TABLE Zipiyo.Comments;
     TRUNCATE TABLE Zipiyo.Albums;
     TRUNCATE TABLE Zipiyo.Photos;
     TRUNCATE TABLE Zipiyo.Users;

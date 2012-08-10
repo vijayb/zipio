@@ -96,6 +96,16 @@ $(function() {
         $('#register-modal').modal('show');
     }
 
+    var modal = getURLHashParameter("modal");
+    if (modal != null) {
+        if (modal == "comment") {
+            showCommentsModal(hashParams["albumphoto_id"]);
+            $("#comment-input").focus();
+        }
+    }
+
+
+
     $('.alert .close').live("click", function(e) {
         $(this).parent().slideUp(function() {
             $(this).parent().removeClass("alert-success");

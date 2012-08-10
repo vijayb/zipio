@@ -174,7 +174,11 @@ if ($target_album_id > 0) {
     output("Target album has ID $target_album_id\n");
 
     if ($target_user_id == $user_id) {
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // User is adding a photo to own existing album
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         output("User is adding to his own album.\n");
         output("TIME 6.1: " . (time() - $start_time) . "\n");
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
@@ -202,8 +206,12 @@ EMAIL;
         output("TIME 7: " . (time() - $start_time) . "\n");
 
     } else {
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // User is adding to another user's album, so check if the submitter
         // of the photo is a collaborator of the album
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
 
         $is_collaborator = is_collaborator($user_id, $target_album_id);
 
@@ -294,7 +302,11 @@ EMAIL;
     output("Target album ($target_album_handle) does not exist.\n");
 
     if ($target_user_id == $user_id) {
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // User is creating a new album and adding a photo to it
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         output("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
         $target_album_info = get_album_info($target_album_id);
@@ -332,7 +344,11 @@ EMAIL;
 EMAIL;
 
     } else {
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         // A user cannot create an album for another user, so disallow
+        ////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////
         output("User is attempting to create album for another user.\n");
 
         $user_email_body = <<<EMAIL
@@ -511,15 +527,7 @@ function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s
     global $g_s3_root;
     global $g_founders_email_address;
 
-    $query = "SELECT
-                Collaborators.collaborator_id,
-                Users.email
-              FROM Collaborators
-              LEFT JOIN Users
-              ON collaborator_id=Users.id
-              WHERE Collaborators.album_id=" . $album_info["id"];
-    $result = mysql_query($query, $con);
-    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    $collaborators_array = get_collaborators_info($album_info["id"]);
 
     $album_owner_info = get_user_info($album_info["user_id"]);
 
@@ -528,10 +536,10 @@ function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s
         $pictures_html .= "<img src='" . $g_s3_root . "/" . $s3_urls[$i] . "_cropped'><br><br>";
     }
 
-    while ($row = mysql_fetch_assoc($result)) {
+    for ($i = 0; $i < count($collaborators_array); $i++) {
 
         $display_album_ra = array();
-        $display_album_ra["user_id"] = $row["collaborator_id"];
+        $display_album_ra["user_id"] = $collaborators_array[$i]["id"];
         $display_album_ra["timestamp"] = time();
         $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"];
         $display_album_link = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
@@ -542,7 +550,7 @@ function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s
 EMAIL;
         $collaborator_email_body .= $pictures_html;
 
-        send_email($row["email"], $g_founders_email_address, "New photos!", $collaborator_email_body);
+        send_email($collaborators_array[$i]["email"], $g_founders_email_address, "New photos!", $collaborator_email_body);
     }
 
 }

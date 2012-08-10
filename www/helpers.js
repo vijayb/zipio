@@ -75,17 +75,23 @@ function showCaptionModal(albumphotoID) {
 }
 
 
-function showCommentsModal(albumphotoID) {
+function showCommentsModal(albumphotoID, s3) {
+
+    if (!isLoggedIn()) {
+        $("#header-alert-title").html("Log in to comment on photos");
+        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
+        $("#header-alert").addClass("alert-error");
+        $("#header-alert").fadeIn();
+        return;
+    }
+
     $(".modal").modal('hide');
 
     $('#comment-modal').attr("albumphoto-id", albumphotoID);
+    $('#comment-modal').attr("albumphoto-s3", s3);
     $("#comment-modal").modal('show');
 
-
     reloadComments(albumphotoID);
-
-
-
 }
 
 
@@ -136,6 +142,7 @@ function hideFBBar() {
 function submitComment() {
 
     var albumphotoID = parseInt($('#comment-modal').attr("albumphoto-id"));
+    var albumphotoS3 = $('#comment-modal').attr("albumphoto-s3");
     var comment = $("#comment-input").val();
 
     jQuery.ajax({
@@ -146,8 +153,12 @@ function submitComment() {
             "comment": comment,
             "token": gUser["token"],
             "commenter_id": gUser["id"],
-            "album_id": gAlbumID,
-	    "album_owner_id": gAlbumOwnerID
+            "album_id": gAlbum["id"],
+            "album_owner_id": gAlbum["user_id"],
+            "album_owner_username": gAlbum["username"],
+            "album_handle": gAlbum["handle"],
+            "commenter_username": gUser["username"],
+            "albumphoto_s3": albumphotoS3
         },
         success: function(data) {
             if (parseInt(data) == 1) {

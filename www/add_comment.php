@@ -12,9 +12,13 @@ if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["token"]) ||
     !isset($_POST["commenter_id"]) ||
     !isset($_POST["album_id"]) ||
-    !isset($_POST["album_owner_id"])
+    !isset($_POST["album_owner_id"]) ||
+    !isset($_POST["album_owner_username"]) ||
+    !isset($_POST["album_handle"]) ||
+    !isset($_POST["commenter_username"]) ||
+    !isset($_POST["albumphoto_s3"])
     ) {
-    print("03333");
+    print("0");
     exit();
 } else {
     $albumphoto_id = $_POST["albumphoto_id"];
@@ -23,13 +27,16 @@ if (!isset($_POST["albumphoto_id"]) ||
     $commenter_id = $_POST["commenter_id"];
     $album_id = $_POST["album_id"];
     $album_owner_id = $_POST["album_owner_id"];
+    $album_owner_username = $_POST["album_owner_username"];
+    $album_handle = $_POST["album_handle"];
+    $commenter_username = $_POST["commenter_username"];
+    $albumphoto_s3 = $_POST["albumphoto_s3"];
 }
 
 if (!check_token($commenter_id, $token, "Users")) {
-    print("11111");
+    print("1");
     exit();
 }
-
 
 $query ="INSERT INTO Comments (
             albumphoto_id,
@@ -46,6 +53,39 @@ $query ="INSERT INTO Comments (
           )";
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+
+
+$collaborators_array = get_collaborators_info($album_id);
+
+for ($i = 0; $i < count($collaborators_array); $i++) {
+
+    if ($collaborators_array[$i]["id"] == $commenter_id) {
+        continue;
+    }
+
+    $display_album_ra = array();
+    $display_album_ra["user_id"] = $collaborators_array[$i]["id"];
+    $display_album_ra["timestamp"] = time();
+    $display_album_pretty_link = $g_www_root . "/" . $album_owner_username . "/" . $album_handle;
+    $display_album_link_register = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
+    $display_album_link_comment = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#modal=comment&albumphoto_id=" . $albumphoto_id;
+
+    $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "_cropped'><br><br>";
+
+    $collaborator_email_body = <<<EMAIL
+        <b>{$commenter_username}</b> just commented on a photo in the <b>{$album_handle}</b> album.
+        <br><br>
+        "{$comment}"
+        <br><br>
+        <a href='{$display_album_link_comment}'>Add your own comment</a>
+        <br><br>
+        $pictures_html
+
+EMAIL;
+
+    send_email($collaborators_array[$i]["email"], $g_founders_email_address, "New comment in the $album_handle album", $collaborator_email_body);
+
+}
 
 
 

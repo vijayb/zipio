@@ -444,8 +444,6 @@ function get_user_info_from_email($email) {
 
     global $con;
 
-
-
     $query = "SELECT * FROM Users WHERE email_hash=UNHEX(SHA1('$email'))";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -476,6 +474,23 @@ function normalize_email($email) {
 
 
 }
+
+function get_album_owner($album_id) {
+    global $con;
+
+    $query = "SELECT user_id FROM Albums WHERE id='$album_id'";
+
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $albums_array = array();
+    if ($row = mysql_fetch_assoc($result)) {
+        return $row["user_id"];
+    }
+
+    die('Error in ' . __FUNCTION__);
+}
+
 
 
 function get_album_info($album_id) {
@@ -611,11 +626,12 @@ function get_comment_count($albumphoto_id) {
 }
 
 
+
 function get_collaborators_info($album_id) {
 
    global $con;
 
-   $query = "SELECT *
+   $query = "SELECT collaborator_id
              FROM Collaborators
              WHERE album_id='$album_id'";
     $result = mysql_query($query, $con);
@@ -626,6 +642,14 @@ function get_collaborators_info($album_id) {
         $collaborator = get_user_info($row["collaborator_id"]);
         array_push($collaborators_array, $collaborator);
     }
+
+    // Now, add the owner to $collaborators_array since it's useful in the rest
+    // of the code to consider an owner as also a collaborator
+    $album_owner_id = get_album_owner($album_id);
+    $album_owner_info = get_user_info($album_owner_id);
+
+    array_push($collaborators_array, $album_owner_info);
+
     return $collaborators_array;
 
 }

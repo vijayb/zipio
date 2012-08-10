@@ -9,6 +9,7 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 } else {
     $album_to_display = album_exists($_GET["album_handle"], $_GET["album_owner_username"]);
     $album_info = get_album_info($album_to_display);
+    $album_info["username"] = $_GET["album_owner_username"];
     $album_owner_info = get_user_info($album_info["user_id"]);
     $collaborators_info = get_collaborators_info($album_to_display);
 
@@ -150,7 +151,7 @@ HTML;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FACEBOOK LIKE BUTTON
+// FACEBOOK LIKE AND PINTEREST BUTTON
 ////////////////////////////////////////////////////////////////////////////////
 
     $pin_website = urlencode($g_www_root . "/" . $album_owner_info["username"] . "/" . $album_info["handle"]);
@@ -180,14 +181,15 @@ HTML;
     }
 
 ////////////////////////////////////////////////////////////////////////////////
-// END FACEBOOK LIKE BUTTON
+// END FACEBOOK AND PINTEREST LIKE BUTTON
 ////////////////////////////////////////////////////////////////////////////////
+
 
 
 
     $html .= <<<HTML
         <div class="comment-count">
-            <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id);">
+            <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}');">
                 <span id="comment-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_comments"]}</span> <i class="icon-comments"></i>
             </a>
         </div>
@@ -477,6 +479,11 @@ HTML;
 
 
     foreach ($collaborators_info as $collaborator) {
+
+        if ($collaborator["id"] == $album_info["user_id"]) {
+            continue;
+        }
+
         if ($collaborator["id"] == $_SESSION["user_id"]) {
             $you_html = "- this is you";
         } else {
@@ -626,8 +633,6 @@ HTML;
 <script>
 
 var gAlbum;
-var gAlbumID;
-var gAlbumOwnerID;
 
 $(function() {
 
@@ -636,11 +641,11 @@ $(function() {
 
     if ($is_owner || $is_collaborator) {
         print("gAlbum = " . json_encode($album_info) . ";");
+    } else {
+        $album_info_without_token = $album_info;
+        unset($album_info_without_token["token"]);
+        print("gAlbum = " . json_encode($album_info_without_token) . ";");
     }
-
-    print("gAlbumID = " . $album_to_display . ";");
-
-    print("gAlbumOwnerID = " . $album_info["user_id"] . ";");
 
     ?>
 

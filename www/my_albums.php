@@ -108,7 +108,7 @@ HTML;
         if (!isset($_GET["following"]) && is_logged_in() && $_SESSION["user_id"] == $albums_array[$i]["user_id"]) {
             $html .= <<<HTML
 
-            <div class="tile-options" style="display:none; padding:10px">
+            <div class="tile-options" style="display:none; padding:10px; position:absolute; bottom:0px; right:0px;">
                 <div class="btn-group">
                     <button class="btn btn-inverse dropdown-toggle" data-toggle="dropdown">
                         <i class="icon-sort-down icon-white"></i>
