@@ -171,7 +171,6 @@ function submitComment() {
 
             } else {
                 alert(data);
-                // bad token
             }
         },
         async: true

@@ -99,7 +99,7 @@ $(function() {
     var modal = getURLHashParameter("modal");
     if (modal != null) {
         if (modal == "comment") {
-            showCommentsModal(hashParams["albumphoto_id"]);
+	    showCommentsModal(hashParams["albumphoto_id"], hashParams["albumphoto_s3"]);
             $("#comment-input").focus();
         }
     }

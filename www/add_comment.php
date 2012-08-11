@@ -34,7 +34,7 @@ if (!isset($_POST["albumphoto_id"]) ||
 }
 
 if (!check_token($commenter_id, $token, "Users")) {
-    print("1");
+    print("0");
     exit();
 }
 
@@ -68,7 +68,7 @@ for ($i = 0; $i < count($collaborators_array); $i++) {
     $display_album_ra["timestamp"] = time();
     $display_album_pretty_link = $g_www_root . "/" . $album_owner_username . "/" . $album_handle;
     $display_album_link_register = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
-    $display_album_link_comment = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#modal=comment&albumphoto_id=" . $albumphoto_id;
+    $display_album_link_comment = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#modal=comment&albumphoto_id=" . $albumphoto_id . "&albumphoto_s3=" . $albumphoto_s3;
 
     $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "_cropped'><br><br>";
 
