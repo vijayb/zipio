@@ -326,6 +326,22 @@ window.fbAsyncInit = function() {
 
 </div>
 
+
+<div class="modal hide" id="likes-modal">
+
+    <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h2>Likes</h2>
+    </div>
+
+    <div class="modal-body" id="likes-modal-body">
+        <div id="likes">
+
+        </div>
+    </div>
+</div>
+
+
 <?php } ?>
 
 <!----------------------------------------------------------------------------->
