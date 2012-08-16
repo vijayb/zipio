@@ -285,12 +285,12 @@ function likePhoto(albumphotoID, likerID, albumphotoOwnerID) {
 		    $("#albumphoto-like-"+albumphotoID).attr("liked", 1)
 		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount + 1);
 		    likeCount++;
-		    $("#albumphoto-like-heart-"+albumphotoID).attr("src", "/images/heart_1.jpg");
+		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart");
 		} else {
 		    $("#albumphoto-like-"+albumphotoID).attr("liked", 0)
 		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount - 1);
 		    likeCount--;
-		    $("#albumphoto-like-heart-"+albumphotoID).attr("src", "/images/heart_0.jpg");
+		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart-empty");
 		}
 
 		if (likeCount == 0) {

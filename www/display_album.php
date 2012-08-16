@@ -31,6 +31,7 @@ if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
 
     $albumphoto_likes_info = get_albumphoto_likes_info($user_id, $album_info["id"]);
+    print_r($albumphoto_likes_info);
 } else {
   $albumphotos_likes_info = array();
 }
@@ -201,10 +202,10 @@ HTML;
 
 
     if (isset($albumphoto_likes_info) && array_key_exists($albumphoto_id, $albumphoto_likes_info)) {
-        $heart_src = $g_www_root . "/images/heart_1.jpg";
+        $heart = "icon-heart";
 	$liked = 1;
     } else {
-        $heart_src = $g_www_root . "/images/heart_0.jpg";
+        $heart = "icon-heart-empty";
 	$liked = 0;
     }
 
@@ -225,7 +226,7 @@ HTML;
                 <span id="albumphoto-like-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_likes"]}</span> 
             </a>
             <a href="javascript:void(0)" class="no-underline" onclick="likePhoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]});">
-                <img id="albumphoto-like-heart-{$albumphoto_id}" src="{$heart_src}">
+                 <i id="albumphoto-like-heart-{$albumphoto_id}" class="{$heart}"></i>
             </a>
         </div>
 HTML;
