@@ -15,7 +15,8 @@ if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["old_like_value"]) ||
     !isset($_POST["albumphoto_owner_id"]) ||
     !isset($_POST["album_handle"]) ||
-    !isset($_POST["commenter_username"])
+    !isset($_POST["liker_username"]) ||
+    !isset($_POST["albumphoto_s3"])
     ) {
     print("0");
     exit();
@@ -27,7 +28,8 @@ if (!isset($_POST["albumphoto_id"]) ||
     $old_like_value = $_POST["old_like_value"];
     $albumphoto_owner_id = $_POST["albumphoto_owner_id"];
     $album_handle = $_POST["album_handle"];
-    $commenter_username = $_POST["commenter_username"];
+    $liker_username = $_POST["liker_username"];
+    $albumphoto_s3 = $_POST["albumphoto_s3"];
 }
 
 if (!check_token($liker_id, $token, "Users")) {
@@ -53,41 +55,54 @@ if ($old_like_value == "0") {
     $query ="DELETE from AlbumPhotoLikes where albumphoto_id='$albumphoto_id' and liker_id='$liker_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    print("1");
+    exit();
 }
 
-/*
-$collaborators_array = get_collaborators_info($album_id);
+// Now, let's email the albumphoto owner and album owner about the like
 
-for ($i = 0; $i < count($collaborators_array); $i++) {
+$albumphoto_owner_info = get_user_info($albumphoto_owner_id);
+$album_owner_info = get_user_info(get_album_owner($album_id));
 
-    if ($collaborators_array[$i]["id"] == $commenter_id) {
-        continue;
-    }
+$users_to_be_emailed = array();
+
+
+
+if ($albumphoto_owner_id != $liker_id) {
+    array_push($users_to_be_emailed, $albumphoto_owner_info);
+}
+
+if ($album_owner_info["id"] != $liker_id && $albumphoto_owner_id != $album_owner_info["id"]) {
+    array_push($users_to_be_emailed, $album_owner_info);
+}
+
+
+for ($i = 0; $i < count($users_to_be_emailed); $i++) {
 
     $display_album_ra = array();
-    $display_album_ra["user_id"] = $collaborators_array[$i]["id"];
+    $display_album_ra["user_id"] = $users_to_be_emailed[$i]["id"];
     $display_album_ra["timestamp"] = time();
-    $display_album_pretty_link = $g_www_root . "/" . $album_owner_username . "/" . $album_handle;
+    $display_album_pretty_link = $g_www_root . "/" . $album_owner_info["username"] . "/" . $album_handle;
     $display_album_link_register = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
     $display_album_link_comment = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#modal=comment&albumphoto_id=" . $albumphoto_id . "&albumphoto_s3=" . $albumphoto_s3;
 
-    $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "_cropped'><br><br>";
+    $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "'><br><br>";
 
-    $collaborator_email_body = <<<EMAIL
-        <b>{$commenter_username}</b> just commented on a photo in the <b>{$album_handle}</b> album.
-        <br><br>
-        "{$comment}"
-        <br><br>
-        <a href='{$display_album_link_comment}'>Add your own comment</a>
+    if ($albumphoto_owner_id == $users_to_be_emailed[$i]["id"]) {
+        $subject = "$liker_username liked your photo in the $album_handle album";
+    } else {
+        $subject = "$liker_username liked a photo in your $album_handle album";
+    }
+
+    $email_body = <<<EMAIL
+        <a href='{$display_album_link_comment}'>Add a comment to this photo</a>
         <br><br>
         $pictures_html
-
 EMAIL;
 
-    send_email($collaborators_array[$i]["email"], $g_founders_email_address, "New comment in the $album_handle album", $collaborator_email_body);
+    send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
 
 }
-*/
 
 
 

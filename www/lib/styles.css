@@ -12,16 +12,6 @@ body {
     text-decoration: none;
 }
 
-
-.likes-panel {
-    position: absolute;
-    top: 27px;
-    left: 0px;
-    padding: 3px 3px 3px 6px;
-    color: #ffffff;
-    font-size: 24px;
-}
-
 .comment-count {
     background: rgba(0, 0, 0, 0.7);
     position: absolute;
@@ -35,10 +25,11 @@ body {
 .albumphoto-like {
     background: rgba(0, 0, 0, 0.7);
     position: absolute;
-    top: 0px;
-    right: 46px;
-    padding: 0px;
+    top: 40px;
+    right: 0px;
+    padding: 6px;
     color: #ffffff;
+    font-size:18px;
 }
 
 .red-heart {

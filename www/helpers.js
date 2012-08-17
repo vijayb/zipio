@@ -260,7 +260,7 @@ function deleteComment(commentID, commenterID, token, albumphotoID) {
 }
 
 
-function likePhoto(albumphotoID, likerID, albumphotoOwnerID) {
+function likePhoto(albumphotoID, likerID, albumphotoOwnerID, albumphotoS3) {
     if (!isLoggedIn()) {
         $("#header-alert-title").html("Log in to like photos");
         $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
@@ -271,38 +271,39 @@ function likePhoto(albumphotoID, likerID, albumphotoOwnerID) {
 
     jQuery.ajax({
         type: 'POST',
-        url: "/like_photo.php",
+        url: "/like_albumphoto.php",
         data: {
             "albumphoto_id": albumphotoID,
             "token": gUser["token"],
             "album_id": gAlbum["id"],
-	    "liker_id": likerID,
-	    "old_like_value": $("#albumphoto-like-"+albumphotoID).attr("liked"),
-	    "albumphoto_owner_id": albumphotoOwnerID,
+            "liker_id": likerID,
+            "old_like_value": $("#albumphoto-like-"+albumphotoID).attr("liked"),
+            "albumphoto_owner_id": albumphotoOwnerID,
             "album_handle": gAlbum["handle"],
-            "commenter_username": gUser["username"],
+            "liker_username": gUser["username"],
+            "albumphoto_s3": albumphotoS3
         },
         success: function(data) {
             if (parseInt(data) == 1) {
-		var likeCount = parseInt($("#albumphoto-like-count-" + albumphotoID).html());
-		
-		if (parseInt($("#albumphoto-like-"+albumphotoID).attr("liked")) == 0) {
-		    $("#albumphoto-like-"+albumphotoID).attr("liked", 1)
-		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount + 1);
-		    likeCount++;
-		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart");
-		} else {
-		    $("#albumphoto-like-"+albumphotoID).attr("liked", 0)
-		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount - 1);
-		    likeCount--;
-		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart-empty");
-		}
+            var likeCount = parseInt($("#albumphoto-like-count-" + albumphotoID).html());
 
-		if (likeCount == 0) {
-		    $("#albumphoto-like-count-link-" + albumphotoID).hide();
-		} else {
-		    $("#albumphoto-like-count-link-" + albumphotoID).show();
-		}
+            if (parseInt($("#albumphoto-like-"+albumphotoID).attr("liked")) == 0) {
+                $("#albumphoto-like-"+albumphotoID).attr("liked", 1)
+                $("#albumphoto-like-count-" + albumphotoID).html(likeCount + 1);
+                likeCount++;
+                $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart");
+            } else {
+                $("#albumphoto-like-"+albumphotoID).attr("liked", 0)
+                $("#albumphoto-like-count-" + albumphotoID).html(likeCount - 1);
+                likeCount--;
+                $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart-empty");
+            }
+
+            if (likeCount == 0) {
+                $("#albumphoto-like-count-link-" + albumphotoID).hide();
+            } else {
+                $("#albumphoto-like-count-link-" + albumphotoID).show();
+            }
 
             } else {
                 alert(data);
