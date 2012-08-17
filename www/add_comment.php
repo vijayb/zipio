@@ -75,7 +75,7 @@ for ($i = 0; $i < count($collaborators_array); $i++) {
     $display_album_link_register = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#register=true";
     $display_album_link_comment = $display_album_pretty_link . "?request=" . urlencode(encrypt_json($display_album_ra)) . "#modal=comment&albumphoto_id=" . $albumphoto_id . "&albumphoto_s3=" . $albumphoto_s3;
 
-    $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "_cropped'><br><br>";
+    $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "'><br><br>";
 
     $collaborator_email_body = <<<EMAIL
         <b>{$commenter_username}</b> just commented on a photo in the <b>{$album_handle}</b> album.

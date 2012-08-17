@@ -205,7 +205,7 @@ HTML;
                 <span id="comment-count-{$albumphoto_id}" $display_like_count class="count-number">
                     {$albumphotos_array[$i]["num_comments"]}
                 </span>
-                <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}');">
+                <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
                     <i class="icon-comments"></i>
                 </a>
             </div>
