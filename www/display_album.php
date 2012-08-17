@@ -142,7 +142,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                     <!------------------------------------------------------------->
 
                     <div class="album-privacy">
-                        posted by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
+                        by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                     </div>
 
                 </a>
@@ -195,42 +195,49 @@ HTML;
 
 
 
+    $display_like_count = "";
+    if ($albumphotos_array[$i]["num_comments"] == 0) {
+        $display_like_count = "style='display:none'";
+    }
 
     $html .= <<<HTML
             <div class="comment-count">
+                <span id="comment-count-{$albumphoto_id}" $display_like_count class="count-number">
+                    {$albumphotos_array[$i]["num_comments"]}
+                </span>
                 <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}');">
-                    <span id="comment-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_comments"]}</span> <i class="icon-comments"></i>
+                    <i class="icon-comments"></i>
                 </a>
             </div>
 HTML;
 
 
     if (isset($albumphoto_likes_info) && array_key_exists($albumphoto_id, $albumphoto_likes_info)) {
-        $heart = "icon-heart";
+        $heart_class = "heart-red";
         $liked = 1;
     } else {
-        $heart = "icon-heart-empty";
+        $heart_class = "heart-gray";
         $liked = 0;
     }
 
     $photo_owner_id = $albumphotos_array[$i]["photo_owner_id"];
     if (isset($user_id)) {
-      $liker_id = $user_id;
+        $liker_id = $user_id;
     } else {
-      $liker_id = 0;
+        $liker_id = 0;
     }
 
     $display_like_count = "";
     if ($albumphotos_array[$i]["num_likes"] == 0) {
-      $display_like_count = "style='display:none'";
+        $display_like_count = "style='display:none'";
     }
     $html .= <<<HTML
         <div id="albumphoto-like-{$albumphoto_id}" class="albumphoto-like" liked="{$liked}">
-            <a id="albumphoto-like-count-link-{$albumphoto_id}" href="javascript:void(0)" class="no-underline" onclick="showLikersModal({$albumphoto_id});" {$display_like_count}>
+            <a id="albumphoto-like-count-link-{$albumphoto_id}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_id});" {$display_like_count}>
                 <span id="albumphoto-like-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_likes"]}</span>
             </a>
-            <a href="javascript:void(0)" class="no-underline" onclick="likePhoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
-                 <i id="albumphoto-like-heart-{$albumphoto_id}" class="{$heart}"></i>
+            <a href="javascript:void(0)" class="no-underline" onclick="likeAlbumphoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
+                 <i id="albumphoto-like-heart-{$albumphoto_id}" class="icon-heart $heart_class"></i>
             </a>
         </div>
 HTML;

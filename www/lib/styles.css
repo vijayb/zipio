@@ -13,23 +13,35 @@ body {
 }
 
 .comment-count {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.9);
     position: absolute;
     top: 0px;
     right: 0px;
     padding: 6px;
     color: #ffffff;
-    font-size:18px;
+    font-size:22px;
+}
+
+.count-number {
+    font-weight: 700;
+}
+
+.heart-red {
+    color: red;
+}
+
+.heart-gray {
+    color: #999;
 }
 
 .albumphoto-like {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.9);
     position: absolute;
     top: 40px;
     right: 0px;
     padding: 6px;
     color: #ffffff;
-    font-size:18px;
+    font-size:22px;
 }
 
 .red-heart {

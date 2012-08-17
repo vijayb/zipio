@@ -88,7 +88,9 @@ for ($i = 0; $i < count($collaborators_array); $i++) {
 
 EMAIL;
 
-    send_email($collaborators_array[$i]["email"], $g_founders_email_address, "New comment in the $album_handle album", $collaborator_email_body);
+    if (!$g_debug) {
+        send_email($collaborators_array[$i]["email"], $g_founders_email_address, "New comment in the $album_handle album", $collaborator_email_body);
+    }
 
 }
 

@@ -100,7 +100,9 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
         $pictures_html
 EMAIL;
 
-    send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
+    if (!$g_debug) {
+        send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
+    }
 
 }
 
