@@ -14,7 +14,10 @@ if (!isset($_GET["albumphoto_id"])) {
     $albumphoto_id = $_GET["albumphoto_id"];
 }
 
-
+// Force a sleep during debugging to simulate a slow connection
+if ($g_debug) {
+    sleep(1);
+}
 
 
 $query = "SELECT

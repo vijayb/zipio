@@ -49,13 +49,13 @@
 @serifFontFamily:       Georgia, "Times New Roman", Times, serif;
 @monoFontFamily:        Menlo, Monaco, Consolas, "Courier New", monospace;
 
-@baseFontSize:          15px;
+@baseFontSize:          13px;
 @baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        20px;
+@baseLineHeight:        18px;
 @altFontFamily:         @serifFontFamily;
 
 @headingsFontFamily:    inherit; // empty to use BS default, @baseFontFamily
-@headingsFontWeight:    500;    // instead of browser default, bold
+@headingsFontWeight:    normal;    // instead of browser default, bold
 @headingsColor:         inherit; // empty to use BS default, @textColor
 
 
@@ -146,11 +146,11 @@
 // Navbar
 // -------------------------
 @navbarHeight:                    40px;
-@navbarBackground:                #003973;
-@navbarBackgroundHighlight:       #003973;
+@navbarBackground:                @grayDarker;
+@navbarBackgroundHighlight:       @grayDark;
 
-@navbarText:                      #CAD4DE;
-@navbarLinkColor:                 #CAD4DE;
+@navbarText:                      @grayLight;
+@navbarLinkColor:                 @grayLight;
 @navbarLinkColorHover:            @white;
 @navbarLinkColorActive:           @navbarLinkColorHover;
 @navbarLinkBackgroundHover:       transparent;

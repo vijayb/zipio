@@ -22,16 +22,15 @@ Run the following from the zipio directory:
   rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
 -->
 
-<!--
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
--->
 
 
+<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
-
+-->
 
 
 
@@ -111,23 +110,21 @@ $brand_name = "<img src='/images/" . $g_zipio . "_white_small.png'>";
 if (is_logged_in()) {
 
     $logged_in_status = <<<HTML
-        <ul id="right-links" class="nav" style="font-size:18px">
-            <li id="right-links-1"><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> Albums</a></li>
-        </ul>
-
-
-        <ul id="right-links" class="nav pull-right" style="font-size:18px">
-            <li><a href="/{$_SESSION["user_info"]["username"]}"><b>{$_SESSION["user_info"]["email"]}</b></a></li>
-            <li id="right-links-3"><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
-            <!--<li id="right-links-3"><a href="javascript:void(0);" onclick="fbLogin();"><i class="icon-facebook-sign"></i> Connect to Facebook</a></li>-->
+        <ul class="nav pull-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {$_SESSION["user_info"]["email"]} <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                    <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> Albums</a></li>
+                    <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
+                </ul>
+            </li>
         </ul>
 HTML;
-
 
 } else {
 
     $logged_in_status = <<<HTML
-        <ul class="nav pull-right" style="font-size:18px">
+        <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Login</a></li>
         </ul>
 HTML;
@@ -303,7 +300,6 @@ window.fbAsyncInit = function() {
 
     <div class="modal-body" id="comment-modal-body">
         <div id="comments">
-
         </div>
 
 
@@ -319,7 +315,7 @@ window.fbAsyncInit = function() {
         <a href="#" class="btn" data-dismiss="modal">Cancel</a>
         <button onclick="submitComment();"
                 disabled
-                class="btn btn-primary" id="comment-submit" data-loading-text="Please wait...">
+                class="btn btn-primary" id="comment-submit" data-loading-text="Adding comment...">
                 Add comment
         </button>
     </div>
@@ -629,9 +625,9 @@ HTML;
     <div class="row">
         <div class="span9" style="margin-bottom:20px">
             <h1><?php print($page_title); ?></h1>
-            <h2 style="color:#888888; margin: 10px 0px 5px 0px;">
+            <h3 style="color:#888888; margin: 5px 0px 5px 0px;">
                 <?php print($page_subtitle); ?>
-            </h2>
+            </h3>
         </div>
         <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

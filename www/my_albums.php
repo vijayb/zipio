@@ -193,11 +193,6 @@ $(function() {
         });
     });
 
-    if (isLoggedIn()) {
-        $("#right-links li").removeClass("active");
-        $("#right-links-1").addClass("active");
-    }
-
 
 });
 

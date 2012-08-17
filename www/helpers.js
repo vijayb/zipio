@@ -77,6 +77,9 @@ function showCaptionModal(albumphotoID) {
 
 function showCommentsModal(albumphotoID, s3) {
 
+    $("#comment-input").val("");
+    $("#comments").html("Loading comments...");
+
     if (!isLoggedIn()) {
         $("#header-alert-title").html("Log in to comment on photos");
         $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
@@ -141,6 +144,8 @@ function hideFBBar() {
 
 function submitComment() {
 
+    $("#comment-submit").button("loading");
+
     var albumphotoID = parseInt($('#comment-modal').attr("albumphoto-id"));
     var albumphotoS3 = $('#comment-modal').attr("albumphoto-s3");
     var comment = $("#comment-input").val();
@@ -165,9 +170,9 @@ function submitComment() {
                 // need to reload comment stream
 
                 reloadComments(albumphotoID);
-
                 $("#comment-input").val("");
-                $("#comment-submit").attr("disabled", true);
+                $("#comment-submit").button("reset");
+                setCommentSubmitButton();
 
             } else {
                 alert(data);
@@ -705,6 +710,7 @@ function postToFacebook() {
                 link: imageURL,
                 message: $("#facebook-comment").val(),
                 picture: imageURL,
+
            },
            function(response) {
                 if (!response || response.error) {

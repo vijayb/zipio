@@ -33,6 +33,11 @@ if (!isset($_POST["albumphoto_id"]) ||
     $albumphoto_s3 = $_POST["albumphoto_s3"];
 }
 
+// Force a sleep during debugging to simulate a slow connection
+if ($g_debug) {
+    sleep(1);
+}
+
 if (!check_token($commenter_id, $token, "Users")) {
     print("0");
     exit();

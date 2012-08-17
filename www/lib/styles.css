@@ -29,6 +29,7 @@ body {
     right: 0px;
     padding: 6px;
     color: #ffffff;
+    font-size:18px;
 }
 
 .red-heart {
@@ -98,6 +99,10 @@ body {
     padding: 6px 7px 3px 7px;
     color: #ffffff;
     font-size: 15px;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
 }
 
 
