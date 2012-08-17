@@ -198,7 +198,7 @@ HTML;
 
     $html .= <<<HTML
             <div class="comment-count">
-                <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}');">
+                <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
                     <span id="comment-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_comments"]}</span> <i class="icon-comments"></i>
                 </a>
             </div>
