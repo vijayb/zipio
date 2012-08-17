@@ -97,6 +97,20 @@ function showCommentsModal(albumphotoID, s3) {
     reloadComments(albumphotoID);
 }
 
+function showLikersModal(albumphotoID) {
+    if (!isLoggedIn()) {
+        $("#header-alert-title").html("Log in to view photo likes");
+        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
+        $("#header-alert").addClass("alert-error");
+        $("#header-alert").fadeIn();
+        return;
+    }
+
+    $(".modal").modal('hide');
+    $("#likes-modal").modal('show');
+
+    loadLikers(albumphotoID);
+}
 
 
 function getCommentsHTML(commentsArray) {
@@ -124,6 +138,29 @@ function getCommentsHTML(commentsArray) {
     return html;
 
 }
+
+
+function getLikersHTML(likersArray) {
+    var html = "";
+
+    for (i = 0; i < likersArray.length; i++) {
+	var username = likersArray[i]["username"];
+	if (parseInt(likersArray[i]["liker_id"]) == parseInt(gUser["id"])) {
+	    username = "me";
+	}
+
+        html += "\
+            <div style='margin-bottom:8px'>\
+            <b>" + username + ":</b>\
+            <span style='font-size:12px; color:#999999'>" + likersArray[i]["created"] + "</span>";
+
+        html += "</div>";
+    }
+
+    return html;
+}
+
+
 
 
 function showFBBar() {
@@ -203,6 +240,7 @@ function reloadComments(albumphotoID) {
 }
 
 
+
 function deleteComment(commentID, commenterID, token, albumphotoID) {
     var urlString = "/delete_comment.php?comment_id=" + commentID +
                                         "&token=" + token +
@@ -220,6 +258,77 @@ function deleteComment(commentID, commenterID, token, albumphotoID) {
         async: true
     });
 }
+
+
+function likePhoto(albumphotoID, likerID, albumphotoOwnerID) {
+    if (!isLoggedIn()) {
+        $("#header-alert-title").html("Log in to like photos");
+        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
+        $("#header-alert").addClass("alert-error");
+        $("#header-alert").fadeIn();
+        return;
+    }
+
+    jQuery.ajax({
+        type: 'POST',
+        url: "/like_photo.php",
+        data: {
+            "albumphoto_id": albumphotoID,
+            "token": gUser["token"],
+            "album_id": gAlbum["id"],
+	    "liker_id": likerID,
+	    "old_like_value": $("#albumphoto-like-"+albumphotoID).attr("liked"),
+	    "albumphoto_owner_id": albumphotoOwnerID,
+            "album_handle": gAlbum["handle"],
+            "commenter_username": gUser["username"],
+        },
+        success: function(data) {
+            if (parseInt(data) == 1) {
+		var likeCount = parseInt($("#albumphoto-like-count-" + albumphotoID).html());
+		
+		if (parseInt($("#albumphoto-like-"+albumphotoID).attr("liked")) == 0) {
+		    $("#albumphoto-like-"+albumphotoID).attr("liked", 1)
+		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount + 1);
+		    likeCount++;
+		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart");
+		} else {
+		    $("#albumphoto-like-"+albumphotoID).attr("liked", 0)
+		    $("#albumphoto-like-count-" + albumphotoID).html(likeCount - 1);
+		    likeCount--;
+		    $("#albumphoto-like-heart-"+albumphotoID).attr("class", "icon-heart-empty");
+		}
+
+		if (likeCount == 0) {
+		    $("#albumphoto-like-count-link-" + albumphotoID).hide();
+		} else {
+		    $("#albumphoto-like-count-link-" + albumphotoID).show();
+		}
+
+            } else {
+                alert(data);
+            }
+        },
+        async: true
+    });
+}
+
+
+function loadLikers(albumphotoID) {
+    jQuery.ajax({
+        type: "GET",
+        url: "/get_albumphoto_likers_json.php?albumphoto_id=" + albumphotoID,
+        success: function(data) {
+            var likersArray = JSON.parse(data);
+            var html = getLikersHTML(likersArray);
+            $("#likes").html(html);
+
+            //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
+            $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
+        },
+        async: true
+    });
+}
+
 
 
 function submitLogin() {

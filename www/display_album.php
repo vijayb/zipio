@@ -29,6 +29,11 @@ if (!isset($_GET["album_owner_username"]) || !isset($_GET["album_handle"])) {
 
 if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
+
+    $albumphoto_likes_info = get_albumphoto_likes_info($user_id, $album_info["id"]);
+    print_r($albumphoto_likes_info);
+} else {
+  $albumphotos_likes_info = array();
 }
 
 $is_owner = 0;
@@ -202,6 +207,35 @@ HTML;
 HTML;
 
 
+    if (isset($albumphoto_likes_info) && array_key_exists($albumphoto_id, $albumphoto_likes_info)) {
+        $heart = "icon-heart";
+	$liked = 1;
+    } else {
+        $heart = "icon-heart-empty";
+	$liked = 0;
+    }
+
+    $photo_owner_id = $albumphotos_array[$i]["photo_owner_id"];
+    if (isset($user_id)) {
+      $liker_id = $user_id;
+    } else {
+      $liker_id = 0;
+    }
+
+    $display_like_count = "";
+    if ($albumphotos_array[$i]["num_likes"] == 0) {
+      $display_like_count = "style='display:none'";
+    }
+    $html .= <<<HTML
+        <div id="albumphoto-like-{$albumphoto_id}" class="albumphoto-like" liked="{$liked}">
+            <a id="albumphoto-like-count-link-{$albumphoto_id}" href="javascript:void(0)" class="no-underline" onclick="showLikersModal({$albumphoto_id});" {$display_like_count}>
+                <span id="albumphoto-like-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_likes"]}</span> 
+            </a>
+            <a href="javascript:void(0)" class="no-underline" onclick="likePhoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]});">
+                 <i id="albumphoto-like-heart-{$albumphoto_id}" class="{$heart}"></i>
+            </a>
+        </div>
+HTML;
 
 
     // If there IS a caption -------------------------------------------------//

@@ -32,6 +32,15 @@ body {
     font-size:18px;
 }
 
+.albumphoto-like {
+    background: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 0px;
+    right: 46px;
+    padding: 0px;
+    color: #ffffff;
+}
+
 .red-heart {
     color: red;
     text-decoration: none;
