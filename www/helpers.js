@@ -65,11 +65,19 @@ function showFacebookModal(albumphotoID) {
 
 }
 
-function showCaptionModal(albumphotoID) {
-    $(".modal").modal('hide');
 
+function showCaptionModal(albumphotoID, albumphotoOwnerID, albumphotoS3) {
+    $(".modal").modal('hide');
     $('#caption-input').val($("#albumphoto-caption-"+ albumphotoID).html());
+
     $('#caption-modal').attr("albumphoto-id", albumphotoID);
+    $('#caption-modal').attr("caption-modifier-id", gUser["id"]);
+    $('#caption-modal').attr("caption-modifier-username", gUser["username"]);
+    $('#caption-modal').attr("album-handle", gAlbum["handle"]);
+    $('#caption-modal').attr("albumphoto-owner-id", albumphotoOwnerID);
+    $('#caption-modal').attr("albumphoto-s3", albumphotoS3);
+    
+
     $('#caption-modal').modal('show');
     $('#caption-input').focus();
 }
@@ -401,6 +409,7 @@ function submitForgotPassword() {
     });
 }
 
+
 function submitCaption() {
 
     var albumphotoID = $('#caption-modal').attr("albumphoto-id");
@@ -413,7 +422,12 @@ function submitCaption() {
             "albumphoto_id": albumphotoID,
             "caption": caption,
             "token": gAlbum["token"],
-            "album_id": gAlbum["id"]
+            "album_id": gAlbum["id"],
+	    "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
+	    "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
+	    "album_handle": $('#caption-modal').attr("album-handle"),
+	    "albumphoto_owner_id": $('#caption-modal').attr("albumphoto-owner-id"),
+	    "albumphoto_s3": $('#caption-modal').attr("albumphoto-s3")
         },
         success: function(data) {
             if (parseInt(data) == 1) {
@@ -430,6 +444,7 @@ function submitCaption() {
                     $("#add-caption-" + albumphotoID).html('<i class="icon-pencil"></i> Add a caption');
                 }
             } else {
+		alert(data);
                 // bad token
             }
         },

@@ -250,7 +250,7 @@ HTML;
         $edit_caption_string = "";
         if ($is_owner || $is_collaborator) {
             $edit_caption_string = <<<HTML
-                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})" class="no-underline">
+                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
                     &nbsp; <i class="icon-pencil"></i> Edit
                 </a>
 HTML;
@@ -269,7 +269,7 @@ HTML;
         $edit_caption_string = "";
         if ($is_owner || $is_collaborator) {
             $edit_caption_string = <<<HTML
-                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]})" class="no-underline">
+                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
                     <i class="icon-pencil"></i> Add a caption
                 </a>
 HTML;
