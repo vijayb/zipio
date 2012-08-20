@@ -287,6 +287,9 @@ HTML;
     }
 
     $html .= <<<HTML
+            <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
+                <span style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
+            </div>
 
         </div>
 HTML;
@@ -323,7 +326,7 @@ HTML;
                         <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">Rothbard</a></li>
                     </ul>
                 </div>
-                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="color:#666; float:right; margin-left:5px; display:none" onclick="saveFiltered({$albumphoto_id},
+                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="float:right; margin-left:5px; display:none" onclick="saveFiltered({$albumphoto_id},
                                                                                                                                '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg',
                                                                                                                                '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mime_type=image/jpeg',
                                                                                                                                '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big'
@@ -364,10 +367,6 @@ HTML;
 
 
     $html .= <<<HTML
-
-            <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
-                <span style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
-            </div>
         </div>
 HTML;
 

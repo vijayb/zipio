@@ -13,6 +13,7 @@ function showSignupModal() {
 }
 
 function showLoginModal() {
+    $("#login-error").hide();
     $('#login-modal').modal('show');
     $("#login-submit").button("reset");
     $("#login-submit").prop("disabled", true);
@@ -76,7 +77,7 @@ function showCaptionModal(albumphotoID, albumphotoOwnerID, albumphotoS3) {
     $('#caption-modal').attr("album-handle", gAlbum["handle"]);
     $('#caption-modal').attr("albumphoto-owner-id", albumphotoOwnerID);
     $('#caption-modal').attr("albumphoto-s3", albumphotoS3);
-    
+
 
     $('#caption-modal').modal('show');
     $('#caption-input').focus();
@@ -89,10 +90,9 @@ function showCommentsModal(albumphotoID, s3) {
     $("#comments").html("Loading comments...");
 
     if (!isLoggedIn()) {
-        $("#header-alert-title").html("Log in to comment on photos");
-        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
-        $("#header-alert").addClass("alert-error");
-        $("#header-alert").fadeIn();
+        showLoginModal();
+        $("#login-error-message").html("Log in to comment on this photo.");
+        $("#login-error").hide().delay(250).slideDown();
         return;
     }
 
@@ -103,14 +103,14 @@ function showCommentsModal(albumphotoID, s3) {
     $("#comment-modal").modal('show');
 
     reloadComments(albumphotoID);
+    $("#comment-input").focus();
 }
 
 function showLikersModal(albumphotoID) {
     if (!isLoggedIn()) {
-        $("#header-alert-title").html("Log in to view photo likes");
-        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
-        $("#header-alert").addClass("alert-error");
-        $("#header-alert").fadeIn();
+        showLoginModal();
+        $("#login-error-message").html("Log in to see who liked photo.");
+        $("#login-error").hide().delay(250).slideDown();
         return;
     }
 
@@ -278,9 +278,9 @@ function deleteComment(commentID, commenterID, token, albumphotoID) {
 
 function likeAlbumphoto(albumphotoID, likerID, albumphotoOwnerID, albumphotoS3) {
     if (!isLoggedIn()) {
-        $("#header-alert-title").html("Log in to like photos");
-        $("#header-alert-text").html("(or, <a href='javascript:void(0);' onclick='showForgotPasswordModal();'>reset your password</a> if you've forgotten it.)");
-        $("#header-alert").addClass("alert-error").fadeIn();
+        showLoginModal();
+        $("#login-error-message").html("Log in to like this photo.");
+        $("#login-error").hide().delay(250).slideDown();
         return;
     }
 
@@ -361,6 +361,7 @@ function submitLogin() {
                 window.location.replace(window.location.href.split('#')[0]);
             } else {
                 $("#login-error").show();
+                $("#login-error-message").html("<strong>Woops.</strong> That email & password combo is invalid.");
                 $("#login-password").select();
                 $("#login-submit").button("reset");
                 $("#login-submit").prop("disabled", true);

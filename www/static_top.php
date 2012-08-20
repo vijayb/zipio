@@ -221,7 +221,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="register-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Welcome, <?php print($_SESSION["user_info"]["email"]); ?>!</h2>
         <h3>Set a password and change your username (if you want)</h3>
     </div>
@@ -268,7 +268,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="caption-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Edit caption</h2>
     </div>
 
@@ -294,7 +294,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="comment-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Comments</h2>
     </div>
 
@@ -326,7 +326,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="likes-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Likes</h2>
     </div>
 
@@ -345,7 +345,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="login-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">x</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Login</h2>
     </div>
 
@@ -355,7 +355,7 @@ window.fbAsyncInit = function() {
     <div class="modal-body">
         <div class="alert fade in alert-error" id="login-error" style="display:none;">
             <button type="button" class="close">×</button>
-            <strong>Woops.</strong> That email/password combo is invalid.
+            <span id="login-error-message"></span>
         </div>
 
         <div class="form-horizontal">
@@ -397,7 +397,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="password-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Need a password?</h2>
         <h3>You know the drill</h3>
     </div>
@@ -430,7 +430,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="signup-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Signup for a <?php print($g_Zipio); ?> account</h2>
     </div>
 
@@ -481,7 +481,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="invite-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Invite people to see and add photos</h2>
         <h3>Photos can be added by email &mdash; <span style="color:red">they need not sign up!</span></h3>
     </div>
@@ -516,7 +516,7 @@ window.fbAsyncInit = function() {
 <div class="modal hide" id="facebook-modal">
 
     <div class="modal-header">
-        <a class="close" data-dismiss="modal">×</a>
+        <button type="button" class="close" data-dismiss="modal">×</button>
         <h2>Post this photo to Facebook</h2>
         <h3></h3>
     </div>
