@@ -91,13 +91,19 @@ HTML;
         $upper_left = "owner: <b>" . $album_owner_info["username"] . "</b>";
 
 
+       if ($cover_albumphoto_info["filtered"] > 0) {
+           $is_filtered = "_filtered";
+       } else {
+           $is_filtered = "";
+       }
+
         $html .= <<<HTML
         <!--------------------------------------------------------------------->
         <!-- TILE BEGIN ------------------------------------------------------->
 
         <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
             <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
-                <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped'>
+                <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped{$is_filtered}'>
                 <div class="album-details"></div>
                 <div class="album-title">{$albums_array[$i]["handle"]}</div>
                 <div class="album-privacy">{$upper_left}</div>
