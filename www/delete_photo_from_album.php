@@ -8,11 +8,13 @@ require("db.php");
 require("helpers.php");
 
 if (!isset($_GET["albumphoto_id"]) ||
-    !isset($_GET["token"])) {
+    !isset($_GET["token"]) ||
+    !isset($_GET["s3"])) {
     exit();
 } else {
     $albumphoto_id = $_GET["albumphoto_id"];
     $token = $_GET["token"];
+    $s3_handle = $_GET["s3"];
 }
 
 if (!check_token($albumphoto_id, $token, "AlbumPhotos")) {
@@ -33,6 +35,23 @@ if ($cover_albumphoto_id == $albumphoto_id) {
     $new_cover_albumphoto_id = $album_info["albumphoto_ids"][0];
     update_data("Albums", $albumphoto_info["album_id"], array("cover_albumphoto_id" => $new_cover_albumphoto_id));
 }
+
+
+
+
+if (!class_exists('S3')) require_once 'S3.php';
+if (!defined('awsAccessKey')) define('awsAccessKey', 'AKIAJXSDQXVDAE2Q2GFQ');
+if (!defined('awsSecretKey')) define('awsSecretKey', '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');
+$s3 = new S3(awsAccessKey, awsSecretKey);
+
+global $g_s3_bucket_name;
+global $g_s3_folder_name;
+
+
+$s3->deleteObject($g_s3_bucket_name, $g_s3_folder_name . "/" . $s3_handle . "_big");
+$s3->deleteObject($g_s3_bucket_name, $g_s3_folder_name . "/" . $s3_handle . "_big_filtered");
+$s3->deleteObject($g_s3_bucket_name, $g_s3_folder_name . "/" . $s3_handle . "_cropped");
+$s3->deleteObject($g_s3_bucket_name, $g_s3_folder_name . "/" . $s3_handle . "_cropped_filtered");
 
 print("1");
 

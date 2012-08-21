@@ -882,10 +882,11 @@ function preload(arrayOfImages) {
     });
 }
 
-function deletePhotoFromAlbum(albumPhotoID, token) {
+function deletePhotoFromAlbum(albumPhotoID, token, s3) {
     $("#albumphoto-" + albumPhotoID).fadeOut(100);
     var urlString = "/delete_photo_from_album.php?albumphoto_id=" + albumPhotoID +
-                                                "&token=" + token;
+                                                "&token=" + token +
+                                                "&s3=" + s3;
     jQuery.ajax({
         type: "GET",
         url: urlString,
