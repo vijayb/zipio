@@ -53,7 +53,7 @@ if ($g_debug) {
 }
 
 $page_title = <<<HTML
-    {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
+    <b>{$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com</b> <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = "To add photos, email them to the above address";
@@ -133,13 +133,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                    rel="fancybox"
                    href="{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}">
 
-                    <!------------------------------------------------------------->
-                    <!-- THE ACTUAL PHOTO ----------------------------------------->
-                    <!------------------------------------------------------------->
                     <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}">
-                    <!------------------------------------------------------------->
-                    <!------------------------------------------------------------->
-                    <!------------------------------------------------------------->
 
                     <div class="album-privacy">
                         by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
@@ -298,12 +292,12 @@ HTML;
         $html .= <<<HTML
             <div style="position:relative; top:3px;">
 
-                <div rel="tooltip" title="Post to Facebook" class="btn ttip" style="color:#666" onclick="showFacebookModal({$albumphoto_id});">
+                <div rel="tooltip" title="Post to Facebook" class="btn ttip" onclick="showFacebookModal({$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
 
                 <div class="btn-group" style="float:right; margin-left:5px;">
-                    <button rel="tooltip" title="Filters" id="filter-{$albumphoto_id}" class="btn dropdown-toggle ttip" style="color:#666" data-toggle="dropdown" data-loading-text="Filtering...">
+                    <button rel="tooltip" title="Filters" id="filter-{$albumphoto_id}" class="btn dropdown-toggle ttip" data-toggle="dropdown" data-loading-text="Filtering...">
                          <i class="icon-beaker"></i> <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu pull-right">
@@ -337,7 +331,7 @@ HTML;
 
 
                 <div class="btn-group" style="float:right; margin-left:5px;">
-                    <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" style="color:#666" class="btn dropdown-toggle ttip" data-toggle="dropdown">
+                    <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn dropdown-toggle ttip" data-toggle="dropdown">
                         <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
                     </button>
                     <ul class="dropdown-menu pull-right">
@@ -489,7 +483,7 @@ if ($is_owner || $is_collaborator) {
     $html = <<<HTML
         <div class="span3">
             <div style="margin-bottom:50px">
-                <h2>Album Collaborators</h2>
+                <h3 style="margin-top:0px;">Album Collaborators</h3>
                 <h4>Collaborators can <b style="color:#444444">add</b> photos and invite others</h4>
 
                 <div id="collaborators-list" style="margin:10px 0px;">
@@ -578,7 +572,7 @@ HTML;
 
         $html .= <<<HTML
             <div>
-                <h2>Privacy</h2>
+                <h3>Privacy</h3>
                 <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album? Only the album owner can change this.</h4>
 
                 <label class="radio" style="margin:0px;">
@@ -616,7 +610,7 @@ HTML;
 
         $html .= <<<HTML
             <div>
-                <h2>Privacy</h2>
+                <h3>Privacy</h3>
                 <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
                 <p>
                     {$read_permissions_html}

@@ -20,8 +20,8 @@ function login_user($user_id) {
 
     // Now set a login cookie
 
-    setcookie("user_id", $_SESSION["user_id"], time() + 1000000000);
-    setcookie("user_token", $_SESSION["user_info"]["token"], time() + 1000000000);
+    setcookie("user_id", $_SESSION["user_id"], time() + 1000000000, "/", "zipio.com");
+    setcookie("user_token", $_SESSION["user_info"]["token"], time() + 1000000000, "/", "zipio.com");
 }
 
 function is_logged_in() {
