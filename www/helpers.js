@@ -121,7 +121,7 @@ function showLikersModal(albumphotoID) {
 }
 
 
-function getCommentsHTML(commentsArray) {
+function getCommentsHTML(commentsArray, albumphotoID) {
 
     var html = "";
 
@@ -135,8 +135,17 @@ function getCommentsHTML(commentsArray) {
         if (parseInt(commentsArray[i]["commenter_id"]) == parseInt(gUser["id"]) ||
             (typeof gAlbum !== "undefined" && parseInt(gAlbum["user_id"]) == parseInt(gUser["id"]))) {
 
-            html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='$(this).parent().slideUp(); deleteComment(" + commentsArray[i]["id"] + ", " + gUser["id"] + ", \"" + gUser["token"] + "\", " + $('#comment-modal').attr('albumphoto-id') + ");' class='no-underline'><i class='icon-remove'></i></a>";
-        }
+            html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='$(this).parent().slideUp(); deleteComment(" + commentsArray[i]["id"] + ", " + $('#comment-modal').attr('albumphoto-id') + ");' class='no-underline'><i class='icon-remove'></i></a>";
+	}
+
+	var heart = "gray";
+	var likedComment = 0;
+	if (parseInt(commentsArray[i]["liked"]) == 1) {
+	    heart = "red";
+	    likedComment = 1;
+	}
+
+        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>";
 
         html += "\
             </div>";
@@ -230,16 +239,15 @@ function submitComment() {
 }
 
 
-function reloadComments(albumphotoID) {
-
-    var urlString = "/get_comments_json.php?albumphoto_id=" + albumphotoID;
+function reloadComments(albumphotoID, userID) {
+    var urlString = "/get_comments_json.php?albumphoto_id=" + albumphotoID + "&user_id=" + gUser["id"] + "&token=" + gUser["token"];
 
     jQuery.ajax({
         type: "GET",
         url: urlString,
         success: function(data) {
             var commentsArray = JSON.parse(data);
-            var html = getCommentsHTML(commentsArray);
+            var html = getCommentsHTML(commentsArray, albumphotoID);
             $("#comments").html(html);
             $("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
             $("#comment-count-" + albumphotoID).html(commentsArray.length);
@@ -256,11 +264,45 @@ function reloadComments(albumphotoID) {
 }
 
 
+function toggleLikeComment(commentID, commenterID, albumphotoID) {
 
-function deleteComment(commentID, commenterID, token, albumphotoID) {
+    jQuery.ajax({
+        type: 'POST',
+        url: "/toggle_like_comment.php",
+        data: {
+	    "comment_id": commentID,
+            "albumphoto_id": albumphotoID,
+            "album_id": gAlbum["id"],
+	    "commenter_id": commenterID,
+	    "liker_id": gUser["id"],
+	    "liker_username": gUser["username"],
+            "token": gUser["token"],
+	    "old_like_value": $("#comment-like-"+commentID).attr("liked"),
+	    "albumphoto_owner_id": $("#image-"+albumphotoID).attr("owner-id"),
+            "album_handle": gAlbum["handle"],
+	    "albumphoto_s3": $('#comment-modal').attr("albumphoto-s3")
+        },
+        success: function(data) {
+            if (parseInt(data) == 1) {
+		if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
+		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-gray no-underline");
+		    $("#comment-like-"+commentID).attr("liked", 0);
+		} else {
+		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
+		    $("#comment-like-"+commentID).attr("liked", 1);
+		}
+            } else {
+                alert(data);
+            }
+        },
+        async: true
+    });
+}
+
+function deleteComment(commentID, albumphotoID) {
     var urlString = "/delete_comment.php?comment_id=" + commentID +
-                                        "&token=" + token +
-                                        "&commenter_id=" + commenterID;
+                                        "&token=" + gUser["token"] +
+                                        "&commenter_id=" + gUser["id"];
     jQuery.ajax({
         type: "GET",
         url: urlString,

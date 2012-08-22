@@ -136,7 +136,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
                     <!------------------------------------------------------------->
                     <!-- THE ACTUAL PHOTO ----------------------------------------->
                     <!------------------------------------------------------------->
-                    <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}'>
+                    <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}">
                     <!------------------------------------------------------------->
                     <!------------------------------------------------------------->
                     <!------------------------------------------------------------->
