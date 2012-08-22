@@ -109,7 +109,7 @@ function showCommentsModal(albumphotoID, s3) {
 function showLikersModal(albumphotoID) {
     if (!isLoggedIn()) {
         showLoginModal();
-        $("#login-error-message").html("Log in to see who liked photo.");
+        $("#login-error-message").html("Log in to see who liked the photo.");
         $("#login-error").hide().delay(250).slideDown();
         return;
     }
@@ -118,6 +118,19 @@ function showLikersModal(albumphotoID) {
     $("#likes-modal").modal('show');
 
     loadLikers(albumphotoID);
+}
+
+
+function showCommentLikersModal(commentID) {
+    if (!isLoggedIn()) {
+        showLoginModal();
+        $("#login-error-message").html("Log in to see who liked the comment.");
+        $("#login-error").hide().delay(250).slideDown();
+        return;
+    }
+
+    $("#comment-likes-modal").modal('show');
+    loadCommentLikers(commentID);
 }
 
 
@@ -152,7 +165,7 @@ function getCommentsHTML(commentsArray, albumphotoID) {
 
 
 
-        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>&nbsp;<a href='javascript:void(0);' onclick=''><span id=comment-like-count-"+commentsArray[i]["id"]+" "+display_like_count+">"+commentsArray[i]["like_count"]+"</span></a>";
+        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>&nbsp;<a href='javascript:void(0);' onclick='showCommentLikersModal("+commentsArray[i]["id"]+")'><span id=comment-like-count-"+commentsArray[i]["id"]+" "+display_like_count+">"+commentsArray[i]["like_count"]+"</span></a>";
 
         html += "\
             </div>";
@@ -395,6 +408,23 @@ function loadLikers(albumphotoID) {
             var likersArray = JSON.parse(data);
             var html = getLikersHTML(likersArray);
             $("#likes").html(html);
+
+            //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
+            $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
+        },
+        async: true
+    });
+}
+
+
+function loadCommentLikers(commentID) {
+    jQuery.ajax({
+        type: "GET",
+        url: "/get_comment_likers_json.php?comment_id=" + commentID,
+        success: function(data) {
+            var likersArray = JSON.parse(data);
+            var html = getLikersHTML(likersArray);
+            $("#comment-likes").html(html);
 
             //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
             $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
