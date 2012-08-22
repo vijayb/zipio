@@ -4,6 +4,8 @@
 <script src="/lib/jquery-ui-1.8.21.custom.min.js"></script>
 <script src="/lib/jquery.typewatch.js"></script>
 <script src="/lib/filtrr.js"></script>
+<script src="/lib/jquery.cookie.js"></script>
+
 <script src="/helpers.js"></script>
 
 <script type="text/javascript" src="http://assets.pinterest.com/js/pinit.js"></script>

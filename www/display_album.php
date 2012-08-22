@@ -350,7 +350,7 @@ HTML;
 
                         <li>
                             <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
-                                                                            deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}');
+                                                                            deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');
                                                                         }">
                                 <i class="icon-trash"></i> Delete this photo
                             </a>
