@@ -89,9 +89,9 @@ if ($albumphoto_owner_id != $liker_id && $commenter_id != $albumphoto_owner_id) 
     array_push($users_to_be_emailed, $albumphoto_owner_info);
 }
 
-if ($album_owner_id != $liker_id &&
-	$album_owner_id != $albumphoto_owner_id &&
-	$album_owner_id != $commenter_id) {
+if ($album_owner_info["id"] != $liker_id &&
+    $album_owner_info["id"] != $albumphoto_owner_id &&
+    $album_owner_info["id"] != $commenter_id) {
     array_push($users_to_be_emailed, $album_owner_info);
 }
 
