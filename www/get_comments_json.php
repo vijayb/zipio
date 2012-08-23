@@ -25,19 +25,28 @@ if (!check_token($user_id, $token, "Users")) {
 
 
 $query = "SELECT
-            comment_id
+            comment_id,
+            commenter_id
           FROM CommentLikes
-          WHERE albumphoto_id='$albumphoto_id' and liker_id='$user_id'";
+          WHERE albumphoto_id='$albumphoto_id'";
 
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
 
 $liked_comments = array();
-
+$like_count = array();
 
 while ($row = mysql_fetch_assoc($result)) {
-    $liked_comments[$row["comment_id"]] = 1;
+    if ($row["commenter_id"] == $user_id) {
+        $liked_comments[$row["comment_id"]] = 1;
+    }
+
+    if (!isset($like_count[$row["comment_id"]])) {
+        $like_count[$row["comment_id"]] = 1;
+    } else {
+        $like_count[$row["comment_id"]]++;
+    }
 }
 
 
@@ -65,6 +74,12 @@ while ($row = mysql_fetch_assoc($result)) {
         $row["liked"] = 1;
     } else {
         $row["liked"] = 0;
+    }
+
+    if (isset($like_count[$row["id"]])) {
+        $row["like_count"] = $like_count[$row["id"]];
+    } else {
+        $row["like_count"] = 0;
     }
 
     array_push($comments_arr, $row);

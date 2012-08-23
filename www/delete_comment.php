@@ -28,7 +28,16 @@ if (!check_token($commenter_id, $token, "Users")) {
 
 $query = "DELETE FROM Comments WHERE id='$comment_id' AND (commenter_id='$commenter_id' OR album_owner_id='$commenter_id')";
 $result = mysql_query($query, $con);
+$num_rows_deleted = mysql_affected_rows();
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+// As a security measure, only allow deletion of comment likes if the above
+// query actually deleted a comment.
+if ($num_rows_deleted > 0) {
+  $query = "DELETE FROM CommentLikes WHERE comment_id='$comment_id'";
+  $result = mysql_query($query, $con);
+  if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+}
 
 print("1");
 exit();

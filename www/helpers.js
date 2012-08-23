@@ -110,7 +110,7 @@ function showCommentsModal(albumphotoID, s3) {
 function showLikersModal(albumphotoID) {
     if (!isLoggedIn()) {
         showLoginModal();
-        $("#login-error-message").html("Log in to see who liked photo.");
+        $("#login-error-message").html("Log in to see who liked the photo.");
         $("#login-error").hide().delay(250).slideDown();
         return;
     }
@@ -119,6 +119,19 @@ function showLikersModal(albumphotoID) {
     $("#likes-modal").modal('show');
 
     loadLikers(albumphotoID);
+}
+
+
+function showCommentLikersModal(commentID) {
+    if (!isLoggedIn()) {
+        showLoginModal();
+        $("#login-error-message").html("Log in to see who liked the comment.");
+        $("#login-error").hide().delay(250).slideDown();
+        return;
+    }
+
+    $("#comment-likes-modal").modal('show');
+    loadCommentLikers(commentID);
 }
 
 
@@ -146,7 +159,14 @@ function getCommentsHTML(commentsArray, albumphotoID) {
 	    likedComment = 1;
 	}
 
-        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>";
+	var display_like_count = "";
+	if (parseInt(commentsArray[i]["like_count"]) == 0) {
+	    display_like_count = "style='display:none;'";
+	}
+
+
+
+        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>&nbsp;<a href='javascript:void(0);' onclick='showCommentLikersModal("+commentsArray[i]["id"]+")'><span id=comment-like-count-"+commentsArray[i]["id"]+" "+display_like_count+">"+commentsArray[i]["like_count"]+"</span></a>";
 
         html += "\
             </div>";
@@ -285,12 +305,19 @@ function toggleLikeComment(commentID, commenterID, albumphotoID) {
         },
         success: function(data) {
             if (parseInt(data) == 1) {
+                var likeCount = parseInt($("#comment-like-count-" + commentID).html());
 		if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
 		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-gray no-underline");
 		    $("#comment-like-"+commentID).attr("liked", 0);
+                    $("#comment-like-count-" + commentID).html(likeCount - 1);
+		    if (likeCount - 1 == 0) {
+                        $("#comment-like-count-" + commentID).hide();
+		    }
 		} else {
 		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
 		    $("#comment-like-"+commentID).attr("liked", 1);
+                    $("#comment-like-count-" + commentID).html(likeCount + 1);
+                    $("#comment-like-count-" + commentID).show();
 		}
             } else {
                 alert(data);
@@ -299,6 +326,8 @@ function toggleLikeComment(commentID, commenterID, albumphotoID) {
         async: true
     });
 }
+
+
 
 function deleteComment(commentID, albumphotoID) {
     var urlString = "/delete_comment.php?comment_id=" + commentID +
@@ -380,6 +409,23 @@ function loadLikers(albumphotoID) {
             var likersArray = JSON.parse(data);
             var html = getLikersHTML(likersArray);
             $("#likes").html(html);
+
+            //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
+            $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
+        },
+        async: true
+    });
+}
+
+
+function loadCommentLikers(commentID) {
+    jQuery.ajax({
+        type: "GET",
+        url: "/get_comment_likers_json.php?comment_id=" + commentID,
+        success: function(data) {
+            var likersArray = JSON.parse(data);
+            var html = getLikersHTML(likersArray);
+            $("#comment-likes").html(html);
 
             //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
             $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);

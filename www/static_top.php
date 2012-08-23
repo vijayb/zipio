@@ -346,6 +346,21 @@ MODALS
 </div>
 
 
+<div class="modal hide" id="comment-likes-modal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>Comment likes</h2>
+    </div>
+
+    <div class="modal-body" id="comment-likes-modal-body">
+        <div id="comment-likes">
+
+        </div>
+    </div>
+</div>
+
+
 <?php } ?>
 
 <!--
