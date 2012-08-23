@@ -46,6 +46,7 @@ function showFacebookModal(albumphotoID) {
         imageURL = $("#image-" + albumphotoID).attr("src");
 
         $("#facebook-image").data("albumphotoID", albumphotoID);
+        $("#facebook-image").data("caption", $("#albumphoto-caption-" + albumphotoID).html());
 
         $(".modal").modal('hide');
         $("#facebook-comment").empty().focus();
@@ -872,17 +873,21 @@ function createLikeButton(element, url) {
 function postToFacebook() {
     $("#facebook-submit").button("loading");
 
-    imageURL = $("#facebook-image").attr("src");
-    imageURL = imageURL.replace("_cropped", "_big");
+    var imageURL = $("#facebook-image").attr("src");
+    
+    var albumphotoID = $("#facebook-image").data("albumphotoID");
+    var oneUpURL = $("#albumphoto-" + albumphotoID).attr("one-up-link");
 
-    albumphotoID = $("#facebook-image").data("albumphotoID");
+    var albumphotoCaption = $("#facebook-image").data("caption");
 
     FB.api('/me/feed',
            'post',
            {
-                link: imageURL,
+                link: oneUpURL,
                 message: $("#facebook-comment").val(),
                 picture: imageURL,
+                name: "See photo at Zipio",
+                caption: albumphotoCaption
 
            },
            function(response) {
@@ -925,7 +930,7 @@ function preload(arrayOfImages) {
 }
 
 function deletePhotoFromAlbum(albumPhotoID, token, s3) {
-    $("#albumphoto-" + albumPhotoID).fadeOut(100);
+    $("#albumphoto-" + albumPhotoID).fadeOut(300);
     var urlString = "/delete_photo_from_album.php?albumphoto_id=" + albumPhotoID +
                                                 "&token=" + token +
                                                 "&s3=" + s3;

@@ -177,10 +177,6 @@ HTML;
         </div>
 HTML;
 
-    if (isset($_GET["albumphoto"]) && $albumphoto_id == $_GET["albumphoto"]) {
-        $fancybox_image_to_show = $index_of_albumphoto_in_album;
-    }
-
 */
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,6 +184,9 @@ HTML;
 ////////////////////////////////////////////////////////////////////////////////
 
 
+    if (isset($_GET["albumphoto"]) && $albumphoto_id == $_GET["albumphoto"]) {
+        $fancybox_image_to_show = $index_of_albumphoto_in_album;
+    }
 
     $display_like_count = "";
     if ($albumphotos_array[$i]["num_comments"] == 0) {
@@ -484,7 +483,7 @@ if ($is_owner || $is_collaborator) {
         <div class="span3">
             <div style="margin-bottom:50px">
                 <h3 style="margin-top:0px;">Album Collaborators</h3>
-                <h4>Collaborators can <b style="color:#444444">add</b> photos and invite others</h4>
+                <h5>Collaborators can <b style="color:#444444">add</b> photos and invite others</h5>
 
                 <div id="collaborators-list" style="margin:10px 0px;">
                     <div style="padding:3px;">
@@ -548,7 +547,7 @@ HTML;
     $html .= <<<HTML
                 </div>
 
-                <button style="margin-bottom:15px;" class="btn btn-primary btn-large" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite more collaborators</button>
+                <button style="margin-bottom:15px;" class="btn btn-primary btn-large btn-block" href="javascript:void(0);" onclick="showInviteModal();"><i class="icon-plus-sign"></i> Invite collaborators</button>
 HTML;
 
     if ($is_owner) {
@@ -573,14 +572,14 @@ HTML;
         $html .= <<<HTML
             <div>
                 <h3>Privacy</h3>
-                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album? Only the album owner can change this.</h4>
+                <h5 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album? Only the album owner can change this.</h5>
 
                 <label class="radio" style="margin:0px;">
                     <input type="radio" name="album-privacy" id="album-privacy-1" value="1" checked="" onclick="changeAlbumPrivacy();">
                     <b>Album collaborators only</b> <span id="album-privacy-saved-1" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                 </label>
                 <p style="margin-left:20px; color:#666666;">
-                    Just the folks listed above
+                    Just the folks listed above can view this album
                 </p>
 
 
@@ -611,7 +610,7 @@ HTML;
         $html .= <<<HTML
             <div>
                 <h3>Privacy</h3>
-                <h4 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h4>
+                <h5 style="margin-bottom:10px;">Who is allowed to <b style="color:#444444">view</b> this album?</h5>
                 <p>
                     {$read_permissions_html}
                 </p>
@@ -714,7 +713,7 @@ $(function() {
 <?php
 
 $output_js = <<<HTML
-    preload([{$albumphotos_array_js}]);
+    // preload([{$albumphotos_array_js}]);
 HTML;
 
 print($output_js);
