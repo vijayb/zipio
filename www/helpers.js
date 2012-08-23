@@ -121,20 +121,6 @@ function showLikersModal(albumphotoID) {
     loadLikers(albumphotoID);
 }
 
-
-function showCommentLikersModal(commentID) {
-    if (!isLoggedIn()) {
-        showLoginModal();
-        $("#login-error-message").html("Log in to see who liked the comment.");
-        $("#login-error").hide().delay(250).slideDown();
-        return;
-    }
-
-    $("#comment-likes-modal").modal('show');
-    loadCommentLikers(commentID);
-}
-
-
 function getCommentsHTML(commentsArray, albumphotoID) {
 
     var html = "";
@@ -148,28 +134,28 @@ function getCommentsHTML(commentsArray, albumphotoID) {
 
         if (parseInt(commentsArray[i]["commenter_id"]) == parseInt(gUser["id"]) ||
             (typeof gAlbum !== "undefined" && parseInt(gAlbum["user_id"]) == parseInt(gUser["id"]))) {
+                html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='$(this).parent().slideUp(); deleteComment(" + commentsArray[i]["id"] + ", " + $('#comment-modal').attr('albumphoto-id') + ");' class='no-underline'><i class='icon-remove'></i></a>";
+    }
 
-            html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='$(this).parent().slideUp(); deleteComment(" + commentsArray[i]["id"] + ", " + $('#comment-modal').attr('albumphoto-id') + ");' class='no-underline'><i class='icon-remove'></i></a>";
-	}
+    var heart = "gray";
+    var likedComment = 0;
+    if (parseInt(commentsArray[i]["liked"]) == 1) {
+        heart = "red";
+        likedComment = 1;
+    }
 
-	var heart = "gray";
-	var likedComment = 0;
-	if (parseInt(commentsArray[i]["liked"]) == 1) {
-	    heart = "red";
-	    likedComment = 1;
-	}
-
-	var display_like_count = "";
-	if (parseInt(commentsArray[i]["like_count"]) == 0) {
-	    display_like_count = "style='display:none;'";
-	}
-
+    var display_like_count = "";
+    if (parseInt(commentsArray[i]["like_count"]) == 0) {
+        display_like_count = "style='display:none;'";
+    }
 
 
-        html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment("+commentsArray[i]["id"]+","+commentsArray[i]["commenter_id"]+","+albumphotoID+");'><i id='comment-like-"+ commentsArray[i]["id"]+"' liked="+likedComment+" class='icon-heart heart-"+heart+" no-underline'></i></a>&nbsp;<a href='javascript:void(0);' onclick='showCommentLikersModal("+commentsArray[i]["id"]+")'><span id=comment-like-count-"+commentsArray[i]["id"]+" "+display_like_count+">"+commentsArray[i]["like_count"]+"</span></a>";
 
-        html += "\
-            </div>";
+    html += "&nbsp;&nbsp;<a href='javascript:void(0);' onclick='toggleLikeComment(" + commentsArray[i]["id"] + "," + commentsArray[i]["commenter_id"] + "," + albumphotoID + ");'><i id='comment-like-" + commentsArray[i]["id"] + "' liked=" + likedComment + " class='icon-heart heart-" + heart + " no-underline'></i></a>&nbsp;<a href='javascript:void(0);' onclick='loadCommentLikers(" + commentsArray[i]["id"] + ")'><span id=comment-like-count-" + commentsArray[i]["id"] + " " + display_like_count + ">" + commentsArray[i]["like_count"] + "</span></a>";
+
+    html += "\
+        <span style='color:#999; font-size: 12px' id='likers-list-" + commentsArray[i]["id"] + "'></span>\
+        </div>";
 
     }
 
@@ -183,19 +169,20 @@ function getCommentsHTML(commentsArray, albumphotoID) {
 function getLikersHTML(likersArray) {
     var html = "";
 
+    html = "Liked by "
+
     for (i = 0; i < likersArray.length; i++) {
-    var username = likersArray[i]["username"];
-    if (parseInt(likersArray[i]["liker_id"]) == parseInt(gUser["id"])) {
-        username = "me";
+        var username = likersArray[i]["username"];
+        if (parseInt(likersArray[i]["liker_id"]) == parseInt(gUser["id"])) {
+            username = "me";
+        }
+
+        html += username;
+
+        html += ", ";
     }
 
-        html += "\
-            <div style='margin-bottom:8px'>\
-            <b>" + username + ":</b>\
-            <span style='font-size:12px; color:#999999'>" + likersArray[i]["created"] + "</span>";
-
-        html += "</div>";
-    }
+    html = html.replace(/(,\s*$)/g, "");
 
     return html;
 }
@@ -291,34 +278,34 @@ function toggleLikeComment(commentID, commenterID, albumphotoID) {
         type: 'POST',
         url: "/toggle_like_comment.php",
         data: {
-	    "comment_id": commentID,
+            "comment_id": commentID,
             "albumphoto_id": albumphotoID,
             "album_id": gAlbum["id"],
-	    "commenter_id": commenterID,
-	    "liker_id": gUser["id"],
-	    "liker_username": gUser["username"],
+            "commenter_id": commenterID,
+            "liker_id": gUser["id"],
+            "liker_username": gUser["username"],
             "token": gUser["token"],
-	    "old_like_value": $("#comment-like-"+commentID).attr("liked"),
-	    "albumphoto_owner_id": $("#image-"+albumphotoID).attr("owner-id"),
+            "old_like_value": $("#comment-like-"+commentID).attr("liked"),
+            "albumphoto_owner_id": $("#image-"+albumphotoID).attr("owner-id"),
             "album_handle": gAlbum["handle"],
-	    "albumphoto_s3": $('#comment-modal').attr("albumphoto-s3")
+            "albumphoto_s3": $('#comment-modal').attr("albumphoto-s3")
         },
         success: function(data) {
             if (parseInt(data) == 1) {
                 var likeCount = parseInt($("#comment-like-count-" + commentID).html());
-		if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
-		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-gray no-underline");
-		    $("#comment-like-"+commentID).attr("liked", 0);
+        if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
+            $("#comment-like-"+commentID).attr("class", "icon-heart heart-gray no-underline");
+            $("#comment-like-"+commentID).attr("liked", 0);
                     $("#comment-like-count-" + commentID).html(likeCount - 1);
-		    if (likeCount - 1 == 0) {
-                        $("#comment-like-count-" + commentID).hide();
-		    }
-		} else {
-		    $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
-		    $("#comment-like-"+commentID).attr("liked", 1);
+            if (likeCount - 1 == 0) {
+                $("#comment-like-count-" + commentID).hide();
+            }
+        } else {
+            $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
+            $("#comment-like-"+commentID).attr("liked", 1);
                     $("#comment-like-count-" + commentID).html(likeCount + 1);
                     $("#comment-like-count-" + commentID).show();
-		}
+        }
             } else {
                 alert(data);
             }
@@ -409,8 +396,6 @@ function loadLikers(albumphotoID) {
             var likersArray = JSON.parse(data);
             var html = getLikersHTML(likersArray);
             $("#likes").html(html);
-
-            //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
             $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
         },
         async: true
@@ -425,10 +410,8 @@ function loadCommentLikers(commentID) {
         success: function(data) {
             var likersArray = JSON.parse(data);
             var html = getLikersHTML(likersArray);
-            $("#comment-likes").html(html);
-
-            //$("#comment-modal-body").scrollTop($("#comment-modal-body")[0].scrollHeight);
-            $("#albumphoto-like-count-" + albumphotoID).html(likersArray.length);
+            $("#likers-list-" + commentID).html(html);
+            $("#comment-like-count-" + commentID).html(likersArray.length);
         },
         async: true
     });
@@ -513,11 +496,11 @@ function submitCaption() {
             "caption": caption,
             "token": gAlbum["token"],
             "album_id": gAlbum["id"],
-	    "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
-	    "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
-	    "album_handle": $('#caption-modal').attr("album-handle"),
-	    "albumphoto_owner_id": $('#caption-modal').attr("albumphoto-owner-id"),
-	    "albumphoto_s3": $('#caption-modal').attr("albumphoto-s3")
+        "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
+        "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
+        "album_handle": $('#caption-modal').attr("album-handle"),
+        "albumphoto_owner_id": $('#caption-modal').attr("albumphoto-owner-id"),
+        "albumphoto_s3": $('#caption-modal').attr("albumphoto-s3")
         },
         success: function(data) {
             if (parseInt(data) == 1) {
@@ -534,7 +517,7 @@ function submitCaption() {
                     $("#add-caption-" + albumphotoID).html('<i class="icon-pencil"></i> Add a caption');
                 }
             } else {
-		alert(data);
+        alert(data);
                 // bad token
             }
         },
@@ -920,7 +903,7 @@ function postToFacebook() {
     $("#facebook-submit").button("loading");
 
     var imageURL = $("#facebook-image").attr("src");
-    
+
     var albumphotoID = $("#facebook-image").data("albumphotoID");
     var oneUpURL = $("#albumphoto-" + albumphotoID).attr("one-up-link");
 

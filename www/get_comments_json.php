@@ -26,7 +26,7 @@ if (!check_token($user_id, $token, "Users")) {
 
 $query = "SELECT
             comment_id,
-            commenter_id
+            liker_id
           FROM CommentLikes
           WHERE albumphoto_id='$albumphoto_id'";
 
@@ -38,7 +38,7 @@ $liked_comments = array();
 $like_count = array();
 
 while ($row = mysql_fetch_assoc($result)) {
-    if ($row["commenter_id"] == $user_id) {
+    if ($row["liker_id"] == $user_id) {
         $liked_comments[$row["comment_id"]] = 1;
     }
 

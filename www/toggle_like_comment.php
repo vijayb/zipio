@@ -66,9 +66,14 @@ if ($old_like_value == "0") {
     exit();
 }
 
-// Now, let's email the albumphoto owner and album owner about the like
-
 /*
+Now, let's email the
+	- commenter
+	- albumphoto owner
+	- album owner
+*/
+
+$commenter_info = get_user_info($commenter_id);
 $albumphoto_owner_info = get_user_info($albumphoto_owner_id);
 $album_owner_info = get_user_info(get_album_owner($album_id));
 
@@ -76,14 +81,19 @@ $users_to_be_emailed = array();
 
 
 
-if ($albumphoto_owner_id != $liker_id) {
+if ($commenter_id != $liker_id) {
+    array_push($users_to_be_emailed, $commenter_info);
+}
+
+if ($albumphoto_owner_id != $liker_id && $commenter_id != $albumphoto_owner_id) {
     array_push($users_to_be_emailed, $albumphoto_owner_info);
 }
 
-if ($album_owner_info["id"] != $liker_id && $albumphoto_owner_id != $album_owner_info["id"]) {
+if ($album_owner_id != $liker_id &&
+	$album_owner_id != $albumphoto_owner_id &&
+	$album_owner_id != $commenter_id) {
     array_push($users_to_be_emailed, $album_owner_info);
 }
-
 
 for ($i = 0; $i < count($users_to_be_emailed); $i++) {
 
@@ -96,10 +106,12 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
 
     $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "'><br><br>";
 
-    if ($albumphoto_owner_id == $users_to_be_emailed[$i]["id"]) {
-        $subject = "$liker_username liked your photo in the $album_handle album";
+	if ($users_to_be_emailed[$i]["id"] == $commenter_id) {
+        $subject = "$liker_username liked your comment in the $album_handle album";
+    } else if ($users_to_be_emailed[$i]["id"] == $albumphoto_owner_id) {
+        $subject = "$liker_username liked " . $commenter_info["username"] . "'s comment on your photo in the $album_handle album";
     } else {
-        $subject = "$liker_username liked a photo in your $album_handle album";
+        $subject = "$liker_username liked " . $commenter_info["username"] . "'s comment in your $album_handle album";
     }
 
     $email_body = <<<EMAIL
@@ -108,12 +120,11 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
         $pictures_html
 EMAIL;
 
-    if (!$g_debug) {
-        send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
-    }
+    //if (!$g_debug) {
+        send_email($us1ers_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
+    //}
 
 }
-*/
 
 
 
