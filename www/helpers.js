@@ -129,7 +129,7 @@ function getCommentsHTML(commentsArray, albumphotoID) {
         html += "\
             <div style='margin-bottom:8px'>\
             <b>" + commentsArray[i]["username"] + ":</b>\
-            " + commentsArray[i]["comment"] + "\
+            <span id='comment-text-" + commentsArray[i]["id"] + "'>" + commentsArray[i]["comment"] + "</span>\
             <span style='font-size:12px; color:#999999'>" + commentsArray[i]["created"] + "</span>";
 
         if (parseInt(commentsArray[i]["commenter_id"]) == parseInt(gUser["id"]) ||
@@ -279,6 +279,7 @@ function toggleLikeComment(commentID, commenterID, albumphotoID) {
         url: "/toggle_like_comment.php",
         data: {
             "comment_id": commentID,
+	    "comment": $("#comment-text-"+commentID).html(),
             "albumphoto_id": albumphotoID,
             "album_id": gAlbum["id"],
             "commenter_id": commenterID,

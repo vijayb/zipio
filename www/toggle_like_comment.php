@@ -9,6 +9,7 @@ require("helpers.php");
 
 
 if (!isset($_POST["comment_id"]) ||
+    !isset($_POST["comment"]) ||
     !isset($_POST["albumphoto_id"]) ||
     !isset($_POST["album_id"]) ||
     !isset($_POST["commenter_id"]) ||
@@ -24,6 +25,7 @@ if (!isset($_POST["comment_id"]) ||
     exit();
 } else {
     $comment_id = $_POST["comment_id"];
+    $comment = $_POST["comment"];
     $albumphoto_id = $_POST["albumphoto_id"];
     $album_id = $_POST["album_id"];
     $commenter_id = $_POST["commenter_id"];
@@ -71,6 +73,8 @@ Now, let's email the
 	- commenter
 	- albumphoto owner
 	- album owner
+
+(but if a user is more than one of the above, never email them more than once)
 */
 
 $commenter_info = get_user_info($commenter_id);
@@ -106,8 +110,11 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
 
     $pictures_html = "<img src='" . $g_s3_root . "/" . $albumphoto_s3 . "'><br><br>";
 
-	if ($users_to_be_emailed[$i]["id"] == $commenter_id) {
+    $commenter_string = "<b>" . $commenter_info["username"] . "</b>'s";
+
+    if ($users_to_be_emailed[$i]["id"] == $commenter_id) {
         $subject = "$liker_username liked your comment in the $album_handle album";
+        $commenter_string = "your";
     } else if ($users_to_be_emailed[$i]["id"] == $albumphoto_owner_id) {
         $subject = "$liker_username liked " . $commenter_info["username"] . "'s comment on your photo in the $album_handle album";
     } else {
@@ -115,15 +122,18 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
     }
 
     $email_body = <<<EMAIL
+        <b>{$liker_username}</b> liked {$commenter_string} comment:
+        <br><br>
+        "{$comment}"
+        <br><br>
         <a href='{$display_album_link_comment}'>Add a comment to this photo</a>
         <br><br>
         $pictures_html
 EMAIL;
 
-    //if (!$g_debug) {
+    if (!$g_debug) {
         send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
-    //}
-
+    }
 }
 
 
