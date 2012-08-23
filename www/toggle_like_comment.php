@@ -121,7 +121,7 @@ for ($i = 0; $i < count($users_to_be_emailed); $i++) {
 EMAIL;
 
     //if (!$g_debug) {
-        send_email($us1ers_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
+        send_email($users_to_be_emailed[$i]["email"], $g_founders_email_address, $subject, $email_body);
     //}
 
 }
