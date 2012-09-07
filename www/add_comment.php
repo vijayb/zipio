@@ -7,6 +7,7 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
+
 if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["comment"]) ||
     !isset($_POST["token"]) ||

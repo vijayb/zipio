@@ -9,7 +9,6 @@
 <script src="/helpers.js"></script>
 
 <script type="text/javascript" src="http://assets.pinterest.com/js/pinit.js"></script>
-
 <script src="/bootstrap/js/bootstrap-alert.js"></script>
 <script src="/bootstrap/js/bootstrap-modal.js"></script>
 <script src="/bootstrap/js/bootstrap-dropdown.js"></script>
@@ -59,6 +58,7 @@ var hashParams = {};
 
 $(function() {
 
+
     // This PHP code populates gUser in the case that there is a logged in
     // user. Recall that PHP knows about the login status through session
     // variables.
@@ -72,6 +72,13 @@ $(function() {
     ?>
 
     $(window).resize(function() {
+
+        /*
+        if ($("#one-up-photo").length > 0) {
+            $("#one-up-photo").css("height", $(window).height() - $("#one-up-photo").offset().top - 20 + "px");
+        }
+        */
+
         $("canvas").remove();
         imageFiltered = {};
 
@@ -193,12 +200,6 @@ $(function() {
     // -------------------------------------------------------------------------
     // COMMENT
 
-    $("#comment-input").typeWatch({
-        callback: function(e) { setCommentSubmitButton(); },
-        wait: 0,
-        captureLength: 0
-    });
-
     $("#comment-modal input").keyup(function(e) {
         if (e.keyCode == 13 && !$("#comment-submit").attr("disabled")) {
             $("#comment-submit").click();
@@ -239,6 +240,8 @@ $(function() {
     if (!isLoggedIn()) {
         // $("body").css({"background-color":"#ffdddd"});
     }
+
+    $(window).resize();
 
 
 });

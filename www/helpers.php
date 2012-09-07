@@ -518,7 +518,7 @@ function get_album_info($album_id) {
 
     if ($row = mysql_fetch_assoc($result)) {
 
-        $inner_query = "SELECT id FROM AlbumPhotos WHERE album_id='$album_id'";
+        $inner_query = "SELECT id FROM AlbumPhotos WHERE album_id='$album_id' ORDER BY AlbumPhotos.created DESC";
         $inner_result = mysql_query($inner_query, $con);
         if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 

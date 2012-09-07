@@ -85,7 +85,7 @@ function showCaptionModal(albumphotoID, albumphotoOwnerID, albumphotoS3) {
 }
 
 
-function showCommentsModal(albumphotoID, s3) {
+function showCommentsModal(albumphotoID, s3, imageURL) {
 
     $("#comment-input").val("");
     $("#comments").html("Loading comments...");
@@ -236,7 +236,6 @@ function submitComment() {
                 reloadComments(albumphotoID);
                 $("#comment-input").val("");
                 $("#comment-submit").button("reset");
-                setCommentSubmitButton();
 
             } else {
                 alert(data);
@@ -245,6 +244,51 @@ function submitComment() {
         async: true
     });
 }
+
+
+function submitCommentOneUp() {
+
+    $("#one-up-comment-submit").button("loading");
+
+    var albumphotoID = parseInt($('#one-up-photo').attr("albumphoto-id"));
+    var albumphotoS3 = $('#one-up-photo').attr("albumphoto-s3");
+    var comment = $("#one-up-comment-input").val();
+
+    jQuery.ajax({
+        type: 'POST',
+        url: "/add_comment.php",
+        data: {
+            "albumphoto_id": albumphotoID,
+            "comment": comment,
+            "token": gUser["token"],
+            "commenter_id": gUser["id"],
+            "album_id": gAlbum["id"],
+            "album_owner_id": gAlbum["user_id"],
+            "album_owner_username": gAlbum["username"],
+            "album_handle": gAlbum["handle"],
+            "commenter_username": gUser["username"],
+            "albumphoto_s3": albumphotoS3
+        },
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                // need to reload comment stream
+
+                reloadCommentsOneUp(albumphotoID);
+                $("#one-up-comment-input").val("");
+                $("#one-up-comment-submit").button("reset");
+
+            } else {
+                alert(data);
+            }
+        },
+        async: true
+    });
+}
+
+
+
+
+
 
 
 function reloadComments(albumphotoID, userID) {
@@ -272,6 +316,23 @@ function reloadComments(albumphotoID, userID) {
 }
 
 
+function reloadCommentsOneUp(albumphotoID, userID) {
+    var urlString = "/get_comments_json.php?albumphoto_id=" + albumphotoID + "&user_id=" + gUser["id"] + "&token=" + gUser["token"];
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            var commentsArray = JSON.parse(data);
+            var html = getCommentsHTML(commentsArray, albumphotoID);
+            $("#one-up-comments").html(html);
+
+        },
+        async: true
+    });
+}
+
+
 function toggleLikeComment(commentID, commenterID, albumphotoID) {
 
     jQuery.ajax({
@@ -279,34 +340,34 @@ function toggleLikeComment(commentID, commenterID, albumphotoID) {
         url: "/toggle_like_comment.php",
         data: {
             "comment_id": commentID,
-	    "comment": $("#comment-text-"+commentID).html(),
+            "comment": $("#comment-text-" + commentID).html(),
             "albumphoto_id": albumphotoID,
             "album_id": gAlbum["id"],
             "commenter_id": commenterID,
             "liker_id": gUser["id"],
             "liker_username": gUser["username"],
             "token": gUser["token"],
-            "old_like_value": $("#comment-like-"+commentID).attr("liked"),
-            "albumphoto_owner_id": $("#image-"+albumphotoID).attr("owner-id"),
+            "old_like_value": $("#comment-like-" + commentID).attr("liked"),
+            "albumphoto_owner_id": $("#image-" + albumphotoID).attr("owner-id"),
             "album_handle": gAlbum["handle"],
-            "albumphoto_s3": $('#comment-modal').attr("albumphoto-s3")
+            "albumphoto_s3": $("#image-" + albumphotoID).attr("albumphoto-s3")
         },
         success: function(data) {
             if (parseInt(data) == 1) {
                 var likeCount = parseInt($("#comment-like-count-" + commentID).html());
-        if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
-            $("#comment-like-"+commentID).attr("class", "icon-heart heart-gray no-underline");
-            $("#comment-like-"+commentID).attr("liked", 0);
+                if (parseInt($("#comment-like-"+commentID).attr("liked")) == 1) {
+                    $("#comment-like-" + commentID).attr("class", "icon-heart heart-gray no-underline");
+                    $("#comment-like-" + commentID).attr("liked", 0);
                     $("#comment-like-count-" + commentID).html(likeCount - 1);
-            if (likeCount - 1 == 0) {
-                $("#comment-like-count-" + commentID).hide();
-            }
-        } else {
-            $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
-            $("#comment-like-"+commentID).attr("liked", 1);
+                    if (likeCount - 1 == 0) {
+                        $("#comment-like-count-" + commentID).hide();
+                    }
+                } else {
+                    $("#comment-like-"+commentID).attr("class", "icon-heart heart-red no-underline");
+                    $("#comment-like-"+commentID).attr("liked", 1);
                     $("#comment-like-count-" + commentID).html(likeCount + 1);
                     $("#comment-like-count-" + commentID).show();
-        }
+                }
             } else {
                 alert(data);
             }
@@ -497,11 +558,11 @@ function submitCaption() {
             "caption": caption,
             "token": gAlbum["token"],
             "album_id": gAlbum["id"],
-        "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
-        "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
-        "album_handle": $('#caption-modal').attr("album-handle"),
-        "albumphoto_owner_id": $('#caption-modal').attr("albumphoto-owner-id"),
-        "albumphoto_s3": $('#caption-modal').attr("albumphoto-s3")
+            "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
+            "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
+            "album_handle": $('#caption-modal').attr("album-handle"),
+            "albumphoto_owner_id": $('#caption-modal').attr("albumphoto-owner-id"),
+            "albumphoto_s3": $('#caption-modal').attr("albumphoto-s3")
         },
         success: function(data) {
             if (parseInt(data) == 1) {
@@ -625,15 +686,6 @@ function submitSignup() {
 ////////////////////////////////////////////////////////////////////////////////
 // SET MODAL BUTTONS
 ////////////////////////////////////////////////////////////////////////////////
-
-function setCommentSubmitButton() {
-    $("#comment-submit").attr("disabled", true);
-    if ($("#comment-input").val() != "") {
-        $("#comment-submit").removeAttr("disabled");
-    } else {
-        $("#comment-submit").attr("disabled", true);
-    }
-}
 
 function setSignupSubmitButton() {
     debug("setSignupSubmitButton called");
@@ -813,24 +865,18 @@ function checkUsernameIsUnique(prefix) {
 
 
 
-function rotatePhoto(clockwise, albumphotoID, albumID, albumphotoToken, s3Handle) {
-    $("#cover-message-"+albumphotoID).html("Rotating...");
-    $("#cover-" + albumphotoID).fadeIn();
 
-    jQuery.ajax({
-        type: "GET",
-        url: "/rotate_photo.php?clockwise="+clockwise+"&albumphoto_id="+albumphotoID+"&album_id="+albumID+"&albumphoto_token="+albumphotoToken + "&s3_handle=" + s3Handle,
-        success: function(data) {
-	    if (parseInt(data) == 1) {
-		$("#cover-"+albumphotoID).fadeOut();
-		$("#image-"+albumphotoID).attr("src", $("#image-"+albumphotoID).attr("src") + "?" + new Date().getTime());
-	    } else {
-		alert("Error rotating image");
-	    }
-        },
-        async: true
-    });
-}
+
+
+
+
+
+
+
+
+
+
+
 
 
 function resetPhotoToOriginal(albumphotoID, croppedOriginalSrc, bigOriginalSrc) {
@@ -851,7 +897,6 @@ function applyFilter(albumphotoID, imageProxySrc, filter) {
 function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigOriginalSrc) {
     if (imageFiltered.hasOwnProperty(albumphotoID)) {
 
-        $("#cover-message-" + albumphotoID).html("Saving...");
         $("#cover-" + albumphotoID).fadeIn();
 
         if (imageFiltered[albumphotoID] == 0) {
