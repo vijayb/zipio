@@ -235,6 +235,16 @@ HTML;
         </div>
 HTML;
 
+    if (isset($albumphotos_array[$i]["latitude"]) && $albumphotos_array[$i]["longitude"]) {
+        $html .= <<<HTML
+        <div id="map-marker-{$albumphoto_id}" class="map-marker">
+            <a href="javascript:void(0)" class="no-underline" onclick="showMapModal({$albumphotos_array[$i]["latitude"]},{$albumphotos_array[$i]["longitude"]});">
+                 <i id="map-marker-open-{$albumphoto_id}" class="icon-map-marker"></i>
+            </a>
+        </div> 
+HTML;
+}
+
 
     // If there IS a caption -------------------------------------------------//
 

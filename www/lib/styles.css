@@ -44,6 +44,16 @@ body {
     font-size:26px;
 }
 
+.map-marker {
+    background: rgba(0, 0, 0, 0.9);
+    position: absolute;
+    top: 80px;
+    right: 0px;
+    padding: 6px;
+    color: #ffffff;
+    font-size:26px;
+}
+
 .red-heart {
     color: red;
     text-decoration: none;

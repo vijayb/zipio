@@ -621,6 +621,8 @@ function get_albumphoto_info($albumphoto_id) {
                 filtered,
                 caption,
                 s3_url,
+                latitude,
+                longitude,
                 AlbumPhotos.created
               FROM AlbumPhotos
               LEFT JOIN Photos
