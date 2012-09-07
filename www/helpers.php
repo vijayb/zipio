@@ -255,15 +255,24 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
     $exif = exif_read_data($path_to_photo);
 
-    $orientation = $exif['Orientation'];
+    $lat = "";
+    $lng = "";
 
-    switch($orientation) {
-        case 6:
+    if (extractLatLong($exif, $lat, $lng)) {
+        print_r("Got lat/lng!!!".$lat.":".$lng);
+    } else {
+        print_r("failed to get lat /lng :(");
+    }
+
+    if (isset($exif['Orientation'])) {
+        switch($exif['Orientation']) {
+            case 6:
             $image->rotateImage(new ImagickPixel('none'), 90);
             break;
-        case 8:
-           $image->rotateImage(new ImagickPixel('none'), -90);
+            case 8:
+            $image->rotateImage(new ImagickPixel('none'), -90);
             break;
+        }
     }
 
     $image->stripImage();
@@ -317,17 +326,25 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
 
 
     if (!$failed) {
+        $lat_lng_key = "";
+        $lat_lng_val = "";
+        if ($lat != "" && $lng != "") {
+            $lat_lng_key = "latitude,longitude,";
+            $lat_lng_val = $lat.",".$lng.",";
+        }
         $query = "INSERT INTO Photos (
                     user_id,
                     s3_url,
                     width,
                     height,
+                    $lat_lng_key
                     mime_type
                   ) VALUES (
                     '$owner_user_id',
                     '$s3_base_image_url',
                     " . $big_image->getImageWidth() . ",
                     " . $big_image->getImageHeight() . ",
+                    $lat_lng_val
                     'image/jpeg'
                   ) ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
@@ -845,6 +862,43 @@ function opticrop($img, $w, $h, $out) {
     return 0;
 }
 
+
+
+function extractLatLong($exif, &$lat, &$lng) {
+    if (isset($exif["GPSLongitude"]) && 
+        isset($exif["GPSLongitudeRef"]) && 
+        isset($exif["GPSLatitude"]) && 
+        isset($exif["GPSLatitudeRef"]))
+    {
+        $lat = getGps($exif["GPSLatitude"], $exif['GPSLatitudeRef']);
+        $lng = getGps($exif["GPSLongitude"], $exif['GPSLongitudeRef']);
+        return 1;        
+    }
+
+    return 0;
+}
+
+function getGps($exifCoord, $hemi) {
+    $degrees = count($exifCoord) > 0 ? gps2Num($exifCoord[0]) : 0;
+    $minutes = count($exifCoord) > 1 ? gps2Num($exifCoord[1]) : 0;
+    $seconds = count($exifCoord) > 2 ? gps2Num($exifCoord[2]) : 0;
+
+    $flip = ($hemi == 'W' or $hemi == 'S') ? -1 : 1;
+
+    return $flip * ($degrees + $minutes / 60 + $seconds / 3600);
+}
+
+function gps2Num($coordPart) {
+    $parts = explode('/', $coordPart);
+
+    if (count($parts) <= 0)
+        return 0;
+
+    if (count($parts) == 1)
+        return $parts[0];
+
+    return floatval($parts[0]) / floatval($parts[1]);
+}
 
 
 ?>
