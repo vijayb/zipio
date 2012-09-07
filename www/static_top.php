@@ -352,6 +352,20 @@ window.fbAsyncInit = function() {
 
 <!-- ----------------------------------------------------------------------- -->
 
+<div class="modal hide" id="map-modal">
+
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">×</button>
+        <h2>This is where the photo was taken</h2>
+    </div>
+
+    <div class="modal-body" id="map-modal-body">
+        <img id="map-canvas" style="width:100%">
+    </div>
+</div>
+
+<!-- ----------------------------------------------------------------------- -->
+
 <div class="modal hide" id="login-modal">
 
     <div class="modal-header">

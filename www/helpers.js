@@ -1,11 +1,20 @@
 var imageFiltered = {};
-
+var map;
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // SHOW MODALS
 ////////////////////////////////////////////////////////////////////////////////
 
+function showMapModal(lat, lng) {
+    $(".modal").modal('hide');
+
+    $('#map-modal').modal('show');
+    var width = $('#map-modal').width();
+    var height = 300;
+    $("#map-canvas").attr("src", "http://maps.googleapis.com/maps/api/staticmap?center="+lat+","+lng+
+        "&zoom=14&size="+width+"x"+height+"&maptype=roadmap&markers=color:red%7Clabel:S%7C"+lat+","+lng+"&sensor=false");
+}
 
 function showSignupModal() {
     $('#signup-modal').modal('show');
