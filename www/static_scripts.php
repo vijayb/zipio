@@ -17,7 +17,7 @@
 <script src="/bootstrap/js/bootstrap-popover.js"></script>
 
 
-<script src="http://maps.google.com/maps/api/js?sensor=false&callback=initialize"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <!--
 <script src="/bootstrap/js/bootstrap-collapse.js"></script>
 <script src="/bootstrap/js/bootstrap-scrollspy.js"></script>

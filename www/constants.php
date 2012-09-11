@@ -25,19 +25,11 @@ if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com
     $g_debug = 1;
     $g_zipio = "zipiyo";
     $g_Zipio = "Zipiyo";
-
-    if ($_SERVER["HTTP_HOST"] == "zipiyo.com") {
-        $g_database_to_use = "TEST";
-    } else if ($_SERVER["HTTP_HOST"] == "localhost") {
-        $g_database_to_use = "LOCAL";
-    }
-
     $g_fb_app_id = "255929901188660";
 } else {
     $g_debug = 0;
     $g_zipio = "zipio";
     $g_Zipio = "Zipio";
-    $g_database_to_use = "PROD";
     $g_fb_app_id = "457795117571468";
 }
 

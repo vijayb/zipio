@@ -1,4 +1,4 @@
-<?php
+    <?php
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 require("static_supertop.php");
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -54,7 +54,7 @@ if ($g_debug) {
 }
 
     $page_title = <<<HTML
-        <b>{$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com</b> <!-- <i class="icon-info-sign big-icon"></i> -->
+        {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = "To add photos, email them to the above address";
@@ -238,7 +238,7 @@ HTML;
             <a href="javascript:void(0)" class="no-underline" onclick="showMapModal({$albumphotos_array[$i]["latitude"]},{$albumphotos_array[$i]["longitude"]});">
                  <i id="map-marker-open-{$albumphoto_id}" class="icon-map-marker"></i>
             </a>
-        </div> 
+        </div>
 HTML;
 }
 
