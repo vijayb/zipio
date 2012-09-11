@@ -874,18 +874,24 @@ function checkUsernameIsUnique(prefix) {
 
 
 
+function rotatePhoto(clockwise, albumphotoID, albumID, albumphotoToken, s3Handle) {
+    $("#cover-message-"+albumphotoID).html("Rotating...");
+    $("#cover-" + albumphotoID).fadeIn();
 
-
-
-
-
-
-
-
-
-
-
-
+    jQuery.ajax({
+        type: "GET",
+        url: "/rotate_photo.php?clockwise="+clockwise+"&albumphoto_id="+albumphotoID+"&album_id="+albumID+"&albumphoto_token="+albumphotoToken + "&s3_handle=" + s3Handle,
+        success: function(data) {
+	    if (parseInt(data) == 1) {
+		$("#cover-"+albumphotoID).fadeOut();
+		$("#image-"+albumphotoID).attr("src", $("#image-"+albumphotoID).attr("src") + "?" + new Date().getTime());
+	    } else {
+		alert("Error rotating image");
+	    }
+        },
+        async: true
+    });
+}
 
 
 function resetPhotoToOriginal(albumphotoID, croppedOriginalSrc, bigOriginalSrc) {
@@ -906,6 +912,7 @@ function applyFilter(albumphotoID, imageProxySrc, filter) {
 function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigOriginalSrc) {
     if (imageFiltered.hasOwnProperty(albumphotoID)) {
 
+        $("#cover-message-" + albumphotoID).html("Saving...");
         $("#cover-" + albumphotoID).fadeIn();
 
         if (imageFiltered[albumphotoID] == 0) {

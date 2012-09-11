@@ -110,17 +110,21 @@ $html = <<<HTML
         <div style="overflow:hidden">
             <div style="float:left">
                 <a href="/one_up.php?albumphoto_id={$prev_albumphoto_id}" class="no-underline">
-                    <i class="icon-arrow-left"></i> <img style="height:50px; width:50px" src="{$g_s3_root}/{$prev_albumphoto_info["s3_url"]}_cropped{$prev_is_filtered}"></a>
+                    <i class="icon-caret-left"></i> <img style="height:50px; width:50px" src="{$g_s3_root}/{$prev_albumphoto_info["s3_url"]}_cropped{$prev_is_filtered}"></a>
             </div>
             <div style="float:right">
                 <a href="/one_up.php?albumphoto_id={$next_albumphoto_id}" class="no-underline">
-                    <img style="height:50px; width:50px" src="{$g_s3_root}/{$next_albumphoto_info["s3_url"]}_cropped{$next_is_filtered}"> <i class="icon-arrow-right"></i></a>
+                    <img style="height:50px; width:50px" src="{$g_s3_root}/{$next_albumphoto_info["s3_url"]}_cropped{$next_is_filtered}"> <i class="icon-caret-right"></i></a>
             </div>
         </div>
 HTML;
 
     $html .= <<<HTML
-        <div id="one-up-comments" style="clear:both; margin-top:10px;">
+        <div style="clear:both; margin-top:20px;">
+            <h3 style="margin-top:0px;">Comments</h3>
+            <div id="one-up-comments">
+                <span style="color:#999999">No comments yet. Be the first!</span>
+            </div>
         </div>
 HTML;
 

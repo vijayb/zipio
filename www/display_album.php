@@ -288,7 +288,7 @@ HTML;
 
     $html .= <<<HTML
             <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
-                <span style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
+                <span id="cover-message-{$albumphoto_id}" style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
             </div>
 
         </div>
@@ -343,10 +343,23 @@ HTML;
                     <ul class="dropdown-menu pull-right">
 
                         <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(0, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-undo"></i> Rotate left
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(1, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-repeat"></i> Rotate right
+                            </a>
+                        </li>
+
+                        <li>
                             <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}');">
                                 <i class="icon-picture"></i> Set as album cover
                             </a>
                         </li>
+
 
                         <li>
                             <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
