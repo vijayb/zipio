@@ -53,8 +53,8 @@ if ($g_debug) {
     print("<!-- is_owner: $is_owner -->\n");
 }
 
-    $page_title = <<<HTML
-        {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
+$page_title = <<<HTML
+    {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = "To add photos, email them to the above address";
