@@ -128,7 +128,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
             <div style="position:relative">
 
-                <a href="/one_up.php?albumphoto_id={$albumphoto_id}">
+                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$albumphoto_id}">
 
                     <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}" albumphoto-s3="{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}">
 
