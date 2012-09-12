@@ -1,4 +1,4 @@
-<?php
+    <?php
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 require("static_supertop.php");
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -32,7 +32,7 @@ if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
     $albumphoto_likes_info = get_albumphoto_likes_info($user_id, $album_info["id"]);
 } else {
-  $albumphotos_likes_info = array();
+    $albumphotos_likes_info = array();
 }
 
 $is_owner = 0;
@@ -54,7 +54,7 @@ if ($g_debug) {
 }
 
     $page_title = <<<HTML
-        <b>{$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com</b> <!-- <i class="icon-info-sign big-icon"></i> -->
+        {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = "To add photos, email them to the above address";
@@ -132,7 +132,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
                     <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}" albumphoto-s3="{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}">
 
-                    <div class="album-privacy">
+                    <div class="albumphoto-owner">
                         by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                     </div>
 
@@ -185,14 +185,14 @@ HTML;
         $fancybox_image_to_show = $index_of_albumphoto_in_album;
     }
 
-    $display_like_count = "";
+    $display_comment_count = "";
     if ($albumphotos_array[$i]["num_comments"] == 0) {
-        $display_like_count = "style='display:none'";
+        $display_comment_count = "style='display:none'";
     }
 
     $html .= <<<HTML
             <div class="comment-count">
-                <span id="comment-count-{$albumphoto_id}" $display_like_count class="count-number">
+                <span id="comment-count-{$albumphoto_id}" $display_comment_count class="count-number">
                     {$albumphotos_array[$i]["num_comments"]}
                 </span>
                 <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}', '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}');">
@@ -238,7 +238,7 @@ HTML;
             <a href="javascript:void(0)" class="no-underline" onclick="showMapModal({$albumphotos_array[$i]["latitude"]},{$albumphotos_array[$i]["longitude"]});">
                  <i id="map-marker-open-{$albumphoto_id}" class="icon-map-marker"></i>
             </a>
-        </div> 
+        </div>
 HTML;
 }
 
@@ -288,7 +288,7 @@ HTML;
 
     $html .= <<<HTML
             <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
-                <span style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
+                <span id="cover-message-{$albumphoto_id}" style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
             </div>
 
         </div>
@@ -343,10 +343,23 @@ HTML;
                     <ul class="dropdown-menu pull-right">
 
                         <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(0, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-undo"></i> Rotate left
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(1, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-repeat"></i> Rotate right
+                            </a>
+                        </li>
+
+                        <li>
                             <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}');">
                                 <i class="icon-picture"></i> Set as album cover
                             </a>
                         </li>
+
 
                         <li>
                             <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {

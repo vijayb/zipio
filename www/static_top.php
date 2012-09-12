@@ -16,23 +16,24 @@
 <link href="/lib/fonts.css" rel="stylesheet" />
 
 
-<!--
-Run the following from the zipio directory:
-rm www/lib/bootstrap.css; lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
-rm www/lib/bootstrap-responsive.css; lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
--->
-<!--
+
+
+
+
+
+
+
+
+
 
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
--->
 
-
-
+<!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
 <link rel="stylesheet/less" href="/bootstrap/less/responsive.less" media="all" />
 <script src="/lib/less-1.3.0.min.js"></script>
-
+-->
 
 
 
@@ -129,7 +130,7 @@ HTML;
 
     $logged_in_status = <<<HTML
         <ul class="nav pull-right">
-            <li><a href="javascript:void(0);" onclick="showLoginModal();">Login</a></li>
+            <li><a href="javascript:void(0);" onclick="showLoginModal();">Log in</a></li>
         </ul>
 HTML;
 
@@ -378,7 +379,6 @@ window.fbAsyncInit = function() {
 
     <div class="modal-body">
         <div class="alert fade in alert-error" id="login-error" style="display:none;">
-            <button type="button" class="close">×</button>
             <span id="login-error-message"></span>
         </div>
 
@@ -591,7 +591,7 @@ window.fbAsyncInit = function() {
 
 <div class="navbar navbar-fixed-top <? if ($g_debug) { print('navbar-inverse'); } ?>">
     <div class="navbar-inner" style="background-color:initial">
-        <div class="container">
+        <div class="container<?php print($is_fluid); ?>">
 
             <a class="brand" href="/<? if (is_logged_in()) { print($_SESSION["user_info"]["username"]); } ?>">
                 <?php print($brand_name); ?>
@@ -607,47 +607,6 @@ window.fbAsyncInit = function() {
         <button class="btn btn-primary" href="#" onclick="FB.login();">Find them with Facebook</button>
     </div>
 </div>
-
-
-
-
-<div class="navbar navbar-fixed-bottom" style="z-index:-1000">
-
-
-
-<?php
-/*
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-if ($g_debug) {
-
-    $html = <<<HTML
-    <div style="color:#999999; font-weight:700; text-align:center; font-size:20px; padding:10px;">
-        DB: {$g_database_to_use} - zipio: {$g_zipio}/{$g_Zipio}
-    </div>
-HTML;
-    print($html);
-
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-*/
-?>
-
-</div>
-
-
-
-
-
-
 
 
 

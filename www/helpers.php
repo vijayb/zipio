@@ -535,7 +535,7 @@ function get_album_info($album_id) {
 
     if ($row = mysql_fetch_assoc($result)) {
 
-        $inner_query = "SELECT id FROM AlbumPhotos WHERE album_id='$album_id' ORDER BY AlbumPhotos.created DESC";
+        $inner_query = "SELECT id FROM AlbumPhotos WHERE album_id='$album_id' AND visible='1' ORDER BY AlbumPhotos.created DESC";
         $inner_result = mysql_query($inner_query, $con);
         if (!$inner_result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -595,6 +595,7 @@ function get_albumphotos_info($album_id) {
     $query = "SELECT id
               FROM AlbumPhotos
               WHERE album_id='$album_id'
+              AND visible='1'
               ORDER BY AlbumPhotos.created DESC
               ";
     $result = mysql_query($query, $con);
@@ -681,8 +682,8 @@ function get_albumphoto_likes_info($user_id, $album_id) {
     global $con;
 
     $query = "SELECT albumphoto_id, photo_owner_id
-             FROM AlbumPhotoLikes
-             WHERE album_id='$album_id' and liker_id='$user_id'";
+              FROM AlbumPhotoLikes
+              WHERE album_id='$album_id' AND liker_id='$user_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
@@ -907,14 +908,14 @@ function opticrop($img, $w, $h, $out) {
 
 
 function extractLatLong($exif, &$lat, &$lng) {
-    if (isset($exif["GPSLongitude"]) && 
-        isset($exif["GPSLongitudeRef"]) && 
-        isset($exif["GPSLatitude"]) && 
+    if (isset($exif["GPSLongitude"]) &&
+        isset($exif["GPSLongitudeRef"]) &&
+        isset($exif["GPSLatitude"]) &&
         isset($exif["GPSLatitudeRef"]))
     {
         $lat = getGps($exif["GPSLatitude"], $exif['GPSLatitudeRef']);
         $lng = getGps($exif["GPSLongitude"], $exif['GPSLongitudeRef']);
-        return 1;        
+        return 1;
     }
 
     return 0;
