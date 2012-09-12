@@ -56,6 +56,10 @@ $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
 
 
+// Now add the event for creating the comment!
+$comment_id = mysql_insert_id();
+add_event($commenter_id, ACTION_ADD_COMMENT, $album_id, $albumphoto_id, $comment_id);
+
 $collaborators_array = get_collaborators_info($album_id);
 
 for ($i = 0; $i < count($collaborators_array); $i++) {

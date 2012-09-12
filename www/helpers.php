@@ -745,6 +745,46 @@ function update_data($table, $id, $key_values) {
 }
 
 
+function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_id) {
+    global $con;
+
+    if (isset($comment_id)) {
+        $object_id = $comment_id;
+    } else if (isset($albumphoto_id)) {
+        $object_id = $albumphoto_id;
+    } else if (isset($album_id)) {
+        $object_id = $album_id;
+    } else {
+        print_r("ERROR no valid object was defined");
+        exit();
+    }
+
+    $keys = "actor_id, action_type, object_id";
+    $values = "$actor_id, $action_type, $object_id";
+
+    if (isset($comment_id)) {
+        $keys .= ",comment_id";
+        $values .= ",$comment_id";
+    }
+    if (isset($albumphoto_id)) {
+        $keys .= ",albumphoto_id";
+        $values .= ",$albumphoto_id";
+    }
+    if (isset($album_id)) {
+        $keys .= ",album_id";
+        $values .= ",$album_id";
+    }
+
+    $query = "INSERT INTO Events ($keys) values ($values) ON DUPLICATE KEY UPDATE id=id";
+
+    $result = mysql_query($query, $con);
+
+    if (!$result) {
+        die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+    }
+}
+
+
 
 // Input is an imagemagick image. $w/$h are the dimensions of the desired
 // cropped image, and $out is where the cropped image will be written.

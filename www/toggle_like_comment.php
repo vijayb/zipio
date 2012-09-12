@@ -45,6 +45,7 @@ if (!check_token($liker_id, $token, "Users")) {
 }
 
 if ($old_like_value == "0") {
+    add_event($liker_id, ACTION_LIKE_COMMENT, $album_id, $albumphoto_id, $comment_id);
     $query ="INSERT INTO CommentLikes (
               comment_id,
               albumphoto_id,

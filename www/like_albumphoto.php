@@ -38,6 +38,8 @@ if (!check_token($liker_id, $token, "Users")) {
 }
 
 if ($old_like_value == "0") {
+    add_event($liker_id, ACTION_LIKE_ALBUMPHOTO, $album_id, $albumphoto_id, NULL);
+    
     $query ="INSERT INTO AlbumPhotoLikes (
               albumphoto_id,
               album_id,
@@ -59,6 +61,7 @@ if ($old_like_value == "0") {
     exit();
 }
 
+
 // Now, let's email the albumphoto owner and album owner about the like
 
 $albumphoto_owner_info = get_user_info($albumphoto_owner_id);
@@ -75,6 +78,8 @@ if ($albumphoto_owner_id != $liker_id) {
 if ($album_owner_info["id"] != $liker_id && $albumphoto_owner_id != $album_owner_info["id"]) {
     array_push($users_to_be_emailed, $album_owner_info);
 }
+
+
 
 
 for ($i = 0; $i < count($users_to_be_emailed); $i++) {
