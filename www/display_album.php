@@ -32,7 +32,7 @@ if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
     $albumphoto_likes_info = get_albumphoto_likes_info($user_id, $album_info["id"]);
 } else {
-  $albumphotos_likes_info = array();
+    $albumphotos_likes_info = array();
 }
 
 $is_owner = 0;
@@ -132,7 +132,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
                     <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}" albumphoto-s3="{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}">
 
-                    <div class="album-privacy">
+                    <div class="albumphoto-owner">
                         by <b>{$photo_owners[$albumphotos_array[$i]["photo_owner_id"]]["username"]}</b>
                     </div>
 
@@ -185,14 +185,14 @@ HTML;
         $fancybox_image_to_show = $index_of_albumphoto_in_album;
     }
 
-    $display_like_count = "";
+    $display_comment_count = "";
     if ($albumphotos_array[$i]["num_comments"] == 0) {
-        $display_like_count = "style='display:none'";
+        $display_comment_count = "style='display:none'";
     }
 
     $html .= <<<HTML
             <div class="comment-count">
-                <span id="comment-count-{$albumphoto_id}" $display_like_count class="count-number">
+                <span id="comment-count-{$albumphoto_id}" $display_comment_count class="count-number">
                     {$albumphotos_array[$i]["num_comments"]}
                 </span>
                 <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}', '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}');">

@@ -4,7 +4,10 @@
 
 BEFORE PUSHING:
 
-- Compile LESS and use static CSS in static_top.php (if you need to)
+Run the following from the zipio directory (download less first):
+rm www/lib/bootstrap.css; ~/less/bin/lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
+rm www/lib/bootstrap-responsive.css; ~/less/bin/lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
+
 
 To delete the database:
 

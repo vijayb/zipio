@@ -875,19 +875,19 @@ function checkUsernameIsUnique(prefix) {
 
 
 function rotatePhoto(clockwise, albumphotoID, albumID, albumphotoToken, s3Handle) {
-    $("#cover-message-"+albumphotoID).html("Rotating...");
+    $("#cover-message-" + albumphotoID).html("Rotating...");
     $("#cover-" + albumphotoID).fadeIn();
 
     jQuery.ajax({
         type: "GET",
-        url: "/rotate_photo.php?clockwise="+clockwise+"&albumphoto_id="+albumphotoID+"&album_id="+albumID+"&albumphoto_token="+albumphotoToken + "&s3_handle=" + s3Handle,
+        url: "/rotate_photo.php?clockwise=" + clockwise + "&albumphoto_id=" + albumphotoID + "&album_id=" + albumID + "&albumphoto_token=" + albumphotoToken + "&s3_handle=" + s3Handle,
         success: function(data) {
-	    if (parseInt(data) == 1) {
-		$("#cover-"+albumphotoID).fadeOut();
-		$("#image-"+albumphotoID).attr("src", $("#image-"+albumphotoID).attr("src") + "?" + new Date().getTime());
-	    } else {
-		alert("Error rotating image");
-	    }
+            if (parseInt(data) == 1) {
+                $("#cover-" + albumphotoID).fadeOut();
+                $("#image-" + albumphotoID).attr("src", $("#image-"+albumphotoID).attr("src") + "?" + new Date().getTime());
+            } else {
+                alert("Error rotating image");
+            }
         },
         async: true
     });
@@ -1028,7 +1028,8 @@ function preload(arrayOfImages) {
 }
 
 function deletePhotoFromAlbum(albumPhotoID, token, s3) {
-    $("#albumphoto-" + albumPhotoID).fadeOut(300);
+    $("#albumphoto-" + albumPhotoID).fadeOut(500);
+    $("#image-" + albumPhotoID).fadeOut(500);
     var urlString = "/delete_photo_from_album.php?albumphoto_id=" + albumPhotoID +
                                                 "&token=" + token +
                                                 "&s3=" + s3;
@@ -1141,6 +1142,10 @@ function getAlert(alert) {
     } else if (alert == 8) {
         returnArr["title"] = "Welcome to Zipio! Here's your first album.";
         returnArr["text"]  = "Now, invite people to add their photos! Photos can be added by email, so there's no sign-up required. Click the blue \"Invite\" button below to add collaborators (we'll send them invites).";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 9) {
+        returnArr["title"] = "That photo was deleted.";
+        returnArr["text"]  = "";
         returnArr["class"] = "alert-success";
     }
 

@@ -16,16 +16,18 @@
 <link href="/lib/fonts.css" rel="stylesheet" />
 
 
-<!--
-Run the following from the zipio directory (download less first):
-rm www/lib/bootstrap.css; ~/less/bin/lessc www/bootstrap/less/bootstrap.less > www/lib/bootstrap.css
-rm www/lib/bootstrap-responsive.css; ~/less/bin/lessc www/bootstrap/less/responsive.less > www/lib/bootstrap-responsive.css
--->
+
+
+
+
+
+
+
+
 
 
 <link href="/lib/bootstrap.css" rel="stylesheet" />
 <link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
-
 
 <!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
