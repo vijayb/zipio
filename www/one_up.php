@@ -147,7 +147,7 @@ $html = <<<HTML
         <div class="albumphoto-owner">
             by <b>{$albumphoto_owner_info["username"]}</b>
         </div>
-        <div id="albumphoto-like-{$albumphoto_info['id']}" class="albumphoto-like" liked="{$liked}">
+        <div id="albumphoto-like-{$albumphoto_info['id']}" class="comment-count" liked="{$liked}">
             <a id="albumphoto-like-count-link-{$albumphoto_info['id']}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_info['id']});" {$display_like_count}>
                 <span id="albumphoto-like-count-{$albumphoto_info['id']}">{$albumphoto_info["num_likes"]}</span>
             </a>
@@ -155,6 +155,56 @@ $html = <<<HTML
                  <i id="albumphoto-like-heart-{$albumphoto_info['id']}" class="icon-heart $heart_class"></i>
             </a>
         </div>
+HTML;
+
+
+
+    // If there IS a caption -------------------------------------------------//
+
+    if (isset($albumphoto_info["caption"]) && $albumphoto_info["caption"] != "") {
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphoto_info["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphoto_info["id"]}, {$albumphoto_info["photo_owner_id"]}, '{$albumphoto_info["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                    &nbsp; <i class="icon-pencil"></i> Edit
+                </a>
+HTML;
+        }
+
+        $html .= <<<HTML
+            <div class="albumphoto-caption-always-visible" style="text-align:left;">
+                <span id="albumphoto-caption-{$albumphoto_info["id"]}">{$albumphoto_info["caption"]}</span>
+                {$edit_caption_string}
+            </div>
+HTML;
+    } else {
+
+    // If there is NO caption ------------------------------------------------//
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphoto_info["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphoto_info["id"]}, {$albumphoto_info["photo_owner_id"]}, '{$albumphoto_info["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                    <i class="icon-pencil"></i> Add a caption
+                </a>
+HTML;
+
+            $html .= <<<HTML
+            <div class="albumphoto-caption" style="text-align:left;">
+                <span id="albumphoto-caption-{$albumphoto_info["id"]}">{$albumphoto_info["caption"]}</span>
+                {$edit_caption_string}
+            </div>
+HTML;
+
+
+        }
+
+    }
+
+
+    $html .= <<<HTML
+
     </div>
 
     <div class="span4">

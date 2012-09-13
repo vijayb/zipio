@@ -298,7 +298,7 @@ HTML;
         $html .= <<<HTML
             <div style="position:relative; top:3px;">
 
-                <div rel="tooltip" title="Post to Facebook" class="btn ttip" onclick="showFacebookModal({$albumphoto_id});">
+                <div rel="tooltip" title="Post to Facebook" class="btn ttip" onclick="showFacebookModal('{$album_owner_info["username"]}', '{$album_info["handle"]}', {$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
 

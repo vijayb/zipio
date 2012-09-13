@@ -8,6 +8,7 @@ require("constants.php");
 require("db.php");
 require("helpers.php");
 
+
 check_request_and_cookie_for_login($_GET);
 
 ?>

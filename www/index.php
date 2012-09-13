@@ -10,6 +10,12 @@ require("static_supertop.php");
 ////////////////////////////////////////////////////////////////////////////////
 // Page-specific PHP goes here
 
+
+if (is_logged_in()) {
+    print("is logged in = true");
+}
+
+
 if (is_logged_in()) {
     header("Location: " . "/" . $_SESSION["user_info"]["username"]);
 }

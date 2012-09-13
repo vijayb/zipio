@@ -20,8 +20,8 @@ function login_user($user_id) {
 
     // Now set a login cookie
 
-    setcookie("user_id", $_SESSION["user_id"], time() + 1000000000, "/", "zipio.com");
-    setcookie("user_token", $_SESSION["user_info"]["token"], time() + 1000000000, "/", "zipio.com");
+    // setcookie("user_id", $_SESSION["user_id"], time() + 100000, "/");
+    // setcookie("user_token", $_SESSION["user_info"]["token"], time() + 100000, "/");
 }
 
 function is_logged_in() {
@@ -33,6 +33,7 @@ function is_logged_in() {
 }
 
 function check_request_and_cookie_for_login($_GET) {
+
     if (isset($_GET["request"])) {
         $request = decrypt_json($_GET["request"]);
         if (isset($request["user_id"])) {
@@ -43,7 +44,12 @@ function check_request_and_cookie_for_login($_GET) {
         }
     }
 
+    /*
+
+    Temporarily disabling cookie-based login because it was acting weird...
+
     if (!is_logged_in() && isset($_COOKIE["user_id"]) && isset($_COOKIE["user_token"])) {
+
         if (check_token($_COOKIE["user_id"], $_COOKIE["user_token"], "Users")) {
             login_user($_COOKIE["user_id"]);
             $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -51,6 +57,7 @@ function check_request_and_cookie_for_login($_GET) {
             return;
         }
     }
+    */
 }
 
 function rand_string($length) {
