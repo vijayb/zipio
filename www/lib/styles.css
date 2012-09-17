@@ -8,6 +8,10 @@ body {
     padding-bottom: 250px;
 }
 
+.gray {
+    color: #999;
+}
+
 .no-underline:hover {
     text-decoration: none;
 }

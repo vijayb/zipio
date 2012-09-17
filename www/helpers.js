@@ -2,6 +2,9 @@ var imageFiltered = {};
 var map;
 
 
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 // SHOW MODALS
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,13 +51,16 @@ function showInviteModal() {
     $("#invite-emails").val("").focus();
 }
 
-function showFacebookModal(albumphotoID) {
+function showFacebookModal(albumOwnerUsername, albumHandle, albumphotoID) {
 
     if (gFB["status"] == 1) {
 
         imageURL = $("#image-" + albumphotoID).attr("src");
 
-        $("#facebook-image").data("albumphotoID", albumphotoID);
+        $("#facebook-image").data("album-owner-username", albumOwnerUsername);
+        $("#facebook-image").data("album-handle", albumHandle);
+        $("#facebook-image").data("albumphoto-id", albumphotoID);
+
         $("#facebook-image").data("caption", $("#albumphoto-caption-" + albumphotoID).html());
 
         $(".modal").modal('hide');
@@ -921,7 +927,6 @@ function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigO
                 url: '/save_filtered.php?albumphoto_id=' + albumphotoID + '&reset_to_original',
                 sync: false,
                 success: function(data) {
-                    console.log(data);
                     $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
                     $("#save-" + albumphotoID).hide();
                     $("#cover-" + albumphotoID).fadeOut();
@@ -973,8 +978,11 @@ function postToFacebook() {
 
     var imageURL = $("#facebook-image").attr("src");
 
-    var albumphotoID = $("#facebook-image").data("albumphotoID");
-    var oneUpURL = $("#albumphoto-" + albumphotoID).attr("one-up-link");
+    var albumOwnerUsername = $("#facebook-image").data("album-owner-username");
+    var albumHandle = $("#facebook-image").data("album-handle");
+    var albumphotoID = $("#facebook-image").data("albumphoto-id");
+
+    var oneUpURL = "http://zipio.com/" + albumOwnerUsername + "/" + albumHandle + "/" + albumphotoID;
 
     var albumphotoCaption = $("#facebook-image").data("caption");
 

@@ -25,13 +25,27 @@ if (!isset($_GET["albumphoto_id"])) {
 ////////////////////////////////////////////////////////////////////////////////
 // Page-specific PHP goes here
 
+
+
 if (is_logged_in()) {
     $user_id = $_SESSION['user_id'];
     $albumphoto_likes_info = get_albumphoto_likes_info($user_id, $album_info["id"]);
 } else {
-  $albumphotos_likes_info = array();
+    $albumphotos_likes_info = array();
 }
 
+$is_owner = 0;
+$is_collaborator = 0;
+
+if (is_logged_in() && is_collaborator($_SESSION["user_id"], $album_info["id"])) {
+    $is_collaborator = 1;
+} else if (is_logged_in() && $album_info["user_id"] == $_SESSION["user_id"]) {
+    $is_owner = 1;
+}
+
+if ($album_info["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
+    goto_homepage();
+}
 
 if ($albumphoto_info["filtered"] > 0) {
     $is_filtered = "_filtered";
@@ -133,7 +147,7 @@ $html = <<<HTML
         <div class="albumphoto-owner">
             by <b>{$albumphoto_owner_info["username"]}</b>
         </div>
-        <div id="albumphoto-like-{$albumphoto_info['id']}" class="albumphoto-like" liked="{$liked}">
+        <div id="albumphoto-like-{$albumphoto_info['id']}" class="comment-count" liked="{$liked}">
             <a id="albumphoto-like-count-link-{$albumphoto_info['id']}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_info['id']});" {$display_like_count}>
                 <span id="albumphoto-like-count-{$albumphoto_info['id']}">{$albumphoto_info["num_likes"]}</span>
             </a>
@@ -141,16 +155,66 @@ $html = <<<HTML
                  <i id="albumphoto-like-heart-{$albumphoto_info['id']}" class="icon-heart $heart_class"></i>
             </a>
         </div>
+HTML;
+
+
+
+    // If there IS a caption -------------------------------------------------//
+
+    if (isset($albumphoto_info["caption"]) && $albumphoto_info["caption"] != "") {
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphoto_info["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphoto_info["id"]}, {$albumphoto_info["photo_owner_id"]}, '{$albumphoto_info["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                    &nbsp; <i class="icon-pencil"></i> Edit
+                </a>
+HTML;
+        }
+
+        $html .= <<<HTML
+            <div class="albumphoto-caption-always-visible" style="text-align:left;">
+                <span id="albumphoto-caption-{$albumphoto_info["id"]}">{$albumphoto_info["caption"]}</span>
+                {$edit_caption_string}
+            </div>
+HTML;
+    } else {
+
+    // If there is NO caption ------------------------------------------------//
+
+        $edit_caption_string = "";
+        if ($is_owner || $is_collaborator) {
+            $edit_caption_string = <<<HTML
+                <a id="add-caption-{$albumphoto_info["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphoto_info["id"]}, {$albumphoto_info["photo_owner_id"]}, '{$albumphoto_info["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                    <i class="icon-pencil"></i> Add a caption
+                </a>
+HTML;
+
+            $html .= <<<HTML
+            <div class="albumphoto-caption" style="text-align:left;">
+                <span id="albumphoto-caption-{$albumphoto_info["id"]}">{$albumphoto_info["caption"]}</span>
+                {$edit_caption_string}
+            </div>
+HTML;
+
+
+        }
+
+    }
+
+
+    $html .= <<<HTML
+
     </div>
 
     <div class="span4">
         <div class="well well-small" style="overflow:hidden">
             <div style="float:left">
-                <a href="/one_up.php?albumphoto_id={$prev_albumphoto_id}" class="no-underline" id="link-prev">
+                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$prev_albumphoto_id}" class="no-underline" id="link-prev">
                     <i class="icon-caret-left"></i> <img style="height:50px; width:50px" src="{$g_s3_root}/{$prev_albumphoto_info["s3_url"]}_cropped{$prev_is_filtered}"></a>
             </div>
             <div style="float:right">
-                <a href="/one_up.php?albumphoto_id={$next_albumphoto_id}" class="no-underline" id="link-next">
+                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$next_albumphoto_id}" class="no-underline" id="link-next">
                     <img style="height:50px; width:50px" src="{$g_s3_root}/{$next_albumphoto_info["s3_url"]}_cropped{$next_is_filtered}"> <i class="icon-caret-right"></i></a>
             </div>
         </div>

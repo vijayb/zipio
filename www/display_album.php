@@ -53,8 +53,8 @@ if ($g_debug) {
     print("<!-- is_owner: $is_owner -->\n");
 }
 
-    $page_title = <<<HTML
-        {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
+$page_title = <<<HTML
+    {$album_info["handle"]}@<a href="/{$album_owner_info["username"]}">{$album_owner_info["username"]}</a>.{$g_zipio}.com <!-- <i class="icon-info-sign big-icon"></i> -->
 HTML;
 
 $page_subtitle = "To add photos, email them to the above address";
@@ -128,7 +128,7 @@ for ($i = 0; $i < count($albumphotos_array); $i++) {
 
             <div style="position:relative">
 
-                <a href="/one_up.php?albumphoto_id={$albumphoto_id}">
+                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$albumphoto_id}">
 
                     <img class="albumphoto-image" id="image-{$albumphoto_id}" src='{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}' owner-id="{$albumphotos_array[$i]["photo_owner_id"]}" albumphoto-s3="{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}">
 
@@ -298,7 +298,7 @@ HTML;
         $html .= <<<HTML
             <div style="position:relative; top:3px;">
 
-                <div rel="tooltip" title="Post to Facebook" class="btn ttip" onclick="showFacebookModal({$albumphoto_id});">
+                <div rel="tooltip" title="Post to Facebook" class="btn ttip" onclick="showFacebookModal('{$album_owner_info["username"]}', '{$album_info["handle"]}', {$albumphoto_id});">
                     <i class="icon-facebook"></i>
                 </div>
 

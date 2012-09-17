@@ -39,31 +39,34 @@ $page_subtitle = "";
 $albums_array_where_owner = get_albums_info_where_owner($owner_id);
 $albums_array_where_collaborator = get_albums_info_where_collaborator($owner_id);
 
-$albums_to_display = array();
-array_push($albums_to_display, $albums_array_where_owner);
+$album_sets_to_display = array();
+array_push($album_sets_to_display, $albums_array_where_owner);
 
 if (is_logged_in() && $_SESSION["user_id"] == $owner_id) {
-    array_push($albums_to_display, $albums_array_where_collaborator);
+    array_push($album_sets_to_display, $albums_array_where_collaborator);
 }
 
 
 
-for ($k = 0; $k < count($albums_to_display); $k++) {
+for ($k = 0; $k < count($album_sets_to_display); $k++) {
 
-    $albums_array = $albums_to_display[$k];
+    $albums_array = $album_sets_to_display[$k];
 
 
     if ($k == 0) {
-        $section_title = "My albums";
+        $section_title = $owner_username . "'s albums";
+        if (is_logged_in() && $owner_id == $_SESSION["user_id"]) {
+            $section_title = "My albums";
+        }
     } else if ($k == 1) {
-        $section_title = "Others' albums";
+        $section_title = "Others' albums (where I'm a collaborator)";
     }
 
 
     $html = <<<HTML
     <div class="row">
 
-        <div class="span12" style="margin-bottom:20px">
+        <div class="span12" style="margin-bottom:15px">
             <h2>$section_title</h2>
         </div>
 
@@ -134,41 +137,45 @@ HTML;
 
         $html .= <<<HTML
         </div>
-
-        <!-- TILE END --------------------------------------------------------->
-        <!--------------------------------------------------------------------->
-
-
-
+        <!-- TILE END ------------------------------------------------------ -->
+        <!-- --------------------------------------------------------------- -->
 HTML;
 
     }
 
+    if (count($albums_array) == 0 && $k == 0) {
+        $html .= <<<HTML
+
+        <div class="span12">
+            <div class="well well-small">
+                <b>You have no albums of your own.</b> Send a photo to <i>&#60;album_name&#62;</i>@zipio.com to create one.
+            </div>
+        </div>
+HTML;
+
+    }
+
+    if (count($albums_array) == 0 && $k == 1) {
+        $html .= <<<HTML
+
+        <div class="span12">
+            asdsdfasda
+        </div>
+HTML;
+
+    }
+
+
     $html .= <<<HTML
     </div>
-
-
-
-
-
-
-
-
-
-
 HTML;
 
     print($html);
 
 }
-
-
-
-
-
-
-
 ?>
+
+
 </div>
 
 

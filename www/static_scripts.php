@@ -75,12 +75,6 @@ $(function() {
 
     $(window).resize(function() {
 
-        /*
-        if ($("#one-up-photo").length > 0) {
-            $("#one-up-photo").css("height", $(window).height() - $("#one-up-photo").offset().top - 20 + "px");
-        }
-        */
-
         $("canvas").remove();
         imageFiltered = {};
 
@@ -237,10 +231,8 @@ $(function() {
 
 
     // Clear the hash if there was one
-    window.location.hash = "";
-
-    if (!isLoggedIn()) {
-        // $("body").css({"background-color":"#ffdddd"});
+    if (/#/.test(window.location.href)) {
+        window.location.hash = "";
     }
 
     $(window).resize();
