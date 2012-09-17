@@ -587,27 +587,65 @@ window.fbAsyncInit = function() {
 
 
 
+<?php
+    require_once("helpers.php");
+
+    $alert_count = 0;
+    $show_alerts_style = "style=\"display: none;\"";
+    if (is_logged_in()) {
+        $alerts_array = get_events_array($_SESSION["user_info"]["id"]);
+        if (count($alerts_array) > 0) {
+            $alert_count = count($alerts_array);
+            $show_alerts_style = "";
+        }
+    }
 
 
-<div class="navbar navbar-fixed-top <? if ($g_debug) { print('navbar-inverse'); } ?>">
+$user_zipio_dir = "/";
+if (isset($_SESSION["user_info"]["username"])) {
+    $user_zipio_dir = "/".$_SESSION["user_info"]["username"];
+}
+$navbar_html = <<<HTML
+
+<div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner" style="background-color:initial">
-        <div class="container<?php print($is_fluid); ?>">
+        <div class="container{$is_fluid}">
 
-            <a class="brand" href="/<? if (is_logged_in()) { print($_SESSION["user_info"]["username"]); } ?>">
-                <?php print($brand_name); ?>
+
+            <div class="notifications notification-icon btn-group pull-right">
+                <a id="notification-icon" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="icon-bell"></i>
+                    <span class="notification-counter" id="notification-counter" {$show_alerts_style}>{$alert_count}</span>
+                </a>
+                <ul id="notification-items" class="dropdown-menu">
+                    <li class="divider"></li>
+                    <li id="notification-spinner"> </li>
+                    <li class="divider"></li>
+                    <li class="notification-button">See all notifications</li>
+                </ul>
+            </div>
+
+
+            <a class="brand" href="{$user_zipio_dir}">
+                {$brand_name}
             </a>
 
-            <?php print($logged_in_status); ?>
+            {$logged_in_status}
 
         </div>
     </div>
 
     <div id="fb-bar" style="display:none;">
-        <span class="highlight">People you know are already using <?php print($g_Zipio); ?>!</span>
+        <span class="highlight">People you know are already using {$g_Zipio}!</span>
         <button class="btn btn-primary" href="#" onclick="FB.login();">Find them with Facebook</button>
     </div>
 </div>
 
+HTML;
+
+echo $navbar_html
+
+?>
 
 
 

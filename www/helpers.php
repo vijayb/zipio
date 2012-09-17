@@ -785,7 +785,20 @@ function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_
     }
 }
 
+function get_events_array($user_id) {
+    global $con;
 
+    $query = "SELECT * FROM Events WHERE 1";
+
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $events_array = array();
+    while ($event = mysql_fetch_assoc($result)) {
+        array_push($events_array, $event);
+    }
+    return $events_array;
+}
 
 // Input is an imagemagick image. $w/$h are the dimensions of the desired
 // cropped image, and $out is where the cropped image will be written.
