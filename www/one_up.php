@@ -44,7 +44,7 @@ if (is_logged_in() && is_collaborator($_SESSION["user_id"], $album_info["id"])) 
 }
 
 if ($album_info["read_permissions"] == 1 && !($is_collaborator || $is_owner)) {
-    goto_homepage();
+    goto_homepage("");
 }
 
 if ($albumphoto_info["filtered"] > 0) {

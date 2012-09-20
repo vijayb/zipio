@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `Users` (
   `utm` varchar(255) NOT NULL,
   `session_id` varchar(255) NOT NULL,
   `session_created` datetime NOT NULL,
+  `last_notified` datetime NOT NULL,
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `subscribed` tinyint(1) NOT NULL DEFAULT '0',
   `last_emailed` datetime DEFAULT NULL,

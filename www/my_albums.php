@@ -106,7 +106,7 @@ HTML;
 
         <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
             <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
-                <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped{$is_filtered}'>
+                <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped{$is_filtered}' style="width:100%">
                 <div class="album-details"></div>
                 <div class="album-title">{$albums_array[$i]["handle"]}</div>
                 <div class="albumphoto-owner">{$upper_left}</div>

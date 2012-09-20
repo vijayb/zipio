@@ -28,11 +28,6 @@
 <script src="/bootstrap/js/bootstrap-typeahead.js"></script>
 -->
 
-<script src="/fancybox/jquery.fancybox.pack.js?v=2.0.6"></script>
-<script src="/fancybox/helpers/jquery.fancybox-thumbs.js?v=2.0.6"></script>
-
-
-
 
 <script>
 
@@ -72,6 +67,8 @@ $(function() {
     }
 
     ?>
+
+    pollNotifications();
 
     $(window).resize(function() {
 

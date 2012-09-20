@@ -96,11 +96,13 @@ if (mysql_num_rows($result) == 1) {
     $query = "INSERT INTO Users (
                 name,
                 email,
-                username
+                username,
+                last_notified
               ) VALUES (
                 '$name',
                 '$sender',
-                '$username'
+                '$username',
+                NOW()
               ) ON DUPLICATE KEY UPDATE last_seen=UTC_TIMESTAMP()";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());

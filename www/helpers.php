@@ -194,12 +194,14 @@ function create_user($name, $username, $password_hash, $email) {
                 name,
                 email,
                 username,
-                password_hash
+                password_hash,
+                last_notified
               ) VALUES (
                 '$name',
                 '$email',
                 '$username',
-                '$password_hash'
+                '$password_hash',
+                NOW()
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
@@ -376,6 +378,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
         $albumphoto_id = mysql_insert_id();
+        add_event($owner_user_id, ACTION_ADD_ALBUMPHOTO, $target_album_id, $albumphoto_id, NULL);
         return $albumphoto_id;
 
     } else {
@@ -473,6 +476,22 @@ function get_user_info($user_id) {
 
     if ($row = mysql_fetch_assoc($result)) {
         $row["token"] = calculate_token($row["id"], $row["created"]);
+        return $row;
+    } else {
+        return 0;
+    }
+}
+
+
+function get_comment_info($comment_id) {
+
+    global $con;
+
+    $query = "SELECT * FROM Comments WHERE id='$comment_id' LIMIT 1";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
         return $row;
     } else {
         return 0;
@@ -795,7 +814,17 @@ function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_
 function get_events_array($user_id) {
     global $con;
 
-    $query = "SELECT * FROM Events WHERE 1";
+    $query = "SELECT last_notified FROM Users WHERE id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $last_notified = $row["last_notified"];
+    } else {
+        exit();
+    }
+
+    $query = "SELECT * FROM Events WHERE 1 ORDER BY created DESC LIMIT 5 "; //created > '$last_notified'";
 
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -804,7 +833,27 @@ function get_events_array($user_id) {
     while ($event = mysql_fetch_assoc($result)) {
         array_push($events_array, $event);
     }
+
     return $events_array;
+}
+
+function update_last_notified($user_id) {
+    global $con;
+
+    $query = "SELECT last_notified FROM Users WHERE id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if ($row = mysql_fetch_assoc($result)) {
+        $last_notified = $row["last_notified"];
+    } else {
+        exit();
+    }
+
+
+    $query = "UPDATE Users SET last_notified=NOW() WHERE id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 }
 
 // Input is an imagemagick image. $w/$h are the dimensions of the desired

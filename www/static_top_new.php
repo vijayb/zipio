@@ -9,6 +9,9 @@
 
 
 
+<link href="/fancybox/helpers/jquery.fancybox-thumbs.css?v=2.0.6" rel="stylesheet" />
+<link href="/fancybox/jquery.fancybox.css?v=2.0.6" rel="stylesheet" media="screen" />
+
 <link href="/lib/styles.css" rel="stylesheet" />
 <link href="/lib/fonts.css" rel="stylesheet" />
 
@@ -609,16 +612,19 @@ $navbar_html = <<<HTML
     <div class="navbar-inner" style="background-color:initial">
         <div class="container{$is_fluid}">
 
-            <ul class="nav pull-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="showNotificationPanel();">
-                        <i class="icon-envelope-alt"></i>
-                        <span id="notification-counter" class="badge badge-important" {$show_alerts_style}>{$alert_count}</span>
-                    </a>
-                    <ul id="notification-items" class="dropdown-menu" style="width:300px;">
-                    </ul>
-                </li>
-            </ul>
+
+            <div class="notifications notification-icon btn-group pull-right">
+                <a id="notification-icon" class="btn btn-inverse dropdown-toggle" data-toggle="dropdown" href="#" onclick="showNotificationPanel();">
+                    <i class="icon-bell"></i>
+                    <span class="notification-counter" id="notification-counter" {$show_alerts_style}>{$alert_count}</span>
+                </a>
+                <ul id="notification-items" class="dropdown-menu">
+                    <li class="divider"></li>
+                    <li id="notification-spinner"> </li>
+                    <li class="divider"></li>
+                    <li class="notification-button">See all notifications</li>
+                </ul>
+            </div>
 
 
             <a class="brand" href="{$user_zipio_dir}">

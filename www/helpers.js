@@ -136,6 +136,63 @@ function showLikersModal(albumphotoID) {
     loadLikers(albumphotoID);
 }
 
+
+function showNotificationPanel() {
+
+    debug("Start of showNotificationPanel()");
+
+    jQuery.ajax({
+        type: "GET",
+        url: "/update_last_notified_and_get_html.php?&user_id=" + gUser["id"] + "&token=" + gUser["token"],
+        success: function(data) {
+            $("#notification-counter").fadeOut();
+            $("#notification-items").html(data);
+
+            if (data == "") {
+                $("#notification-items").html("<li style='padding:5px 15px'>No new notifications</li>");
+            }
+
+
+        },
+        async: true
+    });
+
+
+
+
+}
+
+
+function pollNotifications() {
+
+    debug("Start of pollNotifications()");
+
+
+    if (!isLoggedIn()) {
+        return;
+    }
+
+
+    jQuery.ajax({
+        type: "GET",
+        url: "/poll_notifications_json.php?user_id=" + gUser["id"] + "&token=" + gUser["token"] + "&num_notifications=" + $('#notification-counter').html(),
+        success: function(data) {
+            var notificationsArray = JSON.parse(data);
+            var numNotifications = notificationsArray.length;
+
+            if (numNotifications > 0) {
+                $("#notification-counter").html(numNotifications).show();
+            } else {
+                $("#notification-counter").html(numNotifications).fadeOut();
+            }
+
+            pollNotifications();
+        },
+        async: true
+    });
+
+}
+
 function getCommentsHTML(commentsArray, albumphotoID) {
 
     var html = "";
@@ -179,6 +236,8 @@ function getCommentsHTML(commentsArray, albumphotoID) {
     return html;
 
 }
+
+
 
 
 function getLikersHTML(likersArray) {
