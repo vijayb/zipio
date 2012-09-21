@@ -61,6 +61,8 @@ if (!$s3->putObject($image_data,
 
 update_data("AlbumPhotos", $_POST["albumphoto_id"], array("filtered" => "1"));
 
+add_event($_POST["user_id"], ACTION_FILTER_ALBUMPHOTO, $_POST["album_id"], $_POST["albumphoto_id"], NULL);
+
 print("1");
 
 ?>

@@ -46,6 +46,7 @@ for ($i = 0; $i < count($events_array); $i++) {
         $albumphoto_owner_info = get_user_info($albumphoto_info["photo_owner_id"]);
         $object_owner_info = $albumphoto_owner_info;
         $object_owner_username = $albumphoto_owner_info["username"];
+        $truncated_caption = trim(substr($albumphoto_info["caption"], 0, 40)) . '...';
     }
 
     if (isset($events_array[$i]["comment_id"])) {
@@ -61,6 +62,10 @@ for ($i = 0; $i < count($events_array); $i++) {
     $link_albumphoto_one_up = "/" . $albumphoto_owner_info['username'] . "/" . $album_info['handle'] . "/" . $albumphoto_info['id'];
     $link_actor = "/" . $actor_info["username"];
     $img_albumphoto_cropped = $g_s3_root . "/" . $albumphoto_info['s3_url'] . "_cropped";
+    if ($albumphoto_info["filtered"] == 1) {
+        $img_albumphoto_cropped .= "_filtered?" . time();
+    }    
+
     $actor_username = $actor_info["username"];
 
 
@@ -97,7 +102,16 @@ HTML;
 
         case ACTION_ADD_ALBUM:
             $html .= <<<HTML
+            <div class="notification-photo">
+                <a class="normal" href="{$link_albumphoto_one_up}">
+                    <img class="notification-photo-image" src="{$img_albumphoto_cropped}">
+                </a>
+            </div>
 
+            <div class="notification-message">
+                <a class="normal" href="{$link_actor}">{$actor_username}</a> created an album named 
+                 <a class="normal" href="/{$album_owner_info['username']}/{$album_info['handle']}">{$album_info['handle']}</a>
+            </div>            
 
 HTML;
             break;
@@ -185,6 +199,18 @@ HTML;
         case ACTION_EDIT_CAPTION:
             $html .= <<<HTML
 
+            <div class="notification-photo">
+                <a class="normal" href="{$link_albumphoto_one_up}">
+                    <img class="notification-photo-image" src="{$img_albumphoto_cropped}">
+                </a>
+            </div>
+
+            <div class="notification-message">
+                <a class="normal" href="{$link_actor}">{$actor_username}</a> added a caption to
+                <a href="$link_actor" class="normal">{$object_owner_username}</a> photo:
+                <a class="normal" href="{$link_albumphoto_one_up}" style="color:#999999">{$truncated_caption}</a>
+            </div>
+
 HTML;
             break;
 
@@ -221,7 +247,18 @@ HTML;
         case ACTION_FILTER_ALBUMPHOTO:
             $html .= <<<HTML
 
+            <div class="notification-photo">
+                <a class="normal" href="{$link_albumphoto_one_up}">
+                    <img class="notification-photo-image" src="{$img_albumphoto_cropped}">
+                </a>
+            </div>
+
+            <div class="notification-message">
+                <a class="normal" href="{$link_actor}">{$actor_username}</a> filtered a photo in {$album_owner_username}
+                {$album_info['handle']} <a class="normal" href="/{$album_owner_info['username']}/{$album_info['handle']}"> album</a>
+            </div>
 HTML;
+
             break;
 
         case ACTION_CHANGE_ALBUM_COVER:

@@ -322,6 +322,7 @@ EMAIL;
                 output("current_albumphoto_id: $current_albumphoto_id\n");
                 update_data("Albums", $target_album_id, array("cover_albumphoto_id" => $current_albumphoto_id));
                 output("Adding albumphoto $current_albumphoto_id added to album $target_album_id\n");
+                add_event($user_id, ACTION_ADD_ALBUM, $target_album_id, $current_albumphoto_id, NULL);
             }
         }
         email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);

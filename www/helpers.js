@@ -963,7 +963,6 @@ function resetPhotoToOriginal(albumphotoID, croppedOriginalSrc, bigOriginalSrc) 
     $("#save-" + albumphotoID).show();
     $("#albumphoto-" + albumphotoID).find("canvas").remove();
     $("#image-" + albumphotoID).attr("src", croppedOriginalSrc);
-    $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
     imageFiltered[albumphotoID.toString()] = 0;
 }
 
@@ -986,7 +985,6 @@ function saveFiltered(albumphotoID, croppedImageProxySrc, bigImageProxySrc, bigO
                 url: '/save_filtered.php?albumphoto_id=' + albumphotoID + '&reset_to_original',
                 sync: false,
                 success: function(data) {
-                    $("#fancybox-" + albumphotoID).attr("href", bigOriginalSrc);
                     $("#save-" + albumphotoID).hide();
                     $("#cover-" + albumphotoID).fadeOut();
                 }

@@ -88,11 +88,6 @@ $photo_owners = array();
 // won't be visible (hence the "continue").
 $index_of_albumphoto_in_album = 0;
 
-// If this page is being loaded with an albumphoto GET paramter, then we need to
-// know the fancybox index (which is the index of the albumphoto in the album
-// AS DISPLAYED, such that the first photo DISPLAYED in the album has index 0)
-// so that we can open that image up with fancybox.
-$fancybox_image_to_show = 0;
 
 for ($i = 0; $i < count($albumphotos_array); $i++) {
 
@@ -180,10 +175,6 @@ HTML;
 // END FACEBOOK AND PINTEREST LIKE BUTTON
 ////////////////////////////////////////////////////////////////////////////////
 
-
-    if (isset($_GET["albumphoto"]) && $albumphoto_id == $_GET["albumphoto"]) {
-        $fancybox_image_to_show = $index_of_albumphoto_in_album;
-    }
 
     $display_comment_count = "";
     if ($albumphotos_array[$i]["num_comments"] == 0) {
@@ -688,29 +679,6 @@ $(function() {
 
     ?>
 
-    $(".fancybox").fancybox({
-        prevEffect: 'none',
-        nextEffect: 'none',
-        padding: '1',
-        arrows: false,
-        helpers: {
-            title: {
-                type: 'outside'
-            },
-            overlay: {
-                opacity: 0.8,
-                css: {
-                    'background-color': '#000'
-                }
-            },
-            thumbs: {
-                width: 100,
-                height: 100
-            }
-        }
-    });
-
-
 
     // Set some things if the user is logged in AND gAlbum is set. gAlbum is set
     // only if the user is EITHER a collaborator OR an owner
@@ -739,33 +707,6 @@ HTML;
 print($output_js);
 
 ?>
-
-
-    if (getURLParameter("albumphoto") != "null") {
-
-        $.fancybox.open($(".fancybox"), {
-            prevEffect: 'none',
-            nextEffect: 'none',
-            padding: '1',
-            arrows: false,
-            index: <?php print($fancybox_image_to_show); ?>,
-            helpers: {
-                title: {
-                    type: 'outside'
-                },
-                overlay: {
-                    opacity: 0.8,
-                    css: {
-                        'background-color': '#000'
-                    }
-                },
-                thumbs: {
-                    width: 100,
-                    height: 100
-                }
-            }
-        });
-    }
 
 
 });

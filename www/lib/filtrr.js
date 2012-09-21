@@ -810,8 +810,6 @@
      *           has be loaded.
      **/
     this.filter_and_cover_img = function(albumphotoID, imgSrc, callback) {
-
-        console.log(albumphotoID);
         var imgElem = document.getElementById("image-" + albumphotoID);
 
         if (imgElem) {
@@ -890,6 +888,8 @@
                 url: '/save_filtered.php',
                 sync: true,
                 data: {
+                    'user_id': gUser["id"],
+                    'album_id': gAlbum["id"],
                     'albumphoto_id': albumphotoID,
                     'cropped_image_data': croppedImgData,
                     'cropped_image_src': croppedImgSrc,
@@ -901,15 +901,8 @@
                     console.log(data);
                     $("#image-" + albumphotoID).attr("src", $("#image-" + albumphotoID).attr("src").replace(/_cropped$/, "_cropped_filtered"));
 
-                    // If the current fancybox href ends with _big, turn that into _big_filtered with a random string to force reload
-                    $("#fancybox-" + albumphotoID).attr("href", $("#fancybox-" + albumphotoID).attr("href").replace(/_big$/, "_big_filtered?" + new Date().getTime()));
-
-                    // If the current fancybox href already ends with _big_filtered, just add the random string to force reload
-                    $("#fancybox-" + albumphotoID).attr("href", $("#fancybox-" + albumphotoID).attr("href").replace(/_big_filtered$/, "_big_filtered?" + new Date().getTime()));
-
                     $("#save-" + albumphotoID).hide();
                     $("#cover-" + albumphotoID).fadeOut();
-
                 }
             });
         };
