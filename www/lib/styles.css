@@ -181,3 +181,8 @@ div.notification-message {
     float:right;
     color:black;
 }
+
+div.nf-photo {
+    float:left;
+    margin-right:10px;
+}

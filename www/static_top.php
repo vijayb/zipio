@@ -112,23 +112,18 @@ $brand_name = "<img src='/images/" . $g_zipio . "_white_small.png'>";
 if (is_logged_in()) {
 
     $logged_in_status = <<<HTML
-        <ul class="nav pull-right">
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {$_SESSION["user_info"]["email"]} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> Albums</a></li>
                     <li><a href="/logout.php"><i class="icon-off"></i> Logout</a></li>
                 </ul>
             </li>
-        </ul>
 HTML;
 
 } else {
 
     $logged_in_status = <<<HTML
-        <ul class="nav pull-right">
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Log in</a></li>
-        </ul>
 HTML;
 
 }
@@ -325,7 +320,6 @@ window.fbAsyncInit = function() {
                 Add comment
         </button>
     </div>
-</div>
 </div>
 
 
@@ -609,6 +603,17 @@ $navbar_html = <<<HTML
     <div class="navbar-inner" style="background-color:initial">
         <div class="container{$is_fluid}">
 
+            <a class="brand" href="{$user_zipio_dir}">
+                {$brand_name}
+            </a>
+
+
+            <ul class="nav">
+                <li><a href="/news_feed.php?owner_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
+                <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
+            </ul>
+
+
             <ul class="nav pull-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" onclick="showNotificationPanel();">
@@ -618,14 +623,10 @@ $navbar_html = <<<HTML
                     <ul id="notification-items" class="dropdown-menu" style="width:300px;">
                     </ul>
                 </li>
+                {$logged_in_status}
+
             </ul>
 
-
-            <a class="brand" href="{$user_zipio_dir}">
-                {$brand_name}
-            </a>
-
-            {$logged_in_status}
 
         </div>
     </div>

@@ -1,5 +1,3 @@
-</div>
-
 <script src="/lib/jquery-1.7.2.min.js"></script>
 <script src="/lib/jquery-ui-1.8.21.custom.min.js"></script>
 <script src="/lib/jquery.typewatch.js"></script>
