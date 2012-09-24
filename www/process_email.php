@@ -311,6 +311,7 @@ EMAIL;
         ////////////////////////////////////////////////////////////////////////
         output("User is attempting to create own album.");
         $target_album_id = create_album($user_id, $target_album_handle);
+        create_album_follows($user_id, $album_id);
         $target_album_info = get_album_info($target_album_id);
 
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {

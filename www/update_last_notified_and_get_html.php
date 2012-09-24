@@ -64,7 +64,7 @@ for ($i = 0; $i < count($events_array); $i++) {
     $img_albumphoto_cropped = $g_s3_root . "/" . $albumphoto_info['s3_url'] . "_cropped";
     if ($albumphoto_info["filtered"] == 1) {
         $img_albumphoto_cropped .= "_filtered?" . time();
-    }    
+    }
 
     $actor_username = $actor_info["username"];
 
@@ -76,16 +76,26 @@ for ($i = 0; $i < count($events_array); $i++) {
         $actor_username = "You";
     }
 
-    if ($actor_info["id"] == $object_owner_info["id"]) {
+    if ($object_owner_info["id"] == $user_info["id"]) {
         $object_owner_username = "your";
     } else {
         $object_owner_username .= "'s";
     }
 
-    if ($actor_info["id"] == $album_owner_info["id"]) {
+    if ($object_owner_info["id"] == $actor_info["id"]) {
+        $object_owner_username = "their";
+    }
+
+
+
+    if ($album_owner_info["id"] == $user_info["id"]) {
         $album_owner_username = "your";
     } else {
         $album_owner_username = $album_owner_info["username"] . "'s";
+    }
+
+    if ($actor_info["id"] == $album_owner_info["id"]) {
+        $album_owner_username = "their own";
     }
 
 
@@ -109,9 +119,9 @@ HTML;
             </div>
 
             <div class="notification-message">
-                <a class="normal" href="{$link_actor}">{$actor_username}</a> created an album named 
+                <a class="normal" href="{$link_actor}">{$actor_username}</a> created an album named
                  <a class="normal" href="/{$album_owner_info['username']}/{$album_info['handle']}">{$album_info['handle']}</a>
-            </div>            
+            </div>
 
 HTML;
             break;
@@ -128,7 +138,7 @@ HTML;
 
             <div class="notification-message">
                 <a class="normal" href="{$link_actor}">{$actor_username}</a> added a photo to
-                {$album_owner_username} <a class="normal" href="/{$album_owner_info['username']}/{$album_info['handle']}"> album</a>
+                {$album_owner_username} <a class="normal" href="/{$album_owner_info['username']}/{$album_info['handle']}">{$album_info['handle']} album</a>
             </div>
 
 

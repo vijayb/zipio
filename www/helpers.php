@@ -772,6 +772,43 @@ function update_data($table, $id, $key_values) {
 }
 
 
+
+function create_album_followers($album_owner_id, $album_id) {
+    $query = "SELECT user_id FROM Friends WHERE friend_id='$album_owner_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+}
+
+
+
+
+
+
+function add_friend($user_id, $friend_id) {
+    global $con;
+
+    $query ="INSERT INTO Friends (
+                user_id,
+                friend_id
+              ) VALUES (
+                '$user_id',
+                '$friend_id'
+              ), (
+                '$friend_id',
+                '$user_id'
+              ) ON DUPLICATE KEY UPDATE id=id";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    $id = mysql_insert_id();
+    return $id;
+}
+
+
+
+
+
+
 function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_id) {
     global $con;
 
@@ -824,7 +861,7 @@ function get_events_array($user_id) {
         exit();
     }
 
-    $query = "SELECT * FROM Events WHERE 1 ORDER BY created DESC LIMIT 5 "; //created > '$last_notified'";
+    $query = "SELECT * FROM Events WHERE 1 ORDER BY created DESC LIMIT 10 "; //created > '$last_notified'";
 
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());

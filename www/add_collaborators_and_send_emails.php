@@ -58,6 +58,7 @@ foreach ($emails as $email) {
         }
 
         create_collaborator($user_id_corresponding_to_this_email, $album_id);
+        add_friend($inviter_id, $user_id_corresponding_to_this_email);
 
         $display_album_ra = array();
         $display_album_ra["user_id"] = $user_id_corresponding_to_this_email;

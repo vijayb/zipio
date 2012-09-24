@@ -592,6 +592,7 @@ function submitInvite() {
         type: "GET",
         url: urlString,
         success: function(data) {
+            console.log("hello");
             window.location.replace(window.location.href.split('#')[0] + "#alert=6");
             window.location.reload(true);
         },

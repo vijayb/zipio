@@ -27,6 +27,7 @@ $album_id = $request["album_id"];
 $album_info = get_album_info($request["album_id"]);
 
 create_collaborator($collaborator_id, $album_id);
+add_friend($user_id, $collaborator_id);
 
 // Now, all of collabortor_id's photos that live in target_user_id's albums need to be made visible
 
