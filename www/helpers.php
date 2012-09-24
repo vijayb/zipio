@@ -722,6 +722,34 @@ function get_albumphoto_likes_info($user_id, $album_id) {
 }
 
 
+
+function get_friends($user_id) {
+   global $con;
+
+   $query = "SELECT friend_id
+             FROM Friends
+             WHERE user_id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    $friends_array = array();
+    while ($row = mysql_fetch_assoc($result)) {
+        $friend = get_user_info($row["friend_id"]);
+        array_push($friends_array, $friend);
+    }
+
+    return $friends_array;
+
+}
+
+
+
+
+
+
+
+
+
 function get_collaborators_info($album_id) {
 
    global $con;

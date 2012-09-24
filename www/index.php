@@ -39,6 +39,7 @@ $page_subtitle = "";
 
 <div class="row">
 
+
     <div class="span12" style="position:absolute; top:-230px; text-align:center; z-index:-10;">
         <img src="/images/glow.png">
     </div>

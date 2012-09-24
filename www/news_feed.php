@@ -26,7 +26,7 @@ if ($owner_id == 0) {
 }
 
 $page_title = "$owner_username's News Feed";
-$page_subtitle = "";
+$page_subtitle = "Here's what's going on at Zipio";
 
 
 ?>
@@ -40,7 +40,7 @@ $events_array = get_events_array($owner_id);
 
 $html = <<<HTML
 <div class="row">
-    <div class="span9">
+    <div class="span8">
 HTML;
 
 
@@ -85,10 +85,6 @@ for ($i = 0; $i < count($events_array); $i++) {
 
     $actor_username = $actor_info["username"];
 
-
-
-
-
     if ($actor_info["id"] == $owner_info["id"]) {
         $actor_username = "You";
     }
@@ -103,8 +99,6 @@ for ($i = 0; $i < count($events_array); $i++) {
         $object_owner_username = "their";
     }
 
-
-
     if ($album_owner_info["id"] == $owner_info["id"]) {
         $album_owner_username = "your";
     } else {
@@ -114,7 +108,6 @@ for ($i = 0; $i < count($events_array); $i++) {
     if ($actor_info["id"] == $album_owner_info["id"]) {
         $album_owner_username = "their own";
     }
-
 
     switch ($events_array[$i]["action_type"]) {
 
@@ -298,7 +291,35 @@ HTML;
             <div style="clear:both; height:10px;"></div>
 HTML;
 }
+
+
+
+$friends_info = get_friends($owner_id);
+
+
+
 $html .= <<<HTML
+    </div>
+
+    <div class="span4">
+        <div style="margin-bottom:50px">
+            <h3 style="margin-top:0px;">People in your feed</h3>
+            <h5>The people listed below appear in your news feed.</h5>
+HTML;
+
+foreach ($friends_info as $friend) {
+    $html .= <<<HTML
+            <div id="friend-{$friend["id"]}" style="padding:3px">
+                <div style="overflow:hidden;">
+                    <a href="/{$friend["username"]}"><b>{$friend["username"]}</b></a>
+                    <br>
+                    <span style="color:#666666">{$friend["email"]}</span>
+                </div>
+            </div>
+HTML;
+}
+$html .= <<<HTML
+        </div>
     </div>
 </div>
 

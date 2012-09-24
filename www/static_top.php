@@ -120,11 +120,23 @@ if (is_logged_in()) {
             </li>
 HTML;
 
+    $nav_bar_links = <<<HTML
+            <ul class="nav">
+                <li><a href="/news_feed.php?owner_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
+                <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
+            </ul>
+HTML;
+
+
 } else {
 
     $logged_in_status = <<<HTML
             <li><a href="javascript:void(0);" onclick="showLoginModal();">Log in</a></li>
 HTML;
+
+    $nav_bar_links = <<<HTML
+HTML;
+
 
 }
 
@@ -607,11 +619,7 @@ $navbar_html = <<<HTML
                 {$brand_name}
             </a>
 
-
-            <ul class="nav">
-                <li><a href="/news_feed.php?owner_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
-                <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
-            </ul>
+            {$nav_bar_links}
 
 
             <ul class="nav pull-right">
@@ -623,6 +631,7 @@ $navbar_html = <<<HTML
                     <ul id="notification-items" class="dropdown-menu" style="width:300px;">
                     </ul>
                 </li>
+
                 {$logged_in_status}
 
             </ul>
