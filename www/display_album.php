@@ -526,11 +526,12 @@ HTML;
         $html .= <<<HTML
                         <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
                             <a href="javascript:void(0);"
+                               class="no-underline"
                                onclick="if (confirm('Sure you want to remove this collaborator?')) {
                                                 deleteCollaborator({$collaborator["id"]},
                                                                    {$album_info["id"]},
                                                                    '{$album_info["token"]}');
-                                            }">
+                                        }">
                                 <i class="icon-remove"></i>
                             </a>
                         </div>

@@ -63,7 +63,7 @@ for ($i = 0; $i < count($events_array); $i++) {
     $link_actor = "/" . $actor_info["username"];
     $img_albumphoto_cropped = $g_s3_root . "/" . $albumphoto_info['s3_url'] . "_cropped";
     if ($albumphoto_info["filtered"] == 1) {
-        $img_albumphoto_cropped .= "_filtered?" . time();
+        $img_albumphoto_cropped .= "_filtered";
     }
 
     $actor_username = $actor_info["username"];

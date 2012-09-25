@@ -595,6 +595,23 @@ function get_albums_info_where_owner($user_id) {
     return $albums_array;
 }
 
+
+function is_follower($user_id, $album_id) {
+    global $con;
+
+    $query = "SELECT * FROM AlbumFollowers WHERE user_id='$user_id' AND album_id=$album_id";
+    $result = mysql_query($query, $con);
+    if (!$result)
+        die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+    if (mysql_num_rows($result) == 1) {
+        return 1;
+    }
+
+    return 0;
+
+}
+
 function get_albums_info_where_collaborator($collaborator_id) {
 
     global $con;
@@ -807,6 +824,7 @@ function create_album_followers($album_owner_id, $album_id) {
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
 }
+
 
 
 

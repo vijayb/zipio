@@ -3,17 +3,17 @@
 require("static_supertop.php");
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-if (!isset($_GET["owner_username"])) {
+if (!isset($_GET["user_username"])) {
     exit();
 } else {
-    $owner_id = get_user_id_from_username($_GET["owner_username"]);
-    $owner_username = get_username_from_user_id($owner_id);
-    $owner_info = get_user_info($owner_id);
+    $user_id = get_user_id_from_username($_GET["user_username"]);
+    $user_username = get_username_from_user_id($user_id);
+    $user_info = get_user_info($user_id);
 
     if ($g_debug) {
-        print("<!-- owner_id: $owner_id -->\n");
-        print("<!-- owner_username: $owner_username -->\n");
-        print("<!-- owner_info: " . print_r($owner_info, true) . "-->");
+        print("<!-- user_id: $user_id -->\n");
+        print("<!-- user_username: $user_username -->\n");
+        print("<!-- user_info: " . print_r($user_info, true) . "-->");
     }
 }
 
@@ -21,11 +21,15 @@ if (!isset($_GET["owner_username"])) {
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 // |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| //
 
-if ($owner_id == 0) {
-    goto_homepage("#alert=5&username=" . $_GET["owner_username"]);
+if ($user_id == 0) {
+    goto_homepage("#alert=5&username=" . $_GET["user_username"]);
 }
 
-$page_title = "$owner_username's News Feed";
+if (!is_logged_in() || $user_id != $_SESSION["user_id"]) {
+    goto_homepage("");
+}
+
+$page_title = "$user_username's News Feed";
 $page_subtitle = "Here's what's going on at Zipio";
 
 
@@ -36,7 +40,7 @@ $page_subtitle = "Here's what's going on at Zipio";
 
 <?php
 
-$events_array = get_events_array($owner_id);
+$events_array = get_events_array($user_id);
 
 $html = <<<HTML
 <div class="row">
@@ -53,60 +57,60 @@ for ($i = 0; $i < count($events_array); $i++) {
 
     if (isset($events_array[$i]["album_id"])) {
         $album_info = get_album_info($events_array[$i]["album_id"]);
-        $album_owner_info = get_user_info($album_info["user_id"]);
-        $object_owner_info = $album_owner_info;
-        $object_owner_username = $album_owner_info["username"];
+        $album_user_info = get_user_info($album_info["user_id"]);
+        $object_user_info = $album_user_info;
+        $object_user_username = $album_user_info["username"];
     }
 
     if (isset($events_array[$i]["albumphoto_id"])) {
         $albumphoto_info = get_albumphoto_info($events_array[$i]["albumphoto_id"]);
-        $albumphoto_owner_info = get_user_info($albumphoto_info["photo_owner_id"]);
-        $object_owner_info = $albumphoto_owner_info;
-        $object_owner_username = $albumphoto_owner_info["username"];
+        $albumphoto_user_info = get_user_info($albumphoto_info["photo_owner_id"]);
+        $object_user_info = $albumphoto_user_info;
+        $object_user_username = $albumphoto_user_info["username"];
         $truncated_caption = trim(substr($albumphoto_info["caption"], 0, 40)) . '...';
     }
 
     if (isset($events_array[$i]["comment_id"])) {
         $comment_info = get_comment_info($events_array[$i]["comment_id"]);
         $commenter_info = get_user_info($comment_info["commenter_id"]);
-        $object_owner_info = $commenter_info;
-        $object_owner_username = $commenter_info["username"];
+        $object_user_info = $commenter_info;
+        $object_user_username = $commenter_info["username"];
 
         $truncated_comment = trim(substr($comment_info["comment"], 0, 40)) . '...';
 
     }
 
-    $link_albumphoto_one_up = "/" . $albumphoto_owner_info['username'] . "/" . $album_info['handle'] . "/" . $albumphoto_info['id'];
+    $link_albumphoto_one_up = "/" . $albumphoto_user_info['username'] . "/" . $album_info['handle'] . "/" . $albumphoto_info['id'];
     $link_actor = "/" . $actor_info["username"];
     $img_albumphoto_cropped = $g_s3_root . "/" . $albumphoto_info['s3_url'] . "_cropped";
     if ($albumphoto_info["filtered"] == 1) {
-        $img_albumphoto_cropped .= "_filtered?" . time();
+        $img_albumphoto_cropped .= "_filtered";
     }
 
     $actor_username = $actor_info["username"];
 
-    if ($actor_info["id"] == $owner_info["id"]) {
+    if ($actor_info["id"] == $user_info["id"]) {
         $actor_username = "You";
     }
 
-    if ($object_owner_info["id"] == $owner_info["id"]) {
-        $object_owner_username = "your";
+    if ($object_user_info["id"] == $user_info["id"]) {
+        $object_user_username = "your";
     } else {
-        $object_owner_username .= "'s";
+        $object_user_username .= "'s";
     }
 
-    if ($object_owner_info["id"] == $actor_info["id"]) {
-        $object_owner_username = "their";
+    if ($object_user_info["id"] == $actor_info["id"]) {
+        $object_user_username = "their";
     }
 
-    if ($album_owner_info["id"] == $owner_info["id"]) {
-        $album_owner_username = "your";
+    if ($album_user_info["id"] == $user_info["id"]) {
+        $album_user_username = "your";
     } else {
-        $album_owner_username = $album_owner_info["username"] . "'s";
+        $album_user_username = $album_user_info["username"] . "'s";
     }
 
-    if ($actor_info["id"] == $album_owner_info["id"]) {
-        $album_owner_username = "their own";
+    if ($actor_info["id"] == $album_user_info["id"]) {
+        $album_user_username = "their own";
     }
 
     switch ($events_array[$i]["action_type"]) {
@@ -121,7 +125,7 @@ for ($i = 0; $i < count($events_array); $i++) {
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> created an album named
-                 <a href="/{$album_owner_info['username']}/{$album_info['handle']}">{$album_info['handle']}</a>
+                 <a href="/{$album_user_info['username']}/{$album_info['handle']}">{$album_info['handle']}</a>
             </div>
 
 HTML;
@@ -139,7 +143,7 @@ HTML;
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> added a photo to
-                {$album_owner_username} <a href="/{$album_owner_info['username']}/{$album_info['handle']}">{$album_info['handle']} album</a>
+                {$album_user_username} <a href="/{$album_user_info['username']}/{$album_info['handle']}">{$album_info['handle']} album</a>
             </div>
 
 
@@ -157,7 +161,7 @@ HTML;
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> commented on
-                <a href="$link_actor">{$object_owner_username}</a> photo:
+                <a href="$link_actor">{$object_user_username}</a> photo:
                 <a href="{$link_albumphoto_one_up}" style="color:#999999">{$truncated_comment}</a>
             </div>
 
@@ -181,7 +185,7 @@ HTML;
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> liked
-                <a href="$link_actor">{$object_owner_username}</a> photo
+                <a href="$link_actor">{$object_user_username}</a> photo
             </div>
 
 
@@ -199,7 +203,7 @@ HTML;
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> liked
-                <a href="$link_actor">{$object_owner_username}</a> comment:
+                <a href="$link_actor">{$object_user_username}</a> comment:
                 <a href="{$link_albumphoto_one_up}" style="color:#999999">{$truncated_comment}</a>
             </div>
 
@@ -218,7 +222,7 @@ HTML;
 
             <div class="nf-message">
                 <a href="{$link_actor}">{$actor_username}</a> added a caption to
-                <a href="$link_actor">{$object_owner_username}</a> photo:
+                <a href="$link_actor">{$object_user_username}</a> photo:
                 <a href="{$link_albumphoto_one_up}" style="color:#999999">{$truncated_caption}</a>
             </div>
 
@@ -265,8 +269,8 @@ HTML;
             </div>
 
             <div class="nf-message">
-                <a href="{$link_actor}">{$actor_username}</a> filtered a photo in {$album_owner_username}
-                {$album_info['handle']} <a href="/{$album_owner_info['username']}/{$album_info['handle']}"> album</a>
+                <a href="{$link_actor}">{$actor_username}</a> filtered a photo in {$album_user_username}
+                {$album_info['handle']} <a href="/{$album_user_info['username']}/{$album_info['handle']}"> album</a>
             </div>
 HTML;
 
@@ -294,7 +298,7 @@ HTML;
 
 
 
-$friends_info = get_friends($owner_id);
+$friends_info = get_friends($user_id);
 
 
 
@@ -308,16 +312,66 @@ $html .= <<<HTML
 HTML;
 
 foreach ($friends_info as $friend) {
+
+    $albums_info = get_albums_info_where_owner($friend["id"]);
+
     $html .= <<<HTML
             <div id="friend-{$friend["id"]}" style="padding:3px">
+
+                <div style="float:left; width:20px; overflow:hidden; position:relative; top:2px;">
+                    <a href="javascript:void(0);"
+                       class="no-underline"
+                       onclick="if (confirm('Sure you don\'t want to see updates from {$friend["username"]}?')) {
+                                    deleteFriend({$friend["id"]}, {$user_id}, '{$user_info["token"]}');
+                                }">
+                        <i class="icon-remove"></i>
+                    </a>
+                </div>
+
                 <div style="overflow:hidden;">
                     <a href="/{$friend["username"]}"><b>{$friend["username"]}</b></a>
                     <br>
                     <span style="color:#666666">{$friend["email"]}</span>
+
+
+                    <div style="margin-left:10px;">
+HTML;
+
+    foreach ($albums_info as $album) {
+
+        $is_follower = is_follower($user_id, $album["id"]);
+
+        if ($is_follower) {
+            $checked ='checked="checked"';
+        } else {
+            $checked = "";
+        }
+
+        $html .= <<<HTML
+                        <div style="padding:1px;">
+                            <label class="checkbox">
+                                <input type="checkbox" {$checked}>{$album["handle"]} ({$album["id"]})
+                            </label>
+                        </div>
+HTML;
+
+    }
+
+    $html .= <<<HTML
+                    </div>
+
                 </div>
+
+
+
+
             </div>
 HTML;
 }
+
+
+
+
 $html .= <<<HTML
         </div>
     </div>

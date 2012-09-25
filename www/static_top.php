@@ -122,7 +122,7 @@ HTML;
 
     $nav_bar_links = <<<HTML
             <ul class="nav">
-                <li><a href="/news_feed.php?owner_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
+                <li><a href="/news_feed.php?user_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
                 <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
             </ul>
 HTML;

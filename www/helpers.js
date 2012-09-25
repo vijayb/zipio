@@ -806,6 +806,26 @@ function setPasswordSubmitButton() {
 
 
 
+function deleteFriend(friendID, userID, userToken) {
+    var urlString = "/delete_friend.php?friend_id=" + friendID +
+                                      "&user_id=" + userID +
+                                      "&user_token=" + userToken;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#friend-" + friendID).remove();
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+
+}
+
 
 
 
