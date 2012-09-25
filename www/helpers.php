@@ -840,13 +840,31 @@ function add_friend($user_id, $friend_id) {
               ) VALUES (
                 '$user_id',
                 '$friend_id'
-              ), (
-                '$friend_id',
-                '$user_id'
               ) ON DUPLICATE KEY UPDATE id=id";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
     $id = mysql_insert_id();
+
+    if (mysql_affected_rows() == 1) {
+
+        $albums_info = get_albums_info_where_owner($friend_id);
+
+        $album_string = "";
+        foreach ($albums_info as $album) {
+            $album_string .= "(" . $user_id . "," . $album["id"] . "," . $album["user_id"] . "),";
+        }
+        $album_string = rtrim($album_string, ",");
+
+        $query = "INSERT INTO AlbumFollowers (
+                    user_id,
+                    album_id,
+                    album_owner_id
+                  ) VALUES $album_string ON DUPLICATE KEY UPDATE id=id";
+        $result = mysql_query($query, $con);
+        print($query);
+        if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
+    }
+
     return $id;
 }
 

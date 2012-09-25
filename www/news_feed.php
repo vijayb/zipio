@@ -315,6 +315,7 @@ foreach ($friends_info as $friend) {
 
     $albums_info = get_albums_info_where_owner($friend["id"]);
 
+
     $html .= <<<HTML
             <div id="friend-{$friend["id"]}" style="padding:3px">
 
@@ -350,7 +351,8 @@ HTML;
         $html .= <<<HTML
                         <div style="padding:1px;">
                             <label class="checkbox">
-                                <input type="checkbox" {$checked}>{$album["handle"]} ({$album["id"]})
+                                <input id="album-checkbox-{$album["id"]}"type="checkbox" onclick="toggleAlbumFollower({$album["id"]}, '{$album["user_id"]}');" {$checked}>{$album["handle"]} ({$album["id"]})
+                                <span id="saved-{$album["id"]}" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
                             </label>
                         </div>
 HTML;

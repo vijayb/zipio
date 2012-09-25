@@ -28,6 +28,13 @@ $query = "DELETE FROM Friends WHERE friend_id='$friend_id' AND user_id='$user_id
 $result = mysql_query($query, $con);
 if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
+
+$query = "DELETE FROM AlbumFollowers WHERE album_owner_id='$friend_id' AND user_id='$user_id'";
+$result = mysql_query($query, $con);
+if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+
+
+
 print("1");
 exit();
 

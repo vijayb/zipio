@@ -664,6 +664,42 @@ function submitCaption() {
 }
 
 
+
+function toggleAlbumFollower(albumID) {
+
+    // Did the user just check or uncheck the box?
+    var checked = $('#album-checkbox-' + albumID).is(':checked');
+    var action = "";
+
+    if (checked) {
+        action = "add";
+    } else {
+        action = "delete"
+    }
+
+    var urlString = "/toggle_albumfollower.php?album_id=" + albumID
+                                           + "&action=" + action
+                                           + "&token=" + gUser["token"]
+                                           + "&user_id=" + gUser["id"]
+                                           + "&album_owner_id=" + albumOwnerID;
+
+    jQuery.ajax({
+        type: "GET",
+        url: urlString,
+        success: function(data) {
+            if (parseInt(data) == 1) {
+                $("#saved-" + albumID).show().delay(700).fadeOut();
+            } else {
+                // bad token
+            }
+        },
+        async: true
+    });
+}
+
+
+
+
 function submitUsernamePassword() {
     $("#register-submit").button("loading");
     var username = gUser["username"];
