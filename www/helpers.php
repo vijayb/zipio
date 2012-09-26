@@ -957,7 +957,7 @@ function get_events_array($user_id) {
     }
 
     $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10 ";
-    echo $query;
+    //echo $query;
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
