@@ -939,12 +939,12 @@ function get_events_array($user_id) {
     }
 
 
-    $album_clause = "";
+    $album_clause = "(";
     foreach ($album_ids_followed as $album_id => $val) {
         $album_clause .= "album_id=$album_id or ";
     }
     $album_clause = substr_replace($album_clause,"",-4);
-
+    $album_clause .= ")";
 
     $query = "SELECT last_notified FROM Users WHERE id='$user_id'";
     $result = mysql_query($query, $con);
@@ -956,8 +956,8 @@ function get_events_array($user_id) {
         exit();
     }
 
-    $query = "SELECT * FROM Events WHERE $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10 ";
-    //echo $query;
+    $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10 ";
+    echo $query;
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
