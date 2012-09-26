@@ -314,6 +314,7 @@ HTML;
 foreach ($friends_info as $friend) {
 
     $albums_info = get_albums_info_where_owner($friend["id"]);
+    $num_albums = count($albums_info);
 
 
     $html .= <<<HTML
@@ -332,10 +333,15 @@ foreach ($friends_info as $friend) {
                 <div style="overflow:hidden;">
                     <a href="/{$friend["username"]}"><b>{$friend["username"]}</b></a>
                     <br>
-                    <span style="color:#666666">{$friend["email"]}</span>
+                    <span style="color:#666666">
+                        <a href="javascript:void(0);"
+                           class="no-underline"
+                           onclick="showNewsFeedAlbums('{$friend["id"]}');"><i id ="albums-caret-{$friend["id"]}" class="icon-caret-right"></i></a>
+                           {$num_albums} albums
+                    </span>
 
 
-                    <div style="margin-left:10px;">
+                    <div style="margin-left:10px; display:none;" id="albums-{$friend["id"]}">
 HTML;
 
     foreach ($albums_info as $album) {

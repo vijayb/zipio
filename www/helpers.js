@@ -600,6 +600,7 @@ function submitInvite() {
     });
 }
 
+
 function submitForgotPassword() {
     $("#password-submit").button("loading");
     var email = $("#password-email").val();
@@ -663,6 +664,13 @@ function submitCaption() {
 
 }
 
+
+function showNewsFeedAlbums(friendID) {
+    $("#albums-" + friendID).toggle();
+
+    $("#albums-caret-" + friendID).toggleClass("icon-caret-right");
+    $("#albums-caret-" + friendID).toggleClass("icon-caret-down");
+}
 
 
 function toggleAlbumFollower(albumID) {
