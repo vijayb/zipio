@@ -915,6 +915,37 @@ function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_
 function get_events_array($user_id) {
     global $con;
 
+    $album_ids_followed = array();
+    $query = "SELECT album_id FROM Collaborators where collaborator_id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+    while ($row = mysql_fetch_assoc($result)) {
+        $album_ids_followed[$row["album_id"]] = 1;
+    }
+
+    // UGH - this is a pain. Collaborators doesn't contain the album owner so we have to get it separately
+    $query = "SELECT id FROM Albums where user_id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+    while ($row = mysql_fetch_assoc($result)) {
+        $album_ids_followed[$row["id"]] = 1;
+    }
+
+    $query = "SELECT album_id FROM AlbumFollowers where user_id='$user_id'";
+    $result = mysql_query($query, $con);
+    if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
+    while ($row = mysql_fetch_assoc($result)) {
+        $album_ids_followed[$row["album_id"]] = 1;
+    }
+
+
+    $album_clause = "(";
+    foreach ($album_ids_followed as $album_id => $val) {
+        $album_clause .= "album_id=$album_id or ";
+    }
+    $album_clause = substr_replace($album_clause,"",-4);
+    $album_clause .= ")";
+
     $query = "SELECT last_notified FROM Users WHERE id='$user_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -925,8 +956,8 @@ function get_events_array($user_id) {
         exit();
     }
 
-    $query = "SELECT * FROM Events WHERE 1 ORDER BY created DESC LIMIT 10 "; //created > '$last_notified'";
-
+    $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10 ";
+    //echo $query;
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
