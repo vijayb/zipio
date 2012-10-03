@@ -23,7 +23,9 @@ if (!check_token($user_id, $token, "Users")) {
     exit();
 }
 
-$events_array = get_events_array($user_id);
+$divider = "<li style='clear:both; margin:3px 1px' class='divider'></li>";
+
+$events_array = get_events_array($user_id, 1);
 
 $html = "";
 
@@ -285,8 +287,6 @@ HTML;
 
     }
 
-
-    $divider = "<li style='clear:both; margin:3px 1px' class='divider'></li>";
 
     $html .= <<<HTML
             <div style="clear:both; height:10px;"></div>

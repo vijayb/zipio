@@ -32,10 +32,10 @@ function is_logged_in() {
     }
 }
 
-function check_request_and_cookie_for_login($_GET) {
+function check_request_and_cookie_for_login($args) {
 
-    if (isset($_GET["request"])) {
-        $request = decrypt_json($_GET["request"]);
+    if (isset($args["request"])) {
+        $request = decrypt_json($args["request"]);
         if (isset($request["user_id"])) {
             login_user($request["user_id"]);
             $url = strtok($_SERVER['REQUEST_URI'], '?');
@@ -630,8 +630,6 @@ function get_albums_info_where_collaborator($collaborator_id) {
 }
 
 
-
-
 function get_albumphotos_info($album_id) {
     global $con;
 
@@ -912,10 +910,20 @@ function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_
     }
 }
 
-function get_events_array($user_id) {
+
+// If $only_new == 1, then only those alerts that the user has NOT seen will be
+// returned (as determined by the $last_notified stamp).
+
+function get_events_array($user_id, $only_new) {
     global $con;
 
+    // Get all album_ids for which user_id should be notified of updates
+
     $album_ids_followed = array();
+
+
+    // First, all albums where user_id is a collaborator
+
     $query = "SELECT album_id FROM Collaborators where collaborator_id='$user_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
@@ -923,6 +931,7 @@ function get_events_array($user_id) {
         $album_ids_followed[$row["album_id"]] = 1;
     }
 
+    // Next, get all the albums owned by user_id
     // UGH - this is a pain. Collaborators doesn't contain the album owner so we have to get it separately
     $query = "SELECT id FROM Albums where user_id='$user_id'";
     $result = mysql_query($query, $con);
@@ -931,13 +940,14 @@ function get_events_array($user_id) {
         $album_ids_followed[$row["id"]] = 1;
     }
 
+    // Third, get all the albums which you are following
+
     $query = "SELECT album_id FROM AlbumFollowers where user_id='$user_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
     while ($row = mysql_fetch_assoc($result)) {
         $album_ids_followed[$row["album_id"]] = 1;
     }
-
 
     $album_clause = "(";
     foreach ($album_ids_followed as $album_id => $val) {
@@ -956,8 +966,12 @@ function get_events_array($user_id) {
         exit();
     }
 
-    $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10 ";
-    //echo $query;
+    if ($only_new) {
+        $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause and created > '$last_notified' ORDER BY created DESC LIMIT 10";
+    } else {
+        $query = "SELECT * FROM Events WHERE actor_id != '$user_id' and $album_clause ORDER BY created DESC LIMIT 10";
+    }
+
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 

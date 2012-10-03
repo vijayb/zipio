@@ -21,7 +21,6 @@ To delete the database:
 To run ec2 tools
     http://blog.bottomlessinc.com/2010/12/installing-the-amazon-ec2-command-line-tools-to-launch-persistent-instances/
 
-
 */
 
 if ($_SERVER["HTTP_HOST"] == "localhost" || $_SERVER["HTTP_HOST"] == "zipiyo.com") {

@@ -28,7 +28,7 @@ $events_array = array();
 
 for ($i = 0; $i < 10; $i++) {
 
-    $events_array = get_events_array($user_id);
+    $events_array = get_events_array($user_id, 1);
 
     if (count($events_array) != $num_notifications) {
         break;

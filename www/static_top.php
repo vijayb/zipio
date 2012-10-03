@@ -596,7 +596,7 @@ window.fbAsyncInit = function() {
     $alert_count = 0;
     $show_alerts_style = "style='display: none;'";
     if (is_logged_in()) {
-        $alerts_array = get_events_array($_SESSION["user_info"]["id"]);
+        $alerts_array = get_events_array($_SESSION["user_info"]["id"], 1);
         if (count($alerts_array) > 0) {
             $alert_count = count($alerts_array);
             $show_alerts_style = "";

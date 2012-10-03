@@ -40,7 +40,8 @@ $page_subtitle = "Here's what's going on at Zipio";
 
 <?php
 
-$events_array = get_events_array($user_id);
+$events_array = get_events_array($user_id, 0);
+
 
 $html = <<<HTML
 <div class="row">
@@ -336,8 +337,10 @@ foreach ($friends_info as $friend) {
                     <span style="color:#666666">
                         <a href="javascript:void(0);"
                            class="no-underline"
-                           onclick="showNewsFeedAlbums('{$friend["id"]}');"><i id ="albums-caret-{$friend["id"]}" class="icon-caret-right"></i></a>
+                           onclick="showNewsFeedAlbums('{$friend["id"]}');">
+                           <i id ="albums-caret-{$friend["id"]}" class="icon-caret-right"></i>
                            {$num_albums} albums
+                        </a>
                     </span>
 
 
