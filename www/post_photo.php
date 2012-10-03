@@ -58,7 +58,7 @@ $path_to_photo = $_FILES["photo"]["tmp_name"];
 
 if ($target_album_info["user_id"] == $user_id) {
     // User owns the album
-    if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 1, $path_to_photo, $s3_url)) {
+    if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 1, $path_to_photo, "", $s3_url)) {
         print("1");
         exit();
     }
@@ -66,13 +66,13 @@ if ($target_album_info["user_id"] == $user_id) {
     $is_friend = is_friend($target_user_info["id"], $user_id);
     if ($is_friend) {
         // User is posting to a friend's album
-        if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 1, $path_to_photo, $s3_url)) {
+        if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 1, $path_to_photo, "", $s3_url)) {
             print("1");
             exit();
         }
     } else {
         // User is posting to a non-friend's album, so post it as invisible
-        if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 0, $path_to_photo, $s3_url)) {
+        if (add_albumphoto($user_id, $target_album_id, $target_user_info["id"], 0, $path_to_photo, "", $s3_url)) {
             print("1");
             exit();
         }
