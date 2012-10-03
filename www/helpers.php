@@ -236,7 +236,7 @@ function create_album($user_id, $handle) {
 }
 
 function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
-                        $visible, $path_to_photo, &$s3_url_parameter) {
+                        $visible, $path_to_photo, $caption, &$s3_url_parameter) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -361,19 +361,37 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
                           $query . " - " . mysql_error());
         $photo_id = mysql_insert_id();
 
-        $query = "INSERT INTO AlbumPhotos (
-                    photo_id,
-                    photo_owner_id,
-                    album_id,
-                    album_owner_id,
-                    visible
-                  ) VALUES (
-                    '$photo_id',
-                    '$owner_user_id',
-                    '$target_album_id',
-                    '$target_album_owner_id',
-                    '$visible'
-                  ) ON DUPLICATE KEY UPDATE id=id";
+        if (strlen($caption) > 0 && strlen($caption) < 200) {
+            $query = "INSERT INTO AlbumPhotos (
+                        photo_id,
+                        photo_owner_id,
+                        album_id,
+                        album_owner_id,
+                        caption,
+                        visible
+                      ) VALUES (
+                        '$photo_id',
+                        '$owner_user_id',
+                        '$target_album_id',
+                        '$target_album_owner_id',
+                        '".mysql_real_escape_string($caption)."',
+                        '$visible'
+                      ) ON DUPLICATE KEY UPDATE id=id";
+        } else {
+            $query = "INSERT INTO AlbumPhotos (
+                                    photo_id,
+                                    photo_owner_id,
+                                    album_id,
+                                    album_owner_id,
+                                    visible
+                                  ) VALUES (
+                                    '$photo_id',
+                                    '$owner_user_id',
+                                    '$target_album_id',
+                                    '$target_album_owner_id',
+                                    '$visible'
+                                  ) ON DUPLICATE KEY UPDATE id=id";
+        }
         $result = mysql_query($query, $con);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
