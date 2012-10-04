@@ -15,9 +15,9 @@ if (!isset($_GET["album_id"]) ||
     exit();
 } else {
     $album_id = $_GET["album_id"];
-    $album_id = $_GET["album_owner_id"];
     $user_id = $_GET["user_id"];
     $action = $_GET["action"];
+    $album_owner_id = $_GET["album_owner_id"];
     $token = $_GET["token"];
 }
 

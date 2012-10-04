@@ -811,7 +811,6 @@ function get_collaborators_info($album_id) {
 }
 
 function update_data($table, $id, $key_values) {
-
     global $con;
 
     $update_string = "";
@@ -835,10 +834,27 @@ function update_data($table, $id, $key_values) {
 
 
 function create_album_followers($album_owner_id, $album_id) {
+    global $con;
+
     $query = "SELECT user_id FROM Friends WHERE friend_id='$album_owner_id'";
     $result = mysql_query($query, $con);
     if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . mysql_error());
 
+    $album_string = "";
+    while ($row = mysql_fetch_assoc($result)) {
+        $album_string .= "(" . $row["user_id"] . "," . $album_id . "," . $album_owner_id . "),";
+    }
+    $album_string = rtrim($album_string, ",");
+
+
+    $insert_query = "INSERT INTO AlbumFollowers (
+                user_id,
+                album_id,
+                album_owner_id
+              ) VALUES $album_string ON DUPLICATE KEY UPDATE id=id";
+    print_r($insert_query);
+    $insert_result = mysql_query($insert_query, $con);
+    if (!$insert_result) die('Invalid query in ' . __FUNCTION__ . ': ' . $insert_query . " - " . mysql_error());
 }
 
 
@@ -877,7 +893,6 @@ function add_friend($user_id, $friend_id) {
                     album_owner_id
                   ) VALUES $album_string ON DUPLICATE KEY UPDATE id=id";
         $result = mysql_query($query, $con);
-        print($query);
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' . $query . " - " . mysql_error());
     }
 

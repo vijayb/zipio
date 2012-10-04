@@ -673,7 +673,7 @@ function showNewsFeedAlbums(friendID) {
 }
 
 
-function toggleAlbumFollower(albumID) {
+function toggleAlbumFollower(albumID, albumOwnerID) {
 
     // Did the user just check or uncheck the box?
     var checked = $('#album-checkbox-' + albumID).is(':checked');
