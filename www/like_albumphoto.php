@@ -11,6 +11,7 @@ require("helpers.php");
 if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["token"]) ||
     !isset($_POST["album_id"]) ||
+    !isset($_POST["album_owner_id"]) ||
     !isset($_POST["liker_id"]) ||
     !isset($_POST["old_like_value"]) ||
     !isset($_POST["albumphoto_owner_id"]) ||
@@ -24,6 +25,7 @@ if (!isset($_POST["albumphoto_id"]) ||
     $albumphoto_id = $_POST["albumphoto_id"];
     $token = $_POST["token"];
     $album_id = $_POST["album_id"];
+    $album_owner_id = $_POST["album_owner_id"];
     $liker_id = $_POST["liker_id"];
     $old_like_value = $_POST["old_like_value"];
     $albumphoto_owner_id = $_POST["albumphoto_owner_id"];
@@ -38,8 +40,8 @@ if (!check_token($liker_id, $token, "Users")) {
 }
 
 if ($old_like_value == "0") {
-    add_event($liker_id, ACTION_LIKE_ALBUMPHOTO, $album_id, $albumphoto_id, NULL);
-    
+    add_event($liker_id, ACTION_LIKE_ALBUMPHOTO, $album_id, $albumphoto_id, NULL, $album_owner_id, $albumphoto_owner_id, NULL);
+
     $query ="INSERT INTO AlbumPhotoLikes (
               albumphoto_id,
               album_id,
