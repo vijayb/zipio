@@ -904,7 +904,7 @@ function add_friend($user_id, $friend_id) {
 
 
 
-function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_id) {
+function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_id, $album_owner_id, $albumphoto_owner_id, $commenter_id) {
     global $con;
 
     if (isset($comment_id)) {
@@ -932,6 +932,18 @@ function add_event($actor_id, $action_type, $album_id, $albumphoto_id, $comment_
     if (isset($album_id)) {
         $keys .= ",album_id";
         $values .= ",$album_id";
+    }
+    if (isset($commenter_id)) {
+        $keys .= ",commenter_id";
+        $values .= ",$commenter_id";
+    }
+    if (isset($albumphoto_owner_id)) {
+        $keys .= ",albumphoto_owner_id";
+        $values .= ",$albumphoto_owner_id";
+    }
+    if (isset($album_owner_id)) {
+        $keys .= ",album_owner_id";
+        $values .= ",$album_owner_id";
     }
 
     $query = "INSERT INTO Events ($keys) values ($values) ON DUPLICATE KEY UPDATE id=id";

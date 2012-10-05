@@ -12,6 +12,7 @@ if (!isset($_POST["comment_id"]) ||
     !isset($_POST["comment"]) ||
     !isset($_POST["albumphoto_id"]) ||
     !isset($_POST["album_id"]) ||
+    !isset($_POST["album_owner_id"]) ||
     !isset($_POST["commenter_id"]) ||
     !isset($_POST["liker_id"]) ||
     !isset($_POST["liker_username"]) ||
@@ -28,6 +29,7 @@ if (!isset($_POST["comment_id"]) ||
     $comment = $_POST["comment"];
     $albumphoto_id = $_POST["albumphoto_id"];
     $album_id = $_POST["album_id"];
+    $album_owner_id = $_POST["album_owner_id"];
     $commenter_id = $_POST["commenter_id"];
     $liker_id = $_POST["liker_id"];
     $liker_username = $_POST["liker_username"];
@@ -44,8 +46,14 @@ if (!check_token($liker_id, $token, "Users")) {
     exit();
 }
 
+
+
+$commenter_info = get_user_info($commenter_id);
+$albumphoto_owner_info = get_user_info($albumphoto_owner_id);
+$album_owner_info = get_user_info(get_album_owner($album_id));
+
 if ($old_like_value == "0") {
-    add_event($liker_id, ACTION_LIKE_COMMENT, $album_id, $albumphoto_id, $comment_id);
+    add_event($liker_id, ACTION_LIKE_COMMENT, $album_id, $albumphoto_id, $comment_id, $album_owner_id, $albumphoto_owner_id, $commenter_id);
     $query ="INSERT INTO CommentLikes (
               comment_id,
               albumphoto_id,
@@ -78,9 +86,7 @@ Now, let's email the
 (but if a user is more than one of the above, never email them more than once)
 */
 
-$commenter_info = get_user_info($commenter_id);
-$albumphoto_owner_info = get_user_info($albumphoto_owner_id);
-$album_owner_info = get_user_info(get_album_owner($album_id));
+
 
 $users_to_be_emailed = array();
 
