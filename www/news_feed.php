@@ -81,7 +81,7 @@ for ($i = 0; $i < count($events_array); $i++) {
 
     }
 
-    $link_albumphoto_one_up = "/" . $albumphoto_user_info['username'] . "/" . $album_info['handle'] . "/" . $albumphoto_info['id'];
+    $link_albumphoto_one_up = "/" . $album_user_info['username'] . "/" . $album_info['handle'] . "/" . $albumphoto_info['id'];
     $link_actor = "/" . $actor_info["username"];
     $img_albumphoto_cropped = $g_s3_root . "/" . $albumphoto_info['s3_url'] . "_cropped";
     if ($albumphoto_info["filtered"] == 1) {
@@ -316,6 +316,31 @@ foreach ($friends_info as $friend) {
 
     $albums_info = get_albums_info_where_owner($friend["id"]);
     $num_albums = count($albums_info);
+    $followed_albums = "";
+    $num_followed_albums = 0;
+
+    foreach ($albums_info as $album) {
+
+        $is_follower = is_follower($user_id, $album["id"]);
+
+        if ($is_follower) {
+            $checked ='checked="checked"';
+            $num_followed_albums++;
+        } else {
+            $checked = "";
+        }
+
+        $followed_albums .= <<<HTML
+                        <div style="padding:1px;">
+                            <label class="checkbox">
+                                <input id="album-checkbox-{$album["id"]}"type="checkbox" onclick="toggleAlbumFollower({$album["id"]}, '{$album["user_id"]}');" {$checked}>{$album["handle"]} ({$album["id"]})
+                                <span id="saved-{$album["id"]}" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
+                            </label>
+                        </div>
+HTML;
+
+    }
+
 
 
     $html .= <<<HTML
@@ -339,36 +364,21 @@ foreach ($friends_info as $friend) {
                            class="no-underline"
                            onclick="showNewsFeedAlbums('{$friend["id"]}');">
                            <i id ="albums-caret-{$friend["id"]}" class="icon-caret-right"></i>
-                           {$num_albums} albums
+                           Following <span id="num-followed-{$friend["id"]}">{$num_followed_albums}</a> of {$num_albums} albums
                         </a>
+                        <br>
                     </span>
 
 
                     <div style="margin-left:10px; display:none;" id="albums-{$friend["id"]}">
-HTML;
 
-    foreach ($albums_info as $album) {
-
-        $is_follower = is_follower($user_id, $album["id"]);
-
-        if ($is_follower) {
-            $checked ='checked="checked"';
-        } else {
-            $checked = "";
-        }
-
-        $html .= <<<HTML
-                        <div style="padding:1px;">
-                            <label class="checkbox">
-                                <input id="album-checkbox-{$album["id"]}"type="checkbox" onclick="toggleAlbumFollower({$album["id"]}, '{$album["user_id"]}');" {$checked}>{$album["handle"]} ({$album["id"]})
-                                <span id="saved-{$album["id"]}" style="display:none; color:green;"><i class='icon-ok-sign'></i> Saved!</span>
-                            </label>
+                        <div style="color:#666666; margin:5px 0px; font-size:12px;">
+                            You'll get updates (here and via email) on the albums checked below.
                         </div>
-HTML;
 
-    }
+                        {$followed_albums}
 
-    $html .= <<<HTML
+
                     </div>
 
                 </div>

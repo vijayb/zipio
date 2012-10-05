@@ -695,8 +695,9 @@ function toggleAlbumFollower(albumID, albumOwnerID) {
         type: "GET",
         url: urlString,
         success: function(data) {
-            if (parseInt(data) == 1) {
+            if (parseInt(data) > 0) {
                 $("#saved-" + albumID).show().delay(700).fadeOut();
+                $("#num-followed-" + albumOwnerID).html(data);
             } else {
                 // bad token
             }
@@ -1275,6 +1276,10 @@ function getAlert(alert) {
         returnArr["class"] = "alert-success";
     } else if (alert == 9) {
         returnArr["title"] = "That photo was deleted.";
+        returnArr["text"]  = "";
+        returnArr["class"] = "alert-success";
+    } else if (alert == 9) {
+        returnArr["title"] = "The album you asked for, '" + hashParams["username"] + hashParams["username"] + "' doesn't exist.";
         returnArr["text"]  = "";
         returnArr["class"] = "alert-success";
     }
