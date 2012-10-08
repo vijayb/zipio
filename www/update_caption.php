@@ -11,6 +11,7 @@ if (!isset($_POST["albumphoto_id"]) ||
     !isset($_POST["caption"]) ||
     !isset($_POST["token"]) ||
     !isset($_POST["album_id"]) ||
+    !isset($_POST["album_owner_id"]) ||
     !isset($_POST["caption_modifier_id"]) ||
     !isset($_POST["caption_modifier_username"]) ||
     !isset($_POST["album_handle"]) ||
@@ -23,6 +24,7 @@ if (!isset($_POST["albumphoto_id"]) ||
     $caption = $_POST["caption"];
     $token = $_POST["token"];
     $album_id = $_POST["album_id"];
+    $album_owner_id = $_POST["album_owner_id"];
     $caption_modifier_id = $_POST["caption_modifier_id"];
     $caption_modifier_username = $_POST["caption_modifier_username"];
     $album_handle = $_POST["album_handle"];
@@ -37,7 +39,8 @@ if (!check_token($album_id, $token, "Albums")) {
 
 $result = update_data("AlbumPhotos", $albumphoto_id, array("caption" => $caption));
 
-add_event($caption_modifier_id, ACTION_EDIT_CAPTION, $album_id, $albumphoto_id, NULL);
+add_event($caption_modifier_id, ACTION_EDIT_CAPTION, $album_id, $albumphoto_id, NULL, $album_owner_id, $albumphoto_owner_id, NULL);
+
 
 // Now, let's email the albumphoto owner and album owner about the modified caption
 

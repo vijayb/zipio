@@ -636,6 +636,7 @@ function submitCaption() {
             "caption": caption,
             "token": gAlbum["token"],
             "album_id": gAlbum["id"],
+            "album_owner_id": gAlbum["user_id"],
             "caption_modifier_id": $('#caption-modal').attr("caption-modifier-id"),
             "caption_modifier_username":$('#caption-modal').attr("caption-modifier-username"),
             "album_handle": $('#caption-modal').attr("album-handle"),

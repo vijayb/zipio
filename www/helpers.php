@@ -396,7 +396,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
         $albumphoto_id = mysql_insert_id();
-        add_event($owner_user_id, ACTION_ADD_ALBUMPHOTO, $target_album_id, $albumphoto_id, NULL);
+        add_event($owner_user_id, ACTION_ADD_ALBUMPHOTO, $target_album_id, $albumphoto_id, NULL, $target_album_owner_id, $owner_user_id, NULL);
         return $albumphoto_id;
 
     } else {

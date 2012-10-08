@@ -1,0 +1,9 @@
+
+
+Every albumphoto has an underlying photo which is the basis for the pixels shown.
+
+A single photo can "be in" many albums as unique albumphotos, but only the owner of the underlying photo can copy, and only to his own albums.
+
+Every photo was submitted to the system by exactly one user, and that user is the owner (user_id in the Photos table).
+
+The owner of an albumphoto is always the owner of the underlying photo. Only the owner can copy an albumphoto to another album. Then, should the owner delete the underlying photo (by deleting the last albumphoto that references it), all the albumphotos will be deleted.

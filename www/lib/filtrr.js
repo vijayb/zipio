@@ -890,6 +890,7 @@
                 data: {
                     'user_id': gUser["id"],
                     'album_id': gAlbum["id"],
+                    'album_owner_id': gAlbum["user_id"],
                     'albumphoto_id': albumphotoID,
                     'cropped_image_data': croppedImgData,
                     'cropped_image_src': croppedImgSrc,
@@ -900,7 +901,6 @@
                 success: function(data) {
                     console.log(data);
                     $("#image-" + albumphotoID).attr("src", $("#image-" + albumphotoID).attr("src").replace(/_cropped$/, "_cropped_filtered"));
-
                     $("#save-" + albumphotoID).hide();
                     $("#cover-" + albumphotoID).fadeOut();
                 }

@@ -1,0 +1,2 @@
+To set a file to public:
+s3cmd setacl --acl-public s3://s3.zipiyo.com/photos/8_4_5966d3f0807745d214eb938785a53afaecf58b27_cropped
