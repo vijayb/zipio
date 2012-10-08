@@ -892,6 +892,7 @@
                     'album_id': gAlbum["id"],
                     'album_owner_id': gAlbum["user_id"],
                     'albumphoto_id': albumphotoID,
+                    'albumphoto_owner_id': $("#image-" + albumphotoID).attr("owner-id"),
                     'cropped_image_data': croppedImgData,
                     'cropped_image_src': croppedImgSrc,
                     'big_image_data': bigImgData,
