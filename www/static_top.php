@@ -9,22 +9,8 @@
 
 
 
-<link href="/lib/styles.css" rel="stylesheet" />
-<link href="/lib/fonts.css" rel="stylesheet" />
-
-
-
-
-
-
-
-
-
-
-
-
 <link href="/lib/bootstrap.css" rel="stylesheet" />
-<link href="/lib/bootstrap-responsive.css" rel="stylesheet" />
+<!-- <link href="/lib/bootstrap-responsive.css" rel="stylesheet" /> -->
 
 <!--
 <link rel="stylesheet/less" href="/bootstrap/less/bootstrap.less" media="all" />
@@ -32,26 +18,24 @@
 <script src="/lib/less-1.3.0.min.js"></script>
 -->
 
+<link href="/lib/styles.css" rel="stylesheet" />
+<link href="/lib/fonts.css" rel="stylesheet" />
+
 
 
 <?php
 
 // =============================================================================
 
-// Some pages on the site are fluid, like one_up.php. I
-$is_fluid = "";
 
 if (strstr($_SERVER["SCRIPT_FILENAME"], "display_album.php")) {
 
-    if (isset($_GET["albumphoto"])) {
-        $albumphoto_id = $_GET["albumphoto"];
-        $albumphoto_info = get_albumphoto_info($albumphoto_id);
-        print("<!-- GET: " . print_r($albumphoto_info, true) . "-->");
-        $html = <<<HTML
-            <meta property="og:image" content="{$g_s3_root}/{$albumphoto_info["s3_url"]}_big" />
+    $html = <<<HTML
+
+
 HTML;
         print($html);
-    }
+
 
 } else if (strstr($_SERVER["SCRIPT_FILENAME"], "index.php")) {
 
@@ -59,16 +43,13 @@ HTML;
         <style>
 
         body {
-        	background-color: #004183;
+        	background-color: #000000;
         }
         </style>
-
 HTML;
 
     print($html);
 
-} else if (strstr($_SERVER["SCRIPT_FILENAME"], "one_up.php")) {
-    $is_fluid = "-fluid";
 }
 
 ?>
@@ -107,7 +88,7 @@ HTML;
 
 // Define default values for templates
 
-$brand_name = "<img src='/images/" . $g_zipio . "_white_small.png'>";
+$brand_name = $g_zipio; // "<img src='/images/" . $g_zipio . "_white_small.png'>";
 
 if (is_logged_in()) {
 
@@ -122,8 +103,8 @@ HTML;
 
     $nav_bar_links = <<<HTML
             <ul class="nav">
-                <li><a href="/news_feed.php?user_username={$_SESSION["user_info"]["username"]}"><i class="icon-reorder"></i> News Feed</a></li>
-                <li><a href="/{$_SESSION["user_info"]["username"]}"><i class="icon-th"></i> My Albums</a></li>
+                <li><a href="/news_feed.php?user_username={$_SESSION["user_info"]["username"]}">News Feed</a></li>
+                <li><a href="/{$_SESSION["user_info"]["username"]}">My Albums</a></li>
             </ul>
 HTML;
 
@@ -612,10 +593,10 @@ if (isset($_SESSION["user_info"]["username"])) {
 $navbar_html = <<<HTML
 
 <div class="navbar navbar-fixed-top navbar-inverse">
-    <div class="navbar-inner" style="background-color:initial">
-        <div class="container{$is_fluid}">
+    <div class="navbar-inner">
+        <div class="container-fluid">
 
-            <a class="brand" href="{$user_zipio_dir}">
+            <a class="brand" href="{$user_zipio_dir}" style="margin-left:0px;">
                 {$brand_name}
             </a>
 
@@ -639,11 +620,6 @@ $navbar_html = <<<HTML
 
         </div>
     </div>
-
-    <div id="fb-bar" style="display:none;">
-        <span class="highlight">People you know are already using {$g_Zipio}!</span>
-        <button class="btn btn-primary" href="#" onclick="FB.login();">Find them with Facebook</button>
-    </div>
 </div>
 
 HTML;
@@ -654,9 +630,9 @@ print($navbar_html);
 
 
 
-<div class="container<?php print($is_fluid); ?>">
+<div class="container-fluid" style="padding:0px;">
 
-    <div class="row">
+    <div class="row-fluid" style="display:none;">
         <div class="span12" style="margin-bottom:10px;">
             <div class="alert" style="display:none; padding:10px 35px 10px 15px;" id="header-alert">
                 <button class="close">×</button>
@@ -666,12 +642,16 @@ print($navbar_html);
         </div>
     </div>
 
-    <div class="row">
-        <div class="span9" style="margin-bottom:20px">
-            <h1><?php print($page_title); ?></h1>
-            <h3 style="color:#888888; margin: 5px 0px 5px 0px;">
-                <?php print($page_subtitle); ?>
-            </h3>
+    <div style="height:40px; background-color:#999;">
+    </div>
+
+    <div class="row-fluid" style="background-color:#000; border-top:1px #444 solid;">
+        <div class="span12">
+            <div style="padding:5px 10px;">
+                <h1 style="color:white; font-size:30px;"><?php print($page_title); ?></h1>
+                <h4 style="color:#aaaaaa; margin: 5px 0px 5px 0px;">
+                    <?php print($page_subtitle); ?>
+                </h4>
+            </div>
         </div>
-        <div class="span3" style="text-align:right"><?php print($page_title_right); ?></div>
     </div>

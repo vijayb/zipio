@@ -23,7 +23,8 @@
   min-height: @navbarHeight;
   padding-left:  20px;
   padding-right: 20px;
-  #gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
+  //#gradient > .vertical(@navbarBackgroundHighlight, @navbarBackground);
+  background-color:rgba(0,0,0,.75);
   border: 1px solid @navbarBorder;
   .border-radius(4px);
   .box-shadow(0 1px 4px rgba(0,0,0,.065));
@@ -233,7 +234,7 @@
   padding: ((@navbarHeight - @baseLineHeight) / 2) 15px ((@navbarHeight - @baseLineHeight) / 2);
   color: @navbarLinkColor;
   text-decoration: none;
-  text-shadow: 0 1px 0 @navbarBackgroundHighlight;
+  //text-shadow: 0 1px 0 @navbarBackgroundHighlight;
 }
 .navbar .nav .dropdown-toggle .caret {
   margin-top: 8px;

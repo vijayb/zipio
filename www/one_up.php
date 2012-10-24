@@ -130,12 +130,11 @@ if ($albumphoto_info["num_likes"] == 0) {
     $display_like_count = "style='display:none'";
 }
 
-
 $html = <<<HTML
 
 <div class="row-fluid">
-    <div class="span8"
-         style="background-color:#eeeeee; text-align:center; margin-bottom:10px; position:relative"
+    <div class="span9"
+         style="background-color:#111111; text-align:center; margin-bottom:10px; position:relative"
          id="one-up-photo"
          albumphoto-id="{$albumphoto_info["id"]}"
          albumphoto-s3="{$albumphoto_info["s3_url"]}_big{$is_filtered}">
@@ -148,11 +147,11 @@ $html = <<<HTML
             by <b>{$albumphoto_owner_info["username"]}</b>
         </div>
         <div id="albumphoto-like-{$albumphoto_info['id']}" class="comment-count" liked="{$liked}">
-            <a id="albumphoto-like-count-link-{$albumphoto_info['id']}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_info['id']});" {$display_like_count}>
-                <span id="albumphoto-like-count-{$albumphoto_info['id']}">{$albumphoto_info["num_likes"]}</span>
-            </a>
             <a href="javascript:void(0)" class="no-underline" onclick="likeAlbumphoto({$albumphoto_info['id']}, {$liker_id}, {$albumphoto_info["photo_owner_id"]}, '{$albumphoto_info["s3_url"]}_cropped{$is_filtered}');">
                  <i id="albumphoto-like-heart-{$albumphoto_info['id']}" class="icon-heart $heart_class"></i>
+            </a>
+            <a id="albumphoto-like-count-link-{$albumphoto_info['id']}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_info['id']});" {$display_like_count}>
+                <span id="albumphoto-like-count-{$albumphoto_info['id']}">{$albumphoto_info["num_likes"]}</span>
             </a>
         </div>
 HTML;
@@ -207,26 +206,29 @@ HTML;
 
     </div>
 
-    <div class="span4">
-        <div class="well well-small" style="overflow:hidden">
-            <div style="float:left">
-                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$prev_albumphoto_id}" class="no-underline" id="link-prev">
-                    <i class="icon-caret-left"></i> <img style="height:50px; width:50px" src="{$g_s3_root}/{$prev_albumphoto_info["s3_url"]}_cropped{$prev_is_filtered}"></a>
+    <div class="span3">
+
+        <div style="margin:25px 40px 25px 20px;">
+
+            <div style="overflow:hidden">
+                <div style="float:left">
+                    <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$prev_albumphoto_id}" class="no-underline" id="link-prev">
+                        <i class="icon-caret-left"></i> <img style="height:50px; width:50px" src="{$g_s3_root}/{$prev_albumphoto_info["s3_url"]}_cropped{$prev_is_filtered}"></a>
+                </div>
+                <div style="float:right">
+                    <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$next_albumphoto_id}" class="no-underline" id="link-next">
+                        <img style="height:50px; width:50px" src="{$g_s3_root}/{$next_albumphoto_info["s3_url"]}_cropped{$next_is_filtered}"> <i class="icon-caret-right"></i></a>
+                </div>
             </div>
-            <div style="float:right">
-                <a href="/{$album_info["username"]}/{$album_info["handle"]}/{$next_albumphoto_id}" class="no-underline" id="link-next">
-                    <img style="height:50px; width:50px" src="{$g_s3_root}/{$next_albumphoto_info["s3_url"]}_cropped{$next_is_filtered}"> <i class="icon-caret-right"></i></a>
-            </div>
-        </div>
 HTML;
 
     $html .= <<<HTML
-        <div style="clear:both; margin-top:20px;">
-            <h3 style="margin-top:0px;">Comments</h3>
-            <div id="one-up-comments">
-                <span style="color:#999999">No comments yet. Be the first!</span>
+            <div style="clear:both; margin-top:20px;">
+                <h3 style="margin-top:0px;">Comments</h3>
+                <div id="one-up-comments">
+                    <span style="color:#999999">No comments yet. Be the first!</span>
+                </div>
             </div>
-        </div>
 HTML;
 
 
@@ -234,13 +236,13 @@ HTML;
 
             $html .= <<<HTML
 
-        <div style="margin-top:10px;">
-            <textarea id="one-up-comment-input" class="input-xlarge" style="width:100%; box-sizing:border-box; height:50px;" placeholder="Add a comment..."></textarea>
-            <button onclick="submitCommentOneUp();"
-                    class="btn btn-primary btn-block" id="one-up-comment-submit" data-loading-text="Adding comment...">
-                    Add comment
-            </button>
-        </div>
+            <div style="margin-top:10px;">
+                <textarea id="one-up-comment-input" class="input-xlarge" style="width:100%; box-sizing:border-box; height:50px;" placeholder="Add a comment..."></textarea>
+                <button onclick="submitCommentOneUp();"
+                        class="btn btn-primary btn-block" id="one-up-comment-submit" data-loading-text="Adding comment...">
+                        Add comment
+                </button>
+            </div>
 HTML;
 
         }
@@ -253,44 +255,44 @@ $html .= <<<HTML
 
 
 
-        <div class="btn-group" style="margin-top:10px;">
-            <button rel="tooltip" title="Options" id="options-{$albumphoto_info['id']}" class="btn dropdown-toggle ttip" data-toggle="dropdown">
-                <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
-            </button>
-            <ul class="dropdown-menu">
+            <div class="btn-group" style="margin-top:10px;">
+                <button rel="tooltip" title="Options" id="options-{$albumphoto_info['id']}" class="btn dropdown-toggle ttip" data-toggle="dropdown">
+                    <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
+                </button>
+                <ul class="dropdown-menu">
 
-                <li>
-                    <a href="javascript:void(0);" onclick="rotatePhoto(0, {$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');">
-                        <i class="icon-undo"></i> Rotate left
-                    </a>
-                </li>
+                    <li>
+                        <a href="javascript:void(0);" onclick="rotatePhoto(0, {$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');">
+                            <i class="icon-undo"></i> Rotate left
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="javascript:void(0);" onclick="rotatePhoto(1, {$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');">
-                        <i class="icon-repeat"></i> Rotate right
-                    </a>
-                </li>
+                    <li>
+                        <a href="javascript:void(0);" onclick="rotatePhoto(1, {$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');">
+                            <i class="icon-repeat"></i> Rotate right
+                        </a>
+                    </li>
 
-                <li>
-                    <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}');">
-                        <i class="icon-picture"></i> Set as album cover
-                    </a>
-                </li>
+                    <li>
+                        <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphoto_info["id"]}, {$albumphoto_info["album_id"]}, '{$albumphoto_info["token"]}');">
+                            <i class="icon-picture"></i> Set as album cover
+                        </a>
+                    </li>
 
 
-                <li>
-                    <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
-                                                                   deletePhotoFromAlbum({$albumphoto_info["id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');
-                                                                   window.location.href = $('#link-next').attr('href') + '#alert=9';
-                                                               }">
-                        <i class="icon-trash"></i> Delete this photo
-                    </a>
-                </li>
+                    <li>
+                        <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
+                                                                       deletePhotoFromAlbum({$albumphoto_info["id"]}, '{$albumphoto_info["token"]}', '{$albumphoto_info["s3_url"]}');
+                                                                       window.location.href = $('#link-next').attr('href') + '#alert=9';
+                                                                   }">
+                            <i class="icon-trash"></i> Delete this photo
+                        </a>
+                    </li>
 
-            </ul>
+                </ul>
+            </div>
+
         </div>
-
-
 
     </div>
 </div>

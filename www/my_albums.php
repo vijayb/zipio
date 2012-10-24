@@ -59,14 +59,14 @@ for ($k = 0; $k < count($album_sets_to_display); $k++) {
             $section_title = "My albums";
         }
     } else if ($k == 1) {
-        $section_title = "Others' albums (where I'm a collaborator)";
+        $section_title = "Albums where I'm a collaborator";
     }
 
 
     $html = <<<HTML
-    <div class="row">
+    <div class="row-fluid">
 
-        <div class="span12" style="margin-bottom:15px">
+        <div class="span12" style="margin:10px">
             <h2>$section_title</h2>
         </div>
 
@@ -101,10 +101,9 @@ HTML;
        }
 
         $html .= <<<HTML
-        <!-- ---------------------------------------------------------------- -->
-        <!-- TILE BEGIN ----------------------------------------------------- -->
+        <!-- TILE BEGIN |||||||||||||||||||||||||||||||||||||||||||||||||||| -->
 
-        <div class="tile span3" id="album-{$albums_array[$i]["id"]}">
+        <div class="tile span2" id="album-{$albums_array[$i]["id"]}">
             <a href="/{$album_owner_info["username"]}/{$albums_array[$i]["handle"]}">
                 <img src='{$g_s3_root}/{$cover_albumphoto_info["s3_url"]}_cropped{$is_filtered}' style="width:100%">
                 <div class="album-details"></div>
@@ -137,8 +136,7 @@ HTML;
 
         $html .= <<<HTML
         </div>
-        <!-- TILE END ------------------------------------------------------ -->
-        <!-- --------------------------------------------------------------- -->
+        <!-- TILE END |||||||||||||||||||||||||||||||||||||||||||||||||||||| -->
 HTML;
 
     }

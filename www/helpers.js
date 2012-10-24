@@ -137,6 +137,25 @@ function showLikersModal(albumphotoID) {
 }
 
 
+function toggleLeftPanel() {
+
+    console.log("hello");
+
+    if ($("#left-panel").css("left") == "0px") {
+
+        $("#left-panel").animate({"left":"-285px"}); $("#photos-panel").animate({"margin-left":"15px"});
+        //$("#left-panel").css({"left":"-280px"}); $("#photos-panel").css({"margin-left":"20px"});
+        $("#left-panel-toggle").addClass("icon-caret-right").removeClass("icon-caret-left");
+
+    } else {
+
+        $("#left-panel").animate({"left":"0px"}); $("#photos-panel").animate({"margin-left":"300px"});
+        //$("#left-panel").css({"left":"0px"}); $("#photos-panel").css({"margin-left":"300px"});
+        $("#left-panel-toggle").addClass("icon-caret-left").removeClass("icon-caret-right");
+    }
+}
+
+
 function showNotificationPanel() {
 
     debug("Start of showNotificationPanel()");
@@ -156,10 +175,6 @@ function showNotificationPanel() {
         },
         async: true
     });
-
-
-
-
 }
 
 

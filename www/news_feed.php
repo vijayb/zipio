@@ -44,7 +44,7 @@ $events_array = get_events_array($user_id, 0);
 
 
 $html = <<<HTML
-<div class="row">
+<div class="row" style="padding:20px;">
     <div class="span8">
 HTML;
 
