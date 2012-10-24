@@ -133,12 +133,12 @@ function send_email($to, $from, $subject, $html) {
 
 function encrypt_json($arr) {
     $json = json_encode($arr);
-    $encrypted_text = openssl_encrypt($json, "aes-128-cbc", "cheapass", true, "1234567812345678");
+    $encrypted_text = openssl_encrypt($json, "aes-128-cbc", "length16length16", true, "1234567812345678");
     return base64_encode($encrypted_text);
 }
 
 function decrypt_json($encrypted_json) {
-    $decrypted_text = openssl_decrypt(base64_decode($encrypted_json), "aes-128-cbc", "cheapass", true, "1234567812345678");
+    $decrypted_text = openssl_decrypt(base64_decode($encrypted_json), "aes-128-cbc", "length16length16", true, "1234567812345678");
     return json_decode($decrypted_text, true);
 }
 

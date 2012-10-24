@@ -22,3 +22,10 @@ CREATE TABLE IF NOT EXISTS `Events` (
   KEY (`commenter_id`),
   UNIQUE KEY `event_key` (`actor_id`, `action_type`, `object_id`)
   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `LastNotifiedPosition` (
+`id` int(11) NOT NULL AUTO_INCREMENT,
+`event_id` int(11) unsigned NOT NULL,
+PRIMARY KEY(`id`),
+KEY(`event_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
