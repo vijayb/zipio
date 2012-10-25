@@ -13,14 +13,47 @@ use Crypt::CBC;
 use MIME::Base64;
 use URI::Escape;
 use WWW::Mailgun;
-    
+use Net::Address::IP::Local;
+use Getopt::Long qw(GetOptionsFromArray);    
+use Proc::ProcessTable;
+
+
 # Force autoflush on std/stderr, so we log
 # what happens if a process dies
 STDERR->autoflush(1);
 STDOUT->autoflush(1);
 
+my $ip = Net::Address::IP::Local->public;
+if (!defined($ip) || $ip eq "127.0.0.1") {
+    die "Error: Unable to determine IP address for this process.\n";
+}
+
+
+# Get arguments to determin if we're in debug mode (default) or production mode
+# (use: --production)
+my $G_DEBUG;
+GetOptionsFromArray(\@ARGV,
+		    "production" => \$G_DEBUG);
+
+if (!defined($G_DEBUG)) {
+    $G_DEBUG = 1;
+} else {
+    $G_DEBUG = 0;
+    if ($ip ne "23.23.243.73") {
+	die "Error: attempting to use --production from non prod machine!\n";
+    }
+}
+
+my $pid = $$;
+my $t = new Proc::ProcessTable;
+
+foreach my $p ( @{$t->table} ){
+    if ($p->cmndline =~ /perl[^n]{1,7}notifier\.pl/ && $p->pid ne $pid) {
+	die "Error: it appears another instance of notifier is running!\n";
+    }
+}
+
 ################################ CONSTANTS ###############################
-my $G_DEBUG = 1;
 my $G_ZIPIO;
 my $G_FB_APP_ID;
 my $G_WWW_ROOT;
@@ -40,6 +73,9 @@ my $G_S3_ROOT = "http://$G_S3_BUCKET_NAME/$G_S3_FOLDER_NAME";
 my $G_FOUNDERS_EMAIL_ADDRESS = "$G_ZIPIO <founders@"."$G_ZIPIO.com>";
 
 ############################################################################
+
+
+
 
 
 
