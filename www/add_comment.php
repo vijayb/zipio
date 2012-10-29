@@ -63,6 +63,8 @@ $albumphoto_info = get_albumphoto_info($albumphoto_id);
 
 add_event($commenter_id, ACTION_ADD_COMMENT, $album_id, $albumphoto_id, $comment_id, $album_owner_id, $albumphoto_info["photo_owner_id"], $commenter_id);
 
+/*
+
 $collaborators_array = get_collaborators_info($album_id);
 
 for ($i = 0; $i < count($collaborators_array); $i++) {
@@ -96,7 +98,7 @@ EMAIL;
     }
 
 }
-
+*/
 
 
 print("1");
