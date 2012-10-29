@@ -78,14 +78,6 @@ if ($old_like_value == "0") {
 }
 
 /*
-Now, let's email the
-	- commenter
-	- albumphoto owner
-	- album owner
-
-(but if a user is more than one of the above, never email them more than once)
-*/
-
 
 
 $users_to_be_emailed = array();
@@ -143,7 +135,7 @@ EMAIL;
     }
 }
 
-
+*/
 
 print("1");
 
