@@ -14,7 +14,7 @@ use MIME::Base64;
 use URI::Escape;
 use WWW::Mailgun;
 use Net::Address::IP::Local;
-use Getopt::Long qw(GetOptionsFromArray);    
+use Getopt::Long qw(GetOptionsFromArray);
 use Proc::ProcessTable;
 
 
@@ -32,14 +32,18 @@ if (!defined($ip) || $ip eq "127.0.0.1") {
 # Get arguments to determin if we're in debug mode (default) or production mode
 # (use: --production)
 my $G_DEBUG;
+my $G_SLEEP_SECONDS = 180;
 GetOptionsFromArray(\@ARGV,
-		    "production" => \$G_DEBUG);
+		    "production" => \$G_DEBUG,
+		    "sleep=i" => \$G_SLEEP_SECONDS);
+
 
 if (!defined($G_DEBUG)) {
     $G_DEBUG = 1;
 } else {
     $G_DEBUG = 0;
-    if ($ip ne "23.23.243.73") {
+    print "[$ip]\n";
+    if ($ip ne "10.215.122.185") {
 	die "Error: attempting to use --production from non prod machine!\n";
     }
 }
@@ -57,13 +61,17 @@ foreach my $p ( @{$t->table} ){
 my $G_ZIPIO;
 my $G_FB_APP_ID;
 my $G_WWW_ROOT;
+my $G_DATABASE;
+
 if ($G_DEBUG) {
     $G_WWW_ROOT = "http://localhost";
     $G_ZIPIO = "zipiyo";
+    $G_DATABASE = "Zipiyo";
     $G_FB_APP_ID = "255929901188660";
 } else {
     $G_WWW_ROOT = "http://zipio.com";
     $G_ZIPIO = "zipio";
+    $G_DATABASE = "Zipio";
     $G_FB_APP_ID = "457795117571468";
 }
 
@@ -111,14 +119,14 @@ $template_files{14} = "./templates/"; # ACTION_CHANGE_ALBUM_COVER
 ############################################################################
 
 
-my @db_params = ("DBI:mysql:Zipiyo;host=localhost;mysql_ssl=1",
+my @db_params = ("DBI:mysql:$G_DATABASE;host=localhost;mysql_ssl=1",
 		 "zipio", "daewoo",
 		 {RaiseError => 1, AutoCommit => 1});
 
 my $dbh;
 my $sth;
 
-my $mg = WWW::Mailgun->new({ 
+my $mg = WWW::Mailgun->new({
     key => 'key-68imhgvpoa-6uw3cl8728kcs9brvlmr9',
     domain => 'zipio.com',
     from => 'founders@zipio.com'
@@ -132,51 +140,53 @@ while (1) {
     $sth->execute() || die "Failed DB query [$query]\n";
     my $event_id = $sth->fetchrow_array();
     if (!defined($event_id)) {
-	die "Unable to find event_id from LastNotifiedPosition table!\n";
-    }
-    
-    print "ID of last event that has been processed: $event_id.\n";
-    
-    $query = "select * from Events where id > $event_id order by id";
-    $sth = $dbh->prepare($query);
-    $sth->execute() || die "Failed DB query [$query]\n";
-    my $event_ref;
-    my $last_event_id;
-    my %emails;
-    my %activity_count;
-    while ($event_ref = $sth->fetchrow_hashref) {
-	process_event($event_ref, \%template_files, \%emails,
-		      \%activity_count, $dbh);
-	
-	print "Event: ".$$event_ref{"id"}."\n";
-	$last_event_id = $$event_ref{"id"};
-    }
-    print "Last id $last_event_id\n";
+       die "Unable to find event_id from LastNotifiedPosition table!\n";
+   }
 
-    if (defined($last_event_id)) {
-	$query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
-	$sth = $dbh->prepare($query);
-	$sth->execute() || die "Failed DB query [$query]\n";
-	
-	foreach my $email (keys %emails) { 
-	    print "$email:".$activity_count{$email}."\n";
-	    print $emails{$email},"\n";
-	    
-	    my $update = "updates";
-	    if ($activity_count{$email} == 1) {
-		$update = "update";
-	    }
-	    $mg->send({
-		to => $email,
-		subject => "Zipio notification: $activity_count{$email} $update",
-		html => $emails{$email},
-		      });
-	}
-    } else {
-	print "No events to process, sleeping... ".time()."\n";
-    }
-    
-    sleep(60);
+   print "ID of last event that has been processed: $event_id.\n";
+
+   $query = "select * from Events where id > $event_id order by id";
+   $sth = $dbh->prepare($query);
+   $sth->execute() || die "Failed DB query [$query]\n";
+   my $event_ref;
+   my $last_event_id;
+   my %emails;
+   my %activity_count;
+   while ($event_ref = $sth->fetchrow_hashref) {
+       process_event($event_ref, \%template_files, \%emails,
+        \%activity_count, $dbh);
+
+       print "Event: ".$$event_ref{"id"}."\n";
+       $last_event_id = $$event_ref{"id"};
+   }
+
+   if (defined($last_event_id)) {
+       print "Last id $last_event_id\n";
+
+       $query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
+       $sth = $dbh->prepare($query);
+       $sth->execute() || die "Failed DB query [$query]\n";
+
+       foreach my $email (keys %emails) {
+           print "$email:".$activity_count{$email}."\n";
+           print $emails{$email},"\n";
+
+           my $update = "updates";
+           if ($activity_count{$email} == 1) {
+              $update = "update";
+          }
+          $mg->send({
+              to => $email,
+              subject => "Zipio notification: $activity_count{$email} $update",
+              html => $emails{$email},
+              });
+      }
+
+      } else {
+       print "No events to process, sleeping for $G_SLEEP_SECONDS seconds... ".time()."\n";
+   }
+
+   sleep($G_SLEEP_SECONDS);
 }
 
 
@@ -196,7 +206,7 @@ sub process_event {
 	my $message = construct_message($user_id, $event_ref,
 					$template_files_ref, $dbh);
 	#print "$message\n";
-	
+
 
 	if (defined($$emails_ref{$email})) {
 	    $$emails_ref{$email} .= "<hr>\n".$message;
@@ -288,10 +298,10 @@ sub add_album_collaborators {
     my $album_id = shift;
     my $users_to_notify_ref = shift;
     my $dbh = shift;
-    
+
     my $query =
 	"select collaborator_id from Collaborators where album_id='$album_id'";
-    
+
     my $sth = $dbh->prepare($query);
     my $collaborator_id;
     $sth->execute() || die "Failed DB query [$query]\n";
@@ -306,10 +316,10 @@ sub add_album_followers {
     my $album_id = shift;
     my $users_to_notify_ref = shift;
     my $dbh = shift;
-    
+
     my $query =
 	"select user_id from AlbumFollowers where album_id='$album_id'";
-    
+
     my $sth = $dbh->prepare($query);
     my $follower_id;
     $sth->execute() || die "Failed DB query [$query]\n";
@@ -377,7 +387,7 @@ sub construct_message {
 		get_attribute($$event_ref{"albumphoto_user_id"},
 			      "username", "Users", $dbh) . "'s";
 	}
-	
+
 	$albumphoto_s3 = get_albumphoto_s3($$event_ref{"albumphoto_id"}, $dbh);
 	$object_owner_id = $$event_ref{"albumphoto_owner_id"};
     }
