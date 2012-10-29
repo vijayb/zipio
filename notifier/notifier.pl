@@ -159,10 +159,16 @@ while (1) {
        print "Event: ".$$event_ref{"id"}."\n";
        $last_event_id = $$event_ref{"id"};
    }
+<<<<<<< HEAD
 
    if (defined($last_event_id)) {
        print "Last id $last_event_id\n";
 
+=======
+   print "Last id $last_event_id\n";
+
+   if (defined($last_event_id)) {
+>>>>>>> 0a72ede9846ba6c194c0fd761f15fbe0bf1a132e
        $query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
        $sth = $dbh->prepare($query);
        $sth->execute() || die "Failed DB query [$query]\n";
@@ -183,10 +189,17 @@ while (1) {
       }
 
       } else {
+<<<<<<< HEAD
        print "No events to process, sleeping for $G_SLEEP_SECONDS seconds... ".time()."\n";
    }
 
    sleep($G_SLEEP_SECONDS);
+=======
+       print "No events to process, sleeping... ".time()."\n";
+   }
+
+   sleep(180);
+>>>>>>> 0a72ede9846ba6c194c0fd761f15fbe0bf1a132e
 }
 
 

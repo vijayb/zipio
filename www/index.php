@@ -37,15 +37,12 @@ $page_subtitle = "";
 
 <!-- Main body of the page goes here -->
 
-<div class="row">
+<div class="row-fluid">
 
 
-    <div class="span12" style="position:absolute; top:-230px; text-align:center; z-index:-10;">
-        <img src="/images/glow.png">
-    </div>
 
 
-    <div class="span12" style="text-align:center">
+    <div class="span12" style="text-align:center; margin-top:30px;">
         <img src="/images/<?php print($g_zipio); ?>_white_big.png">
 
         <div style="margin-top:50px; font-size:30px; font-weight:100; color:#ffffff; line-height:normal">

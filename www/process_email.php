@@ -532,8 +532,8 @@ function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s
 
     global $con;
     global $g_www_root;
-    global $g_s3_root;
-    global $g_founders_email_address;
+    global $g_s3_root
+re;    global $g_founders_email_address;
 
     $collaborators_array = get_collaborators_info($album_info["id"]);
 

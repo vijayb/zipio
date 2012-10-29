@@ -253,7 +253,7 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
     $s3_url_parameter = $s3_base_image_url;
 
     $big_size = 1600;
-    $cropped_size = 300;
+    $cropped_size = 500;
 
     $failed = 0;
 
@@ -845,6 +845,10 @@ function create_album_followers($album_owner_id, $album_id) {
         $album_string .= "(" . $row["user_id"] . "," . $album_id . "," . $album_owner_id . "),";
     }
     $album_string = rtrim($album_string, ",");
+
+    if ($album_string == "") {
+        return;
+    }
 
 
     $insert_query = "INSERT INTO AlbumFollowers (
