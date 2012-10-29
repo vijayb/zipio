@@ -42,7 +42,7 @@ $result = update_data("AlbumPhotos", $albumphoto_id, array("caption" => $caption
 add_event($caption_modifier_id, ACTION_EDIT_CAPTION, $album_id, $albumphoto_id, NULL, $album_owner_id, $albumphoto_owner_id, NULL);
 
 
-// Now, let's email the albumphoto owner and album owner about the modified caption
+/*
 
 $albumphoto_owner_info = get_user_info($albumphoto_owner_id);
 $album_owner_info = get_user_info(get_album_owner($album_id));
@@ -88,7 +88,7 @@ EMAIL;
 
 }
 
-
+*/
 
 print("1");
 

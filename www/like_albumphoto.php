@@ -64,6 +64,9 @@ if ($old_like_value == "0") {
 }
 
 
+
+/*
+
 // Now, let's email the albumphoto owner and album owner about the like
 
 $albumphoto_owner_info = get_user_info($albumphoto_owner_id);
@@ -113,7 +116,7 @@ EMAIL;
 
 }
 
-
+*/
 
 print("1");
 

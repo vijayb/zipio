@@ -193,7 +193,7 @@ if ($target_album_id > 0) {
             array_push($s3_urls, $s3_url);
         }
         output("TIME 6.2: " . (time() - $start_time) . "\n");
-        email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
+        // email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
         output("TIME 6.3: " . (time() - $start_time) . "\n");
 
         $display_album_ra = array();
@@ -229,7 +229,7 @@ EMAIL;
                 add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url);
                 array_push($s3_urls, $s3_url);
             }
-            email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
+            // email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
             $display_album_ra = array();
             $display_album_ra["user_id"] = $user_info["id"];
             $display_album_ra["timestamp"] = time();
@@ -330,7 +330,7 @@ EMAIL;
                 add_event($user_id, ACTION_ADD_ALBUM, $target_album_id, $current_albumphoto_id, NULL, $user_id, $user_id, NULL);
             }
         }
-        email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
+        // email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
         output("TIME 9: " . (time() - $start_time) . "\n");
 
 
@@ -527,13 +527,13 @@ output("TIME 11: " . (time() - $start_time) . "\n");
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-
+/*
 function email_newly_added_photos_to_collaborators($album_info, $sender_info, $s3_urls) {
 
     global $con;
     global $g_www_root;
-    global $g_s3_root
-re;    global $g_founders_email_address;
+    global $g_s3_root;
+    global $g_founders_email_address;
 
     $collaborators_array = get_collaborators_info($album_info["id"]);
 
@@ -562,7 +562,7 @@ EMAIL;
     }
 
 }
-
+*/
 
 
 function output($string) {
