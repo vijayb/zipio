@@ -1,6 +1,0 @@
-Options +FollowSymLinks
-RewriteEngine On
-
-RewriteRule ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$                 display_album.php?album_owner_username=$1&album_handle=$2 [QSA]
-RewriteRule ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([0-9]+)?$         one_up.php?albumphoto_id=$3
-RewriteRule ^([A-Za-z0-9-]+)/?$                                 my_albums.php?owner_username=$1 [QSA]
