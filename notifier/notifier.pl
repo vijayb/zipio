@@ -168,7 +168,7 @@ while (1) {
    print "Last id $last_event_id\n";
 
    if (defined($last_event_id)) {
->>>>>>> 0a72ede9846ba6c194c0fd761f15fbe0bf1a132e
+>>>>>>> 4f36788c9b94801bd92a91d056829e896207420a
        $query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
        $sth = $dbh->prepare($query);
        $sth->execute() || die "Failed DB query [$query]\n";
@@ -199,7 +199,7 @@ while (1) {
    }
 
    sleep(180);
->>>>>>> 0a72ede9846ba6c194c0fd761f15fbe0bf1a132e
+>>>>>>> 4f36788c9b94801bd92a91d056829e896207420a
 }
 
 
