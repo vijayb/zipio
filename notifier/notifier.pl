@@ -181,10 +181,11 @@ while (1) {
 	    my $template = HTML::Template->new(filename => "./templates/email_container_template.tmpl");
 	    $template->param(email_message_loop => $emails{$email});
 	    my $html = $template->output;
-	    $mg->send({
-		to => $email,
-		subject => "Zipio notification: $activity_count{$email} $update",
-		html => $html});
+	    print "$html\n";
+	    #$mg->send({
+	#	to => $email,
+	#	subject => "Zipio notification: $activity_count{$email} $update",
+	#	html => $html});
 	}
 	
     } else {
@@ -209,14 +210,15 @@ sub process_event {
 	my $email = get_attribute($user_id, "email", "Users", $dbh);
 	my $message = construct_message($user_id, $event_ref,
 					$template_files_ref, $dbh);
-	#print "$message\n";
-	my %email_section = ( email_section => $message );
-	
+	my %email_section;
 	if (defined($$emails_ref{$email})) {
+	    %email_section =  ( email_section => $message,
+				__FIRST__ => 0);
 	    push(@{$$emails_ref{$email}}, \%email_section);
-	    #$$emails_ref{$email} .= "<hr>\n".$message;
 	    $$activity_count_ref{$email}++;
 	} else {
+	    %email_section =  ( email_section => $message,
+				__FIRST__ => 1);
 	    my @array = ( \%email_section );
 	    $$emails_ref{$email} = \@array;
 	    $$activity_count_ref{$email}++;
