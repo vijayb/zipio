@@ -12,6 +12,10 @@ a:hover {
     text-decoration: none;
 }
 
+.modal-header h1, .modal-header h2, .modal-header h3 {
+    color: #000;
+}
+
 h1, h2, h3 {
     color: #ffffff;
 }
@@ -49,9 +53,8 @@ h1, h2, h3 {
     position: absolute;
     top: 35px;
     left: 0px;
-    padding: 6px;
+    padding: 3px 5px;
     color: #ffffff;
-    font-size:26px;
 }
 
 .count-number {
@@ -69,21 +72,19 @@ h1, h2, h3 {
 .albumphoto-like {
     background: rgba(0, 0, 0, 0.7);
     position: absolute;
-    top: 78px;
+    top: 70px;
     left: 0px;
-    padding: 6px;
+    padding: 3px 5px;
     color: #ffffff;
-    font-size:26px;
 }
 
 .map-marker {
     background: rgba(0, 0, 0, 0.7);
     position: absolute;
-    top: 120px;
+    top: 105px;
     left: 0px;
-    padding: 6px;
+    padding: 3px 5px;
     color: #ffffff;
-    font-size:26px;
 }
 
 .red-heart {
@@ -134,7 +135,7 @@ h1, h2, h3 {
 }
 
 .big-icon {
-    font-size: 26px;
+    font-size: 22px;
 }
 
 .albumphoto-owner {
@@ -147,16 +148,27 @@ h1, h2, h3 {
     font-size: 13px;
 }
 
-.albumphoto-caption, .albumphoto-caption-always-visible {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 6px 7px 3px 7px;
+.containing {
+    background: rgba(0, 0, 0, 0.8);
     color: #ffffff;
     font-size: 15px;
     position: absolute;
     bottom: 0px;
     left: 0px;
+    right: 0px;
 }
 
+.albumphoto-caption {
+    display: none;
+}
+
+.albumphoto-caption-always-visible {
+    display: block;
+}
+
+.albumphoto-caption-always-visible, .albumphoto-caption, .photo-controls {
+    padding: 6px 7px 3px 7px;
+}
 
 .width-fix {
     width: 100%;

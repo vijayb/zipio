@@ -664,10 +664,12 @@ function submitCaption() {
                 $("#albumphoto-caption-" + albumphotoID).html(caption);
 
                 if (caption != "") {
+                    $("#albumphoto-caption-" + albumphotoID).parent().attr("style", "");
                     $("#albumphoto-caption-" + albumphotoID).parent().addClass("albumphoto-caption-always-visible");
                     $("#albumphoto-caption-" + albumphotoID).parent().removeClass("albumphoto-caption");
                     $("#add-caption-" + albumphotoID).html('&nbsp; <i class="icon-pencil"></i> Edit');
                 } else {
+                    $("#albumphoto-caption-" + albumphotoID).parent().attr("style", "");
                     $("#albumphoto-caption-" + albumphotoID).parent().addClass("albumphoto-caption");
                     $("#albumphoto-caption-" + albumphotoID).parent().removeClass("albumphoto-caption-always-visible");
                     $("#add-caption-" + albumphotoID).html('<i class="icon-pencil"></i> Add a caption');
