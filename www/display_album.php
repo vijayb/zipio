@@ -90,7 +90,7 @@ $html = <<<HTML
 
 <div class="row-fluid">
 
-    <div class="span12" style="overflow:hidden; position:relative;">
+    <div class="span12" style="overflow:hidden; position:relative;" id="main-div">
 HTML;
 
 print($html);
@@ -605,6 +605,11 @@ $(function() {
             $("#toggle-div").css("background-color", "#222222");
         }
     );
+
+
+    $("#left-panel").css("min-height", ($(window).height() - $('#left-panel').offset().top));
+    $("#main-div").css("min-height", ($(window).height() - $('#left-panel').offset().top));
+
 
 <?php
 
