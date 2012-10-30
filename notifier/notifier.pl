@@ -102,6 +102,8 @@ my $cipher = Crypt::CBC->new(
 
 my %template_files;
 
+
+
 $template_files{1} = "./templates/add_album.tmpl"; # ACTION_ADD_ALBUM
 $template_files{2} = "./templates/add_albumphoto.tmpl"; # ACTION_ADD_ALBUMPHOTO
 $template_files{3} = "./templates/add_comment.tmpl"; # ACTION_ADD_COMMENT
@@ -140,52 +142,55 @@ while (1) {
     $sth->execute() || die "Failed DB query [$query]\n";
     my $event_id = $sth->fetchrow_array();
     if (!defined($event_id)) {
-       die "Unable to find event_id from LastNotifiedPosition table!\n";
-   }
+	die "Unable to find event_id from LastNotifiedPosition table!\n";
+    }
+    
+    print "ID of last event that has been processed: $event_id.\n";
+    
+    $query = "select * from Events where id > $event_id order by id";
+    $sth = $dbh->prepare($query);
+    $sth->execute() || die "Failed DB query [$query]\n";
+    my $event_ref;
+    my $last_event_id;
+    my %emails;
+    my %activity_count;
+    while ($event_ref = $sth->fetchrow_hashref) {
+	process_event($event_ref, \%template_files, \%emails,
+		      \%activity_count, $dbh);
+	
+	print "Event: ".$$event_ref{"id"}."\n";
+	$last_event_id = $$event_ref{"id"};
+    }
+    
+    
+    if (defined($last_event_id)) {
+	print "Last id $last_event_id\n";
+	$query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
+	$sth = $dbh->prepare($query);
+	$sth->execute() || die "Failed DB query [$query]\n";
+	
+	foreach my $email (keys %emails) {
+	    print "$email:".$activity_count{$email}."\n";
+	    #print $emails{$email},"\n";
+	    
+	    my $update = "updates";
+	    if ($activity_count{$email} == 1) {
+		$update = "update";
+	    }
 
-   print "ID of last event that has been processed: $event_id.\n";
-
-   $query = "select * from Events where id > $event_id order by id";
-   $sth = $dbh->prepare($query);
-   $sth->execute() || die "Failed DB query [$query]\n";
-   my $event_ref;
-   my $last_event_id;
-   my %emails;
-   my %activity_count;
-   while ($event_ref = $sth->fetchrow_hashref) {
-       process_event($event_ref, \%template_files, \%emails,
-        \%activity_count, $dbh);
-
-       print "Event: ".$$event_ref{"id"}."\n";
-       $last_event_id = $$event_ref{"id"};
-   }
-
-
-   if (defined($last_event_id)) {
-       print "Last id $last_event_id\n";
-       $query = "update LastNotifiedPosition set event_id=$last_event_id where id=1";
-       $sth = $dbh->prepare($query);
-       $sth->execute() || die "Failed DB query [$query]\n";
-
-       foreach my $email (keys %emails) {
-           print "$email:".$activity_count{$email}."\n";
-           print $emails{$email},"\n";
-
-           my $update = "updates";
-           if ($activity_count{$email} == 1) {
-              $update = "update";
-          }
-          $mg->send({
-              to => $email,
-              subject => "Zipio notification: $activity_count{$email} $update",
-              html => $emails{$email},
-              });
-      }
-
-      } else {
-	  print "No events to process, sleeping for $G_SLEEP_SECONDS seconds... ".time()."\n";
-	  
-      }
+	    my $template = HTML::Template->new(filename => "./templates/email_container_template.tmpl");
+	    $template->param(email_message_loop => $emails{$email});
+	    my $html = $template->output;
+	    $mg->send({
+		to => $email,
+		subject => "Zipio notification: $activity_count{$email} $update",
+		html => $html});
+	}
+	
+    } else {
+	print "No events to process, sleeping for $G_SLEEP_SECONDS seconds... ".time()."\n";
+	sleep($G_SLEEP_SECONDS);
+    }
 }
 
 
@@ -205,13 +210,15 @@ sub process_event {
 	my $message = construct_message($user_id, $event_ref,
 					$template_files_ref, $dbh);
 	#print "$message\n";
-
-
+	my %email_section = ( email_section => $message );
+	
 	if (defined($$emails_ref{$email})) {
-	    $$emails_ref{$email} .= "<hr>\n".$message;
+	    push(@{$$emails_ref{$email}}, \%email_section);
+	    #$$emails_ref{$email} .= "<hr>\n".$message;
 	    $$activity_count_ref{$email}++;
 	} else {
-	    $$emails_ref{$email} = $message;
+	    my @array = ( \%email_section );
+	    $$emails_ref{$email} = \@array;
 	    $$activity_count_ref{$email}++;
 	}
     }
@@ -224,7 +231,7 @@ sub get_users_to_notify {
     my $users_to_notify_ref = shift;
     my $event_ref = shift;
     my $dbh = shift;
-
+    
     switch ($$event_ref{"action_type"}) {
 	case 1 { # ACTION_ADD_ALBUM
 	    add_album_followers($$event_ref{"album_id"},
@@ -347,11 +354,6 @@ sub construct_message {
     my $comment;
     my $display_album_pretty_link;
     my $request = get_request($user_to_notify_id, $dbh);
-
-    #print "User to notify : ". $user_to_notify_id."\n";
-    #foreach my $key (keys %{$event_ref}) {
-#	print "$key : ".$$event_ref{$key}."\n";
-#    }
 
     my $actor_username = get_attribute($$event_ref{"actor_id"},
 				       "username", "Users", $dbh);
