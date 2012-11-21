@@ -1,15 +1,22 @@
-   <HTML>
-     <HEAD>
-     </HEAD>
-     <BODY>
-       <H1>Zipio activity notification</H1>
-         <TMPL_LOOP NAME="email_message_loop">
-	    <TMPL_UNLESS __FIRST__>
-	     	<HR>
-      	    </TMPL_UNLESS>
+<HTML>
+
+    <HEAD>
+    </HEAD>
+
+    <BODY>
+        <H1>Zipio activity notification</H1>
+
+        <TMPL_LOOP NAME="email_message_loop">
+
+            <TMPL_UNLESS __FIRST__>
+                <HR>
+            </TMPL_UNLESS>
+
             <DIV>
-               <TMPL_VAR NAME="email_section">
+                <TMPL_VAR NAME="email_section">
             </DIV>
-         </TMPL_LOOP>
-     </BODY>       
-   </HTML>
+
+        </TMPL_LOOP>
+    </BODY>
+
+</HTML>

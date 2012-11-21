@@ -387,7 +387,7 @@ HTML;
     }
 
     $html .= <<<HTML
-            <div class="comment-count">
+            <div class="comment-count big-icon">
                 <a href="javascript:void(0)" class="no-underline" onclick="showCommentsModal($albumphoto_id, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}', '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big{$is_filtered}');">
                     <i class="icon-comments"></i>
                 </a>
@@ -418,25 +418,34 @@ HTML;
         $display_like_count = "style='display:none'";
     }
     $html .= <<<HTML
-        <div id="albumphoto-like-{$albumphoto_id}" class="albumphoto-like" liked="{$liked}">
-            <a href="javascript:void(0)" class="no-underline" onclick="likeAlbumphoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
-                 <i id="albumphoto-like-heart-{$albumphoto_id}" class="icon-heart $heart_class"></i>
-            </a>
-            <a id="albumphoto-like-count-link-{$albumphoto_id}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_id});" {$display_like_count}>
-                <span id="albumphoto-like-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_likes"]}</span>
-            </a>
-        </div>
+            <div id="albumphoto-like-{$albumphoto_id}" class="albumphoto-like big-icon" liked="{$liked}">
+                <a href="javascript:void(0)" class="no-underline" onclick="likeAlbumphoto({$albumphoto_id}, {$liker_id}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}');">
+                     <i id="albumphoto-like-heart-{$albumphoto_id}" class="icon-heart $heart_class"></i>
+                </a>
+                <a id="albumphoto-like-count-link-{$albumphoto_id}" href="javascript:void(0)" class="no-underline count-number" onclick="showLikersModal({$albumphoto_id});" {$display_like_count}>
+                    <span id="albumphoto-like-count-{$albumphoto_id}">{$albumphotos_array[$i]["num_likes"]}</span>
+                </a>
+            </div>
 HTML;
 
     if (isset($albumphotos_array[$i]["latitude"]) && $albumphotos_array[$i]["longitude"]) {
         $html .= <<<HTML
-        <div id="map-marker-{$albumphoto_id}" class="map-marker">
-            <a href="javascript:void(0)" class="no-underline" onclick="showMapModal({$albumphotos_array[$i]["latitude"]},{$albumphotos_array[$i]["longitude"]});">
-                 <i id="map-marker-open-{$albumphoto_id}" class="icon-map-marker"></i>
-            </a>
-        </div>
+            <div id="map-marker-{$albumphoto_id}" class="map-marker big-icon">
+                <a href="javascript:void(0)" class="no-underline" onclick="showMapModal({$albumphotos_array[$i]["latitude"]},{$albumphotos_array[$i]["longitude"]});">
+                     <i id="map-marker-open-{$albumphoto_id}" class="icon-map-marker"></i>
+                </a>
+            </div>
+
+
 HTML;
 }
+
+
+    $html .= <<<HTML
+
+            <div class="containing">
+
+HTML;
 
 
     // If there IS a caption -------------------------------------------------//
@@ -446,17 +455,17 @@ HTML;
         $edit_caption_string = "";
         if ($is_owner || $is_collaborator) {
             $edit_caption_string = <<<HTML
-                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
-                    &nbsp; <i class="icon-pencil"></i> Edit
-                </a>
+                    <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                        &nbsp; <i class="icon-pencil"></i> Edit
+                    </a>
 HTML;
         }
 
         $html .= <<<HTML
-            <div class="albumphoto-caption-always-visible">
-                <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
-                {$edit_caption_string}
-            </div>
+                <div class="albumphoto-caption-always-visible">
+                    <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
+                    {$edit_caption_string}
+                </div>
 HTML;
     } else {
 
@@ -465,16 +474,16 @@ HTML;
         $edit_caption_string = "";
         if ($is_owner || $is_collaborator) {
             $edit_caption_string = <<<HTML
-                <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
-                    <i class="icon-pencil"></i> Add a caption
-                </a>
+                        <a id="add-caption-{$albumphotos_array[$i]["id"]}" href="javascript:void(0)" onclick="showCaptionModal({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["photo_owner_id"]}, '{$albumphotos_array[$i]["s3_url"]}_cropped{$is_filtered}')" class="no-underline">
+                            <i class="icon-pencil"></i> Add a caption
+                        </a>
 HTML;
 
             $html .= <<<HTML
-            <div class="albumphoto-caption">
-                <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
-                {$edit_caption_string}
-            </div>
+                <div class="albumphoto-caption">
+                    <span id="albumphoto-caption-{$albumphotos_array[$i]["id"]}">{$albumphotos_array[$i]["caption"]}</span>
+                    {$edit_caption_string}
+                </div>
 HTML;
 
 
@@ -482,10 +491,113 @@ HTML;
 
     }
 
+
+
+
+
+
+
+
+
+
+    if ($is_owner || $is_collaborator) {
+        $html .= <<<HTML
+            <div class="photo-controls" style="display:none;  margin:3px 0px;">
+
+                <div rel="tooltip" title="Post to Facebook" class="btn ttip btn-inverse" onclick="showFacebookModal('{$album_owner_info["username"]}', '{$album_info["handle"]}', {$albumphoto_id});">
+                    <i class="icon-facebook"></i>
+                </div>
+
+                <div class="btn-group" style="float:right; margin-left:5px;">
+                    <button rel="tooltip" title="Filters" id="filter-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown" data-loading-text="Filtering...">
+                         <i class="icon-beaker"></i> <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right">
+                        <li>
+                            <a href="javascript:void(0);" onclick="resetPhotoToOriginal({$albumphoto_id},
+                                                                                        '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped',
+                                                                                        '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big');">
+                                <i class="icon-undo"></i> Back to Original
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 1);">Hoppe</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 2);">Hayek</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 3);">Sowell</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 4);">Spooner</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 5);">Paul</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 6);">Walter</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 7);">Mises</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 8);">Menger</a></li>
+                        <li><a href="javascript:void(0);" onclick="applyFilter({$albumphoto_id}, '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg', 10);">Rothbard</a></li>
+                    </ul>
+                </div>
+                <button id="save-{$albumphoto_id}" class="btn btn-primary" href="#" style="float:right; margin-left:5px; display:none" onclick="saveFiltered({$albumphoto_id},
+                                                                                                                               '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_cropped&mime_type=image/jpeg',
+                                                                                                                               '{$g_www_root}/proxy.php?url={$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big&mime_type=image/jpeg',
+                                                                                                                               '{$g_s3_root}/{$albumphotos_array[$i]["s3_url"]}_big'
+                                                                                                                               );">
+                    Save
+                </button>
+
+
+
+                <div class="btn-group" style="float:right;">
+                    <button rel="tooltip" title="Options" id="options-{$albumphoto_id}" class="btn btn-inverse dropdown-toggle ttip" data-toggle="dropdown">
+                        <i class="icon-wrench"></i> <i class="icon-sort-down icon-white"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right">
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(0, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-undo"></i> Rotate left
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="rotatePhoto(1, {$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');">
+                                <i class="icon-repeat"></i> Rotate right
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="setAsAlbumCover({$albumphotos_array[$i]["id"]}, {$albumphotos_array[$i]["album_id"]}, '{$albumphotos_array[$i]["token"]}');">
+                                <i class="icon-picture"></i> Set as album cover
+                            </a>
+                        </li>
+
+
+                        <li>
+                            <a href="javascript:void(0);" onclick="if (confirm('Really delete this photo?')) {
+                                                                            deletePhotoFromAlbum({$albumphotos_array[$i]["id"]}, '{$albumphotos_array[$i]["token"]}', '{$albumphotos_array[$i]["s3_url"]}');
+                                                                        }">
+                                <i class="icon-trash"></i> Delete this photo
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
+HTML;
+    }
+
+
+
+
+
+
+
+
     $html .= <<<HTML
+
+
+            </div>
+
             <div id="cover-{$albumphoto_id}" style="position:absolute; top:0px; left:0px; width:100%; height:100%; background-color:black; opacity:0.7; text-align:center; display:none;">
                 <span id="cover-message-{$albumphoto_id}" style="position:relative; top:45%; color:#ffffff; font-size:26px;">Saving...</span>
             </div>
+
 
         </div>
 HTML;
@@ -597,6 +709,8 @@ $(function() {
         $(".ttip").tooltip();
     }
 
+
+
     $("#toggle-div").hover(
         function() {
             $("#toggle-div").css("background-color", "#333333");
@@ -605,6 +719,41 @@ $(function() {
             $("#toggle-div").css("background-color", "#222222");
         }
     );
+
+
+
+
+
+
+
+    $(".tile").each(function(index) {
+        $(this).mouseenter(function() {
+            $(this).find(".albumphoto-caption").stop(true, true).show();
+        });
+        $(this).mouseleave(function() {
+            $(this).find(".albumphoto-caption").stop(true, true).fadeOut();
+        });
+    });
+
+
+    $(".tile").each(function(index) {
+        $(this).mouseenter(function() {
+            $(this).find(".tile-options, .photo-controls").stop(true, true).show();
+        });
+        $(this).mouseleave(function() {
+            $(this).find(".tile-options, .photo-controls").stop(true, true).fadeOut();
+        });
+    });
+
+
+
+
+
+
+
+
+
+
 
 
     $("#left-panel").css("min-height", ($(window).height() - $('#left-panel').offset().top));

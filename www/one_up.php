@@ -134,7 +134,7 @@ $html = <<<HTML
 
 <div class="row-fluid">
     <div class="span9"
-         style="background-color:#111111; text-align:center; margin-bottom:10px; position:relative"
+         style="background-color:#000000; text-align:center; margin-bottom:10px; position:relative"
          id="one-up-photo"
          albumphoto-id="{$albumphoto_info["id"]}"
          albumphoto-s3="{$albumphoto_info["s3_url"]}_big{$is_filtered}">
