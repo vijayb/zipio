@@ -182,12 +182,13 @@ while (1) {
 	    $template->param(email_message_loop => $emails{$email});
 	    my $html = $template->output;
 	    print "$html\n";
-	    #$mg->send({
-	#	to => $email,
-	#	subject => "Zipio notification: $activity_count{$email} $update",
-	#	html => $html});
+	    if ($G_DEBUG == 0) {
+		$mg->send({
+		    to => $email,
+		    subject => "Zipio notification: $activity_count{$email} $update",
+		    html => $html});
+	    }
 	}
-	
     } else {
 	print "No events to process, sleeping for $G_SLEEP_SECONDS seconds... ".time()."\n";
 	sleep($G_SLEEP_SECONDS);
@@ -237,7 +238,8 @@ sub get_users_to_notify {
     switch ($$event_ref{"action_type"}) {
 	case 1 { # ACTION_ADD_ALBUM
 	    add_album_followers($$event_ref{"album_id"},
-				$users_to_notify_ref);
+				$users_to_notify_ref,
+				$dbh);
 	}
 	case 2 { # ACTION_ADD_ALBUMPHOTO
 	    $$users_to_notify_ref{$$event_ref{"album_owner_id"}} = 1;
