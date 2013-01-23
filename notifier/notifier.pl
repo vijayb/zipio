@@ -29,7 +29,7 @@ if (!defined($ip) || $ip eq "127.0.0.1") {
 }
 
 
-# Get arguments to determin if we're in debug mode (default) or production mode
+# Get arguments to determine if we're in debug mode (default) or production mode
 # (use: --production)
 my $G_DEBUG;
 my $G_SLEEP_SECONDS = 180;
@@ -48,6 +48,8 @@ if (!defined($G_DEBUG)) {
     }
 }
 
+
+# Make sure no other instance of the notifier is running:
 my $pid = $$;
 my $t = new Proc::ProcessTable;
 
@@ -411,7 +413,13 @@ sub construct_message {
 
     switch ($$event_ref{"action_type"}) {
 	case 1 { # ACTION_ADD_ALBUM
-
+	    $template->param(actor_username => $actor_username);
+	    $template->param(album_owner_username => $album_owner_username);
+	    $template->param(album_handle => $album_handle);
+	    $template->param(request => $request);
+	    $template->param(g_s3_root => $G_S3_ROOT);
+	    $template->param(albumphoto_s3 => $albumphoto_s3);
+	    $template->param(web_root => $G_WWW_ROOT);
 	}
 	case 2 { # ACTION_ADD_ALBUMPHOTO
 	    $template->param(actor_username => $actor_username);

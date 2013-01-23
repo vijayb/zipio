@@ -236,7 +236,7 @@ function create_album($user_id, $handle) {
 }
 
 function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id,
-                        $visible, $path_to_photo, $caption, &$s3_url_parameter) {
+                        $visible, $path_to_photo, $caption, &$s3_url_parameter, $is_new_album) {
 
     // $owner_user_id: the user who sends the email with the photo attached
     // $target_album_id: the album this photo will be added to
@@ -396,7 +396,9 @@ function add_albumphoto($owner_user_id, $target_album_id, $target_album_owner_id
         if (!$result) die('Invalid query in ' . __FUNCTION__ . ': ' .
                           $query . " - " . mysql_error());
         $albumphoto_id = mysql_insert_id();
-        add_event($owner_user_id, ACTION_ADD_ALBUMPHOTO, $target_album_id, $albumphoto_id, NULL, $target_album_owner_id, $owner_user_id, NULL);
+        if (!$is_new_album) {
+            add_event($owner_user_id, ACTION_ADD_ALBUMPHOTO, $target_album_id, $albumphoto_id, NULL, $target_album_owner_id, $owner_user_id, NULL);
+        }
         return $albumphoto_id;
 
     } else {

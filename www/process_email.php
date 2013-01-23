@@ -189,7 +189,7 @@ if ($target_album_id > 0) {
         output("TIME 6.1: " . (time() - $start_time) . "\n");
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
-            add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url);
+            add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url, 0);
             array_push($s3_urls, $s3_url);
         }
         output("TIME 6.2: " . (time() - $start_time) . "\n");
@@ -226,7 +226,7 @@ EMAIL;
             output("User " . $user_info["username"] . " is an access of album with ID $target_album_id.\n");
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
-                add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url);
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url, 0);
                 array_push($s3_urls, $s3_url);
             }
             // email_newly_added_photos_to_collaborators($target_album_info, $user_info, $s3_urls);
@@ -261,7 +261,7 @@ EMAIL;
             // Add photo as invisible and send an email to the owner
             for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
                 $s3_url = "";
-                add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $caption, $s3_url);
+                add_albumphoto($user_id, $target_album_id, $target_user_id, 0, $paths_to_photos[$i], $caption, $s3_url, 0);
                 array_push($s3_urls, $s3_url);
             }
             // We don't email collaborators about these photos because the
@@ -320,7 +320,7 @@ EMAIL;
 
         for ($i = 0; $i < $num_photos_attached = $_POST["attachment-count"]; $i++) {
             $s3_url = "";
-            $current_albumphoto_id = add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url);
+            $current_albumphoto_id = add_albumphoto($user_id, $target_album_id, $target_user_id, 1, $paths_to_photos[$i], $caption, $s3_url, 1);
             array_push($s3_urls, $s3_url);
             if ($i == 0) {
                 // Set the first photo as the cover photo
